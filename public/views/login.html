@@ -1,0 +1,40 @@
+<div layout="row" layout-align="center center" class="login-box">
+    <div>
+     <form ng-submit="login()">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Login <div class="invalid"> {{loginStatus}} </div></span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content layout="column">
+            <md-input-container>
+              <label>Email</label>
+              <input ng-model="user.username" type="email" required></input>
+            </md-input-container>
+            <md-input-container>
+              <label>Password</label>
+              <input ng-model="user.password" type="password" required></input>
+            </md-input-container>
+        </md-card-content>
+
+        <md-card-actions layout="row" layout-align="start">
+          <md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+          <md-button>Forgot password</md-button>
+        </md-card-actions>
+      
+        <md-divider></md-divider>
+
+        <md-card-actions layout="column">
+          <md-button class="md-primary md-hue-1" ng-href="/auth/google">Google</md-button>
+          <md-button class="md-primary md-hue-1" ng-href="/auth/github">Github</md-button>
+        </md-card-actions>
+      </md-card>
+    </form>
+    </div>
+  </div>
+
+  <div layout="row" layout-align="center center">
+ <h2>Need an account?</h2>
+      <md-button class="md-raised md-warn" ng-href="#/signup">Sign up</button>
+</div>

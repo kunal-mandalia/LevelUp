@@ -1,0 +1,11 @@
+<h1>Admin</h1>
+<p>
+	<a href="#/">Home</a><br />
+	<a href="#/" ng-click="logout()">Logout</a>
+</p>
+<h2>User List</h2>
+<ul>
+	<li ng-repeat="u in users">{{u.name}}</li>
+</ul>
+<h1>Welcome back, {{user.displayName}}</h1>
+<p>Your email address is {{user.emails.value}}</p>

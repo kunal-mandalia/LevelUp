@@ -1,0 +1,61 @@
+<div class="page">
+
+<div layout="row" layout-align="center center" layout-wrap>
+  <form ng-submit="signup()">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Sign up <div ng-class="{ newSocialUser: signupNotification == 'Almost there', newUserError: signupNotification !== 'Almost there' }">{{signupNotification}}</div></span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="column">
+          <md-input-container>
+            <label>First name</label>
+            <input ng-model="newUser.firstName" type="text" required></input>
+          </md-input-container>
+          <md-input-container>
+            <label>Last name</label>
+            <input ng-model="newUser.lastName" type="text" required></input>
+          </md-input-container>
+          <md-input-container>
+            <label>Email address</label>
+            <input ng-model="newUser.email" type="email" required></input>
+          </md-input-container>
+          <md-input-container>
+            <label>Password</label>
+            <input ng-model="newUser.password1" type="password" required></input>
+          </md-input-container>
+          <md-input-container>
+            <label>Confirm password</label>
+            <input ng-model="newUser.password2" type="password" required></input>
+          </md-input-container>
+      </md-card-content>
+      <md-card-actions layout="column" layout-align="start">
+        <md-button class="md-raised md-primary" ng-click="registerUser()">Sign up</md-button>
+      </md-card-actions>
+    </md-card>
+  </form>
+
+  <div>
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Social sign up</span>
+        </md-card-title-text>
+      </md-card-title>
+
+      <md-card-actions layout="column">
+        <md-button class="md-primary md-hue-1" ng-href="/auth/google">Google</md-button>
+        <md-button class="md-primary md-hue-1" ng-href="/auth/github">Github</md-button>
+      </md-card-actions>
+
+    </md-card>
+  </div>
+</div>
+
+<div layout="row" layout-align="center center" hide-xs>
+ <div hide-sm><h2>Already signed up?</h2></div>
+      <md-button class="md-raised md-warn" ng-href="#/login">Login</button>
+</div>
+
+</div>

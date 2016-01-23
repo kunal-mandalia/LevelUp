@@ -1,0 +1,48 @@
+body {
+	background-color: rgba(235,235,235,1);
+	/*background-image: url("/images/minimalism_gradient_glow_blue.jpg");
+	background-size:cover;*/
+}
+
+.menu-icon {
+	fill: white;
+}
+
+.login-box {
+	padding-top: 2em;
+	padding-bottom: 2em;
+}
+
+.menu-toolbar {
+	/*background-color:rgba(63, 81, 181, 0.25) !important;*/
+}
+
+.signup-box {
+	/*min-width: 300px;*/
+	/*max-width: 600px;*/
+	width: 350px;
+}
+
+.main-selling-point{
+	font-weight: bold;
+    font-size: xx-large;
+    text-align: center;
+    margin-top: 100px;
+    padding: 10px;
+}
+
+.invalid {
+  color: red;
+}
+
+.newSocialUser {
+  color: green;
+}
+
+.newUserError {
+  color: red;
+}
+
+.page{
+	background-color: rgba(235,235,235,1);
+}
