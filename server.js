@@ -92,7 +92,7 @@ passport.use(new GithubStrategy({
     //
     var options = {
       headers: {
-        'User-Agent': 'MEANT',
+        'User-Agent': 'LevelUp',
         'Authorization': 'token ' + accessToken
       },
       json:    true,
@@ -141,11 +141,7 @@ passport.use(new GithubStrategy({
         console.log('github user found : ' + profile.emails[0].value);
         return done(null, user, null);
       });
-
-
     });
-      //
-      // 
     });
   }
 ));
