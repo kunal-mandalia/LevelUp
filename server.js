@@ -5,7 +5,7 @@ var routes = require('./app/routes.js');
 var mongoose  = require('mongoose');
 var request = require('request');
 var auth = require('./app/models/auth.js');
-var env = require('./config/environmentVariables.js');
+var envVars = require('./config/environmentVariables.js');
 var User = require('./app/models/user.js');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
@@ -16,7 +16,7 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var GithubStrategy = require('passport-github').Strategy;
 var passportConfig = require('./config/passportConfig.js');
 
-mongoose.connect(env.db);
+mongoose.connect(envVars.db);
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
@@ -159,7 +159,7 @@ passport.deserializeUser(function(user, done) {
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', envVars.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon()); // TODO: change favicon
@@ -187,6 +187,9 @@ if ('development' == app.get('env')) {
 //load routes
 routes(app, User, bcrypt);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+app.listen(envVars.port);
+console.log('LevelUp running on port ' + envVars.port);
+console.log('Db is at ' + envVars.db);
+// http.createServer(app).listen(app.get('port'), function(){
+//   console.log('Express server listening on port ' + app.get('port'));
+// });
