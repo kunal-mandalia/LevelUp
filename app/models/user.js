@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 
 var userSchema = mongoose.Schema({
-
 	email 				: { type: String, unique: true },
 	password			: String,
 	firstname 			: String, 
-	lastname		 	: String
+	lastname		 	: String,
+	public				: Boolean
 });
 
 userSchema
@@ -14,6 +14,5 @@ userSchema
 	return this.firstname + ' ' + this.lastname;
 });
 
-
-// create the model for users and expose it to our app
+// create the model for user and expose it to our app
 module.exports = mongoose.model('User', userSchema);
