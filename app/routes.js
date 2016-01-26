@@ -1,7 +1,7 @@
 var auth = require('./models/auth.js');
 var passport = require('passport');
 
-module.exports = function(app, User, bcrypt) {
+module.exports = function(app, User, Goal, bcrypt) {
 
 	app.get('/', function(req, res){
 	  res.render(__dirname + '/views/index.ejs', { title: 'Express' });
@@ -96,7 +96,7 @@ module.exports = function(app, User, bcrypt) {
 							}
 							else {
 								
-								var newUser = new User({ firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email, password: hash });
+								var newUser = new User({ first_name: req.body.firstName, last_name: req.body.lastName, email: req.body.email, password: hash, public: false });
 								newUser.save(function (err, user) {
 								  if (err) {
 								  	res.status(400);
@@ -122,4 +122,46 @@ module.exports = function(app, User, bcrypt) {
 			});
 		}
 	});
+
+	// goals api
+	app.get('/api/v1/goal/:id', auth, function(req, res){
+		//get currently logged in user id
+		Goal.findOne({ _userid: req.user._id, _id: req.params.id}, function(err, goal){
+			if (err){return res.send(err);}
+
+			return res.send(JSON.stringify(goal));
+		});
+	});
+
+	app.post('/api/v1/goal', auth, function(req, res){
+		//get currently logged in user id through req.user._id
+		var goal = new Goal({ _userid: req.user._id, description: req.body.description, due: req.body.due, status: req.body.status, public: req.body.public });
+		goal.save(function (err, createdGoal) {
+		  if (err){
+		  	res.status(400);
+		  	res.send('Server error');
+		  }
+
+		  return res.send(JSON.stringify(createdGoal));
+		});
+	});
+
+	app.put('/api/v1/goal/:id', auth, function(req, res){
+		// only update fields set in req.body
+		Goal.update({ _userid: req.user._id, _id: req.params.id }, { $set: req.body }, function(err, rawResponse){
+			if (err){ return res.send(err);}
+
+			return res.send('Updated goal : ' + JSON.stringify(rawResponse));
+		});
+	});
+
+	app.delete('/api/v1/goal/:id', auth, function(req, res){
+		//only authorized user may delete goal
+		Goal.findOneAndRemove({ _userid: req.user._id, _id: req.params.id}, function(err){
+			if (err){ return res.send(err);}
+
+			return res.send('Removed goal');
+		});
+	});
+
 };

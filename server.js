@@ -4,11 +4,13 @@ var path = require('path');
 var routes = require('./app/routes.js');
 var mongoose  = require('mongoose');
 var request = require('request');
-var auth = require('./app/models/auth.js');
-var envVars = require('./config/environmentVariables.js');
-var User = require('./app/models/user.js');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
+
+var envVars = require('./config/environmentVariables.js');
+var auth = require('./app/models/auth.js');
+var User = require('./app/models/user.js');
+var Goal = require('./app/models/goal.js');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -185,7 +187,7 @@ if ('development' == app.get('env')) {
 }
 
 //load routes
-routes(app, User, bcrypt);
+routes(app, User, Goal, bcrypt);
 
 app.listen(envVars.port);
 console.log('LevelUp running on port ' + envVars.port);
