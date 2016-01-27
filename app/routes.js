@@ -7,14 +7,6 @@ module.exports = function(app, User, Goal, bcrypt) {
 	  res.render(__dirname + '/views/index.ejs', { title: 'Express' });
 	});
 
-	app.get('/users', auth, function(req, res){
-	  res.send([{name: "user1"}, {name: "user2"}]);
-	});
-
-	//api to be called from angular
-	app.get('/api/me', auth, function(req, res){
-		res.send(req.user.email);
-	});
 	//==================================================================
 
 	//==================================================================
@@ -123,7 +115,20 @@ module.exports = function(app, User, Goal, bcrypt) {
 		}
 	});
 
+	//api to be called from angular
+	app.get('/api/v1/me', auth, function(req, res){
+		res.send(req.user.email);
+	});
+
 	// goals api
+	app.get('/api/v1/goal', auth, function(req, res){
+		Goal.find({ _userid: req.user._id }, function(err, goal){
+			if (err){return res.send(err);}
+
+			return res.send(goal);
+		});
+	});
+
 	app.get('/api/v1/goal/:id', auth, function(req, res){
 		//get currently logged in user id
 		Goal.findOne({ _userid: req.user._id, _id: req.params.id}, function(err, goal){

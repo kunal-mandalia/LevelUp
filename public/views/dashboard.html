@@ -2,7 +2,14 @@
 <div layout="row" layout-align="center center">
 	<md-card flex="95" flex-gt-sm="80">
 	    <md-card-content>
-	      <h2>Welcome back {{me.email}}</h2>
+	      <h4>Welcome back</h4> {{me.email}}
+
+	      <h4>Goals</h4>
+	      <div ng-repeat="g in goal">
+	      	{{g.description}} - {{g.status}}
+	      	<br/>
+	      </div>
+	      <br/>
 	      <md-button href="#/login" ng-click="logout()">Logout</md-button>
 	    </md-card-content>
   	</md-card>

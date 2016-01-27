@@ -147,15 +147,17 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserDetails, $scope, $http) {
+app.controller('DashboardCtrl', function(UserFactory, GoalFactory, $scope, $http) {
   // List of users got from the server
   $scope.users = [];
   $scope.me = [];
+  $scope.goal = [];
 
   getMyDetails();
+  getGoals();
 
     function getMyDetails() {
-        UserDetails.getMyDetails()
+        UserFactory.getMyDetails()
             .success(function (me) {
                 // $scope.customers = custs;
                 $scope.me.email = me;
@@ -165,6 +167,19 @@ app.controller('DashboardCtrl', function(UserDetails, $scope, $http) {
                 $scope.status = 'Unable to load customer data: ' + error.message;
             });
     }
+
+    function getGoals(){
+        GoalFactory.get()
+          .success(function(goal){
+            $scope.goal = goal;
+          })
+          .error(function(error){
+            $scope.status = 'Unable to load goal: ' + error.message;
+          })
+    }
+
+    // function getActions()
+    // foreach goal in goals...
 });
 
 /**********************************************************************
@@ -201,12 +216,22 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
 
 
 //factory
-app.factory('UserDetails', function($http) {
+app.factory('UserFactory', function($http) {
      
     var factory = {};
     return {
         getMyDetails: function() {
-            return $http.get('/api/me');
+            return $http.get('/api/v1/me');
+        }
+    };
+});
+
+app.factory('GoalFactory', function($http) {
+     
+    var factory = {};
+    return {
+        get: function() {
+            return $http.get('/api/v1/goal');
         }
     };
 });
