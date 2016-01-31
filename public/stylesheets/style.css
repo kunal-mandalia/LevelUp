@@ -46,3 +46,57 @@ body {
 .page{
 	background-color: rgba(235,235,235,1);
 }
+
+.goal-due{
+	padding-left: 8px;
+}
+
+.goal-card-icon{
+	opacity: 0.7;
+	/*fill: royalblue;*/
+}
+
+.small-pad-left{
+	padding-left: 5px;
+}
+
+.medium-pad-left{
+	padding-left: 10px;
+}
+
+.small-pad-right{
+	padding-right: 1em;
+}
+.small-pad-left-right{
+	padding: 1em;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+.small-pad-top{
+	padding-top: 1em;
+}
+
+.small-pad-top-bottom{
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+.graph-placeholder{
+	background-color: #FFFCE4;
+	min-height: 80px;
+	min-width: 250px;
+	margin-left: 1em;
+}
+
+.progress-minus{
+	background-color: #F7F6F6;
+}
+
+.action-info{
+	background-color: #FFFCE4;
+}
+
+.progress-plus{
+	background-color: #B3FFAA;
+}

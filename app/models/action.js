@@ -1,14 +1,15 @@
 var mongoose = require('mongoose');
 
 var actionSchema = mongoose.Schema({
-	_goalid			: String, // Use objectId instead?
+	_goalid			: String,
     public			: Boolean,
     verb 			: String,
     verb_quantity	: Number,
-    verb_unit 		: String,
     noun			: String,
     period 			: String,
-    expire 			: Date
+    due 			: Date,
+    date_created    : { type: Date, default: Date.now },
+    date_modified   : { type: Date, default: Date.now }
 });
 
 // create the model for goal and expose it to our app

@@ -5,7 +5,9 @@ var goalSchema = mongoose.Schema({
 	description			: String,
     due					: Date,
     status				: String, // {Open, Closed - goal achieved, Closed - goal not achieved},
-    public				: Boolean
+    public				: Boolean,
+    date_created		: { type: Date, default: Date.now },
+    date_modified		: { type: Date, default: Date.now }
 });
 
 // create the model for goal and expose it to our app

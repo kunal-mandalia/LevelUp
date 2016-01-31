@@ -5,7 +5,9 @@ var userSchema = mongoose.Schema({
 	password			: String,
 	first_name 			: String, 
 	last_name		 	: String,
-	public				: Boolean
+	public				: Boolean,
+	date_created		: { type: Date, default: Date.now },
+    date_modified		: { type: Date, default: Date.now }
 });
 
 userSchema

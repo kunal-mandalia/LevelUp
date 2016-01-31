@@ -147,14 +147,21 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalFactory, $scope, $http) {
+app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, $scope, $http) {
   // List of users got from the server
-  $scope.users = [];
+  //$scope.users = [];
   $scope.me = [];
   $scope.goal = [];
+  $scope.action = [];
+  $scope.progress = [];
+
+  $scope.currentDate = new Date(Date.now());
+  $scope.daysLeft = -1;
+  $scope.currentProgress = -1;
+  $scope.currentPeriodDeadline = new Date();
 
   getMyDetails();
-  getGoals();
+  getGoalsActionsProgress();
 
     function getMyDetails() {
         UserFactory.getMyDetails()
@@ -168,18 +175,93 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, $scope, $http
             });
     }
 
-    function getGoals(){
-        GoalFactory.get()
-          .success(function(goal){
-            $scope.goal = goal;
-          })
-          .error(function(error){
-            $scope.status = 'Unable to load goal: ' + error.message;
-          })
+    // function getGoals(){
+    //     GoalFactory.get()
+    //       .success(function(goal){
+    //         $scope.goal = goal;
+    //       })
+    //       .error(function(error){
+    //         $scope.status = 'Unable to load goal: ' + error.message;
+    //       })
+    // }
+
+    function getGoalsActionsProgress(){
+
+      GoalActionProgressFactory.get()
+        .success(function(goalActionProgress){
+          $scope.goal = goalActionProgress[0];
+          $scope.action = goalActionProgress[1];
+          $scope.progress = goalActionProgress[2];
+
+        /*
+          Do the heavy lifting clientside - categorising progress into period buckets
+          what info do we need from Progress?
+
+          Component: Current period progress
+            Output: Sum of progress filtered for current period over target progress for current period
+            Input: Target progress per period (source: action.verb_quantity)
+
+          Component: Days remaining
+            Output: Days remaining
+            Input: start_date, period_length, today.
+
+          Component: Progress chart
+            Output: progress per period and target. Progress coded to green or red if target met or missed respectively
+            Input: 
+        */
+
+          $scope.daysRemainingForPeriod = function(startDate, compareDate, periodLengthDays){
+            var periodLengthMilliseconds = periodLengthDays * 86400000;
+
+            var startDate = new Date(startDate);
+            var startDateMilliseconds = startDate.getTime();
+            var compareDateMilliseconds = compareDate.getTime();
+
+            var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
+            var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/86400000);
+            $scope.daysLeft = daysRemaining;
+            $scope.currentPeriodDeadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
+
+
+            //return daysRemaining;
+          }
+
+          $scope.currentPeriodProgress = function(startDate, compareDate, periodLengthDays, actionId){
+            // 1. calculate a start and end date range for current period
+            var progressArray = $scope.progress;
+            var periodLengthMilliseconds = periodLengthDays * 86400000;
+            var startDate = new Date(startDate);
+            var startDateMilliseconds = startDate.getTime();
+            var compareDateMilliseconds = compareDate.getTime();
+
+            var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
+            var totalPeriodsExcludingCurrent = totalPeriodsIncludingCurrent - 1; // if totalPeriodsIncludingCurrent = 0?
+
+            var startCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsExcludingCurrent));
+            var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
+            var progressCount = 0;
+
+            // 2. iterate through descendingly sorted progressArray 
+            for (var i = 0; i < progressArray.length; i++) {
+              // sum progress counters falling within current period
+              if ((startCurrentPeriod <= progressArray[i].date_created <= endCurrentPeriod) && progressArray[i]._actionid == actionId){
+                progressCount += progressArray[i].counter;
+              }
+              else {
+                break;
+              }
+            };
+            // 3. return sum of the progress counters
+            $scope.currentProgress = progressCount;
+            // return progressCount;
+          }
+          console.log(goalActionProgress);
+        })
+        .error(function(error){
+          $scope.status = 'Unable to load goals/actions: ' + error.message;
+        })
     }
 
-    // function getActions()
-    // foreach goal in goals...
 });
 
 /**********************************************************************
@@ -234,4 +316,27 @@ app.factory('GoalFactory', function($http) {
             return $http.get('/api/v1/goal');
         }
     };
+});
+
+app.factory('GoalActionProgressFactory', function($http) {
+     
+    var factory = {};
+    return {
+        get: function() {
+            return $http.get('/api/v1/goalsActionsProgress');
+        }
+    };
+});
+
+// http://stackoverflow.com/questions/29989200/angular-calculate-percentage-in-the-html
+app.filter('percentage', ['$filter', function ($filter) {
+  return function (input, decimals) {
+    return $filter('number')(input * 100, decimals) + '%';
+  };
+}]);
+
+app.filter('daysRemainingDescription', function() {
+  return function(daysLeft) {
+    return (daysLeft == 1) ? 'day left' : 'days left';
+  };
 });

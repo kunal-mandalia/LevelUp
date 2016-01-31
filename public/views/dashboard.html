@@ -1,16 +1,63 @@
-<!--restricted user specific content -->
-<div layout="row" layout-align="center center">
-	<md-card flex="95" flex-gt-sm="80">
-	    <md-card-content>
-	      <h4>Welcome back</h4> {{me.email}}
 
-	      <h4>Goals</h4>
-	      <div ng-repeat="g in goal">
-	      	{{g.description}} - {{g.status}}
-	      	<br/>
-	      </div>
-	      <br/>
-	      <md-button href="#/login" ng-click="logout()">Logout</md-button>
-	    </md-card-content>
-  	</md-card>
+<div ng-repeat="g in goal" >
+	<div layout="row" layout-align="center center" layout-wrap class="page">
+
+		<md-card layout-xs="95" flex="80" layout-wrap>
+		<md-card-content>
+		<div layout="column">
+			<div layout="row" layout-align="start center">
+				<div class="md-headline"> {{g.description}} by {{ g.due | date}}</div>
+
+				<div flex layout="row" layout-align="end center">
+					<!-- <div class="md-caption goal-due"> {{ g.due | date}} </div> -->
+
+					<md-button class="md-icon-button goal-card-icon" aria-label="Less">
+					<ng-md-icon icon="arrow_drop_up"></ng-md-icon>
+				</md-button>
+		</div>
+	</div>
+
+	<div ng-repeat="a in action | filter:{ _goalid: g._id}:true">
+	<span layout="row"><hr flex/><hr flex/></span>
+
+		<div layout="row" layout-align="start center" class="small-pad-top">
+			<div layout="column" layout-align="start start" class="small-pad-right">
+
+				<md-button class="md-icon-button goal-card-icon progress-plus" aria-label="Up progress">
+					<ng-md-icon icon="keyboard_arrow_up"></ng-md-icon>
+				</md-button>
+
+				<md-button class="md-icon-button goal-card-icon progress-minus" aria-label="Down progress">
+					<ng-md-icon icon="keyboard_arrow_down"></ng-md-icon>
+				</md-button>
+			</div>
+
+	<div layout="column" class="small-pad-left-right action-info" layout-align="center center">
+		<div class="md-headline">{{currentPeriodProgress(a.date_created, currentDate, 30, a._id)}} {{ currentProgress }}/{{a.verb_quantity}}</div>
+		<!-- {{ [a._id, progress[0]._id, 'dude'] | testFilter | filter:{ _actionid: a._id} }} -->
+		<div>{{ currentProgress/a.verb_quantity | percentage:0 }}</div>
+	</div>
+	<div layout="column" class="small-pad-left-right action-info" layout-align="center center">
+		<div layout="row" layout-align="center center">
+			<div class="md-headline"> {{ daysRemainingForPeriod(a.date_created, currentDate, 30) }} {{ daysLeft }}</div>
+			<div class="small-pad-left">{{ daysLeft | daysRemainingDescription}}</div>
+		</div>
+		<div>{{ currentPeriodDeadline | date: 'MMM d'}}</div>
+	</div>
+	<div flex class="graph-placeholder"></div>
+</div>
+<div layout="row" class="small-pad-top-bottom">
+	<div flex layout="row" layout-align="center center">{{a.verb}} {{a.verb_quantity}} {{a.noun}} {{a.period}} until {{a.due | date}}</div>
+</div>
+
+</div>
+</div>
+</div>
+</md-card-content>
+</md-card>
+</div>
+</div>
+
+<div class="page">
+<md-button href="#/login" ng-click="logout()">Logout</md-button>
 </div>

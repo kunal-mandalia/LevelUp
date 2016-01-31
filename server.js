@@ -11,6 +11,8 @@ var envVars = require('./config/environmentVariables.js');
 var auth = require('./app/models/auth.js');
 var User = require('./app/models/user.js');
 var Goal = require('./app/models/goal.js');
+var Action = require('./app/models/action.js');
+var Progress = require('./app/models/progress.js');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -187,7 +189,7 @@ if ('development' == app.get('env')) {
 }
 
 //load routes
-routes(app, User, Goal, bcrypt);
+routes(app, User, Goal, Action, Progress, bcrypt);
 
 app.listen(envVars.port);
 console.log('LevelUp running on port ' + envVars.port);

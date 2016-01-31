@@ -1,12 +1,14 @@
 var mongoose = require('mongoose');
 
-var historySchema = mongoose.Schema({
-    _actionid		: String
-    progress		: Number,
-    date_modified	: Date,
+var progressSchema = mongoose.Schema({
+    _actionid		: String,
+    counter			: Number,
+    comment 		: String, 
+    date_created	: { type: Date, default: Date.now },
+    date_modified	: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('History', historySchema);
+module.exports = mongoose.model('Progress', progressSchema);
 
 /*
 	Let the client handle rendering data - e.g. grouping into periods
