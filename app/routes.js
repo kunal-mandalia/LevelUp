@@ -248,6 +248,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			return res.send('Document removed');
 		});
 	});
+
 	// PROGRESS API
 	app.post('/api/v1/progress', auth, function(req, res){
 		// 1. find action (to attach progress to) [TODO: and ensure it belongs to current user]
@@ -265,12 +266,22 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			}
 
 			// action found
-			//Todo: check action belongs to current user
+			// TODO: check action belongs to current user
+
+
+			console.log( JSON.stringify(action));
+
+			var now = new Date(Date.now());
+			var progressCount = req.body.counter;
+
+
+			// console.log (action.updateSummary(now, progressCount));
+
 
 			var progress = new Progress({ 
 			    _actionid		: req.body._actionid,
 			    counter			: req.body.counter,
-			    comment			: req.body.comment,
+			    comment			: req.body.comment
 			});
 
 			progress.save(function (err, createdProgress) {
@@ -278,12 +289,17 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			  	res.status(400);
 			  	res.send('Server error');
 			  }
+
+			  //req.body is out of scope, setup local variables
+			    console.log (action.updateSummary(now, progressCount));
+
 			  return res.send(JSON.stringify(createdProgress));
 			});
 		});
 	});
 
-app.get('/api/v1/goalsActionsProgress', auth, function(req, res){
+	// TODO: app.put('/api/v1/activities')
+	app.get('/api/v1/goalsActionsProgress', auth, function(req, res){
 
 		var goals = [];
 		var actions = [];

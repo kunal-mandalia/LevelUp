@@ -147,7 +147,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, $scope, $http) {
+app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
@@ -155,37 +155,70 @@ app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory,
   $scope.action = [];
   $scope.progress = [];
 
+  $scope.currentPeriod = -1;
+  $scope.currentPeriodIndex = -1;
+
   $scope.currentDate = new Date(Date.now());
   $scope.daysLeft = -1;
   $scope.currentProgress = -1;
   $scope.currentPeriodDeadline = new Date();
 
-  getMyDetails();
-  getGoalsActionsProgress();
 
-    function getMyDetails() {
-        UserFactory.getMyDetails()
-            .success(function (me) {
-                // $scope.customers = custs;
-                $scope.me.email = me;
-                console.log(JSON.stringify(me));
-            })
-            .error(function (error) {
-                $scope.status = 'Unable to load customer data: ' + error.message;
-            });
-    }
+  $scope.updateProgress = function(action, progress){
 
-    // function getGoals(){
-    //     GoalFactory.get()
-    //       .success(function(goal){
-    //         $scope.goal = goal;
-    //       })
-    //       .error(function(error){
-    //         $scope.status = 'Unable to load goal: ' + error.message;
-    //       })
-    // }
+    ProgressFactory.post(action._id, progress)
+      .success(function (res){
+        console.log('ProgressFactory success: ' + JSON.stringify(res));
+        console.log($scope.action);
+        action.currentProgress += progress;
+      })
+      .error(function(error){
+        console.log('ProgressFactory error: ' + JSON.stringify(error));
+      });
 
-    function getGoalsActionsProgress(){
+    console.log('actionid: ' + actionid + ', progress: ' + progress);
+  }
+
+$scope.prepareData = function(action){
+
+  var periodLengthMilliseconds = action.period * 86400000;
+  var startDate = new Date(action.date_created);
+  var startDateMilliseconds = startDate.getTime();
+  var compareDateMilliseconds = Date.now();
+  var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
+  var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/86400000);
+  action.daysRemaining = daysRemaining;
+  
+  var deadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
+  action.deadline = deadline;
+  action.currentPeriod = totalPeriodsIncludingCurrent;
+
+  var totalPeriodsExcludingCurrent = totalPeriodsIncludingCurrent - 1; // if totalPeriodsIncludingCurrent = 0?
+
+  var startCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsExcludingCurrent));
+  var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
+  var currentProgress = 0;
+
+  // handle case where no current period progress
+  for (var j = action.summary.length - 1; j >= 0; j--) {
+    if (action.summary[j].period == action.currentPeriod) {
+      currentProgress = action.summary[j].progress;
+      break;
+    };
+  };
+
+  action.currentProgress = currentProgress;
+
+  return null;
+
+  // action.daysRemaining = daysRemaining;
+  // action.deadline = deadline;
+  // action.currentPeriod = totalPeriodsIncludingCurrent;
+  // action.currentProgress = 0;
+}
+
+
+$scope.getGoalsActionsProgress = function(){
 
       GoalActionProgressFactory.get()
         .success(function(goalActionProgress){
@@ -210,57 +243,21 @@ app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory,
             Input: 
         */
 
-          $scope.daysRemainingForPeriod = function(startDate, compareDate, periodLengthDays){
-            var periodLengthMilliseconds = periodLengthDays * 86400000;
+        // prepare data clientside - e.g. progress in current period, days remaining
+        for (var i = $scope.action.length - 1; i >= 0; i--) {
+          $scope.prepareData($scope.action[i]);
+        };
 
-            var startDate = new Date(startDate);
-            var startDateMilliseconds = startDate.getTime();
-            var compareDateMilliseconds = compareDate.getTime();
-
-            var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
-            var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/86400000);
-            $scope.daysLeft = daysRemaining;
-            $scope.currentPeriodDeadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
-
-
-            //return daysRemaining;
-          }
-
-          $scope.currentPeriodProgress = function(startDate, compareDate, periodLengthDays, actionId){
-            // 1. calculate a start and end date range for current period
-            var progressArray = $scope.progress;
-            var periodLengthMilliseconds = periodLengthDays * 86400000;
-            var startDate = new Date(startDate);
-            var startDateMilliseconds = startDate.getTime();
-            var compareDateMilliseconds = compareDate.getTime();
-
-            var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
-            var totalPeriodsExcludingCurrent = totalPeriodsIncludingCurrent - 1; // if totalPeriodsIncludingCurrent = 0?
-
-            var startCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsExcludingCurrent));
-            var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
-            var progressCount = 0;
-
-            // 2. iterate through descendingly sorted progressArray 
-            for (var i = 0; i < progressArray.length; i++) {
-              // sum progress counters falling within current period
-              if ((startCurrentPeriod <= progressArray[i].date_created <= endCurrentPeriod) && progressArray[i]._actionid == actionId){
-                progressCount += progressArray[i].counter;
-              }
-              else {
-                break;
-              }
-            };
-            // 3. return sum of the progress counters
-            $scope.currentProgress = progressCount;
-            // return progressCount;
-          }
           console.log(goalActionProgress);
+          return null;
         })
         .error(function(error){
           $scope.status = 'Unable to load goals/actions: ' + error.message;
+          return null;
         })
     }
+
+    $scope.getGoalsActionsProgress();
 
 });
 
@@ -297,7 +294,8 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
 });
 
 
-//factory
+// FACTORIES
+
 app.factory('UserFactory', function($http) {
      
     var factory = {};
@@ -328,6 +326,18 @@ app.factory('GoalActionProgressFactory', function($http) {
     };
 });
 
+app.factory('ProgressFactory', function($http) {
+     
+    var factory = {};
+    return {
+        post: function(actionid, progress) {
+            var body = {_actionid: actionid, counter: progress};
+            return $http.post('/api/v1/progress', body);
+        }
+    };
+});
+// FILTERS
+
 // http://stackoverflow.com/questions/29989200/angular-calculate-percentage-in-the-html
 app.filter('percentage', ['$filter', function ($filter) {
   return function (input, decimals) {
@@ -338,5 +348,34 @@ app.filter('percentage', ['$filter', function ($filter) {
 app.filter('daysRemainingDescription', function() {
   return function(daysLeft) {
     return (daysLeft == 1) ? 'day left' : 'days left';
+  };
+});
+
+app.filter('periodInWords', function() {
+  return function(period) {
+
+    switch(period){
+      case 0:
+        return 'once';
+        break;
+      case 1:
+        return 'every day';
+        break;
+      case 7:
+        return 'every week';
+        break;
+      case 30:
+        return 'every month';
+        break;
+      case 180:
+        return 'every six months';
+        break;
+      case 365:
+        return 'every year';
+        break;
+      default:
+        return 'every ' + period + ' days';
+        break;
+    }
   };
 });

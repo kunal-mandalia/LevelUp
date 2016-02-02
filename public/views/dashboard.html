@@ -23,31 +23,30 @@
 		<div layout="row" layout-align="start center" class="small-pad-top">
 			<div layout="column" layout-align="start start" class="small-pad-right">
 
-				<md-button class="md-icon-button goal-card-icon progress-plus" aria-label="Up progress">
+				<md-button class="md-icon-button goal-card-icon progress-plus" aria-label="Up progress" ng-click="updateProgress(a, 1);">
 					<ng-md-icon icon="keyboard_arrow_up"></ng-md-icon>
 				</md-button>
 
-				<md-button class="md-icon-button goal-card-icon progress-minus" aria-label="Down progress">
+				<md-button class="md-icon-button goal-card-icon progress-minus" aria-label="Down progress" ng-click="updateProgress(a, -1);">
 					<ng-md-icon icon="keyboard_arrow_down"></ng-md-icon>
 				</md-button>
 			</div>
 
 	<div layout="column" class="small-pad-left-right action-info" layout-align="center center">
-		<div class="md-headline">{{currentPeriodProgress(a.date_created, currentDate, 30, a._id)}} {{ currentProgress }}/{{a.verb_quantity}}</div>
-		<!-- {{ [a._id, progress[0]._id, 'dude'] | testFilter | filter:{ _actionid: a._id} }} -->
-		<div>{{ currentProgress/a.verb_quantity | percentage:0 }}</div>
+		<div class="md-headline">{{ a.currentProgress }}/{{a.verb_quantity}}</div>
+		<div>{{ a.currentProgress/a.verb_quantity | percentage:0 }}</div>
 	</div>
 	<div layout="column" class="small-pad-left-right action-info" layout-align="center center">
 		<div layout="row" layout-align="center center">
-			<div class="md-headline"> {{ daysRemainingForPeriod(a.date_created, currentDate, 30) }} {{ daysLeft }}</div>
-			<div class="small-pad-left">{{ daysLeft | daysRemainingDescription}}</div>
+			<div class="md-headline">{{ a.daysRemaining }}</div>
+			<div class="small-pad-left">{{ a.daysRemaining | daysRemainingDescription}}</div>
 		</div>
-		<div>{{ currentPeriodDeadline | date: 'MMM d'}}</div>
+		<div>{{ a.deadline | date: 'MMM d'}}</div>
 	</div>
 	<div flex class="graph-placeholder"></div>
 </div>
 <div layout="row" class="small-pad-top-bottom">
-	<div flex layout="row" layout-align="center center">{{a.verb}} {{a.verb_quantity}} {{a.noun}} {{a.period}} until {{a.due | date}}</div>
+	<div flex layout="row" layout-align="center center">{{a.verb}} {{a.verb_quantity}} {{a.noun}} {{a.period | periodInWords}} until {{a.due | date}}</div>
 </div>
 
 </div>
