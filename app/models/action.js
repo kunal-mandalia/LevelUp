@@ -13,50 +13,11 @@ var actionSchema = mongoose.Schema({
     date_modified   : { type: Date, default: Date.now }
 });
 
-actionSchema
-.virtual('periodLengthDays')
-.get(function () {
-
-	var periodLengthDays = -1;
-
-	switch(this.period){
-		case 'every day':
-			periodLengthDays = 1
-			break;
-
-		case 'every week':
-			periodLengthDays = 7;
-			break;
-
-		case 'every month':
-			periodLengthDays = 30;
-			break;
-
-		case 'every three months':
-			periodLengthDays = 90;
-			break;
-
-		case 'every six months':
-			periodLengthDays = 182;
-			break;
-
-		case 'every year':
-			periodLengthDays = 365;
-			break;
-
-		default:
-			break;
-	}
-
-	return periodLengthDays;
-});
-
 actionSchema.methods.updateSummary = function(compareDate, progress, cb){
 
 	var updatedSummary = this.summary;
 	var progress = Number(progress);
 	// 1. calculate current period
-		// var progressArray = $scope.progress;
     var periodLengthMilliseconds = (this.period) * 86400000;
     var startDate = new Date(this.date_created);
     var startDateMilliseconds = startDate.getTime();
@@ -89,7 +50,6 @@ actionSchema.methods.updateSummary = function(compareDate, progress, cb){
 	    return this;
 	  });
 }
-
 
 // create the model for goal and expose it to our app
 module.exports = mongoose.model('Action', actionSchema);
