@@ -96,6 +96,7 @@ body {
 
 .action-info{
 	background-color: #FFFCE4;
+	min-width: 80px;
 }
 
 .progress-plus{
