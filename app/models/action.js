@@ -9,7 +9,7 @@ var actionSchema = mongoose.Schema({
     period 			: Number, // TODO: Store period as Number, apply Angular filter clientside to show 'every month' for 30 days, 'every week' for 7 days, 'every 120 days' for 120 day custom period. 0: one time
     due 			: Date,
     summary			: [], // [{period: 1, progress: 2}, {period: 2, progress: 3}]. Similar to how Angular nvD3 requires data format
-    date_created    : { type: Date, default: Date.now },
+    date_created    : { type: Date, default: Date.now }, // TODO: use start date instead of created
     date_modified   : { type: Date, default: Date.now }
 });
 

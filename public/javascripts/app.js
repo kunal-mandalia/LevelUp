@@ -3,7 +3,7 @@
 /**********************************************************************
  * Angular Application
  **********************************************************************/
-var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria', 'ngMaterial', 'ngMdIcons'])
+var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria', 'ngMaterial', 'ngMdIcons', 'nvd3'])
   .config(function($routeProvider, $locationProvider, $httpProvider, $mdThemingProvider) {
     
   var darkBlueMap = $mdThemingProvider.extendPalette('blue', {
@@ -147,13 +147,14 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http) {
+app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
   $scope.goal = [];
   $scope.action = [];
   $scope.progress = [];
+  $scope.chart = [];
 
   $scope.currentPeriod = -1;
   $scope.currentPeriodIndex = -1;
@@ -163,6 +164,7 @@ app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory,
   $scope.currentProgress = -1;
   $scope.currentPeriodDeadline = new Date();
 
+  console.log(periodInWordsFilter(7,1));
 
   $scope.updateProgress = function(action, progress){
 
@@ -171,12 +173,13 @@ app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory,
         console.log('ProgressFactory success: ' + JSON.stringify(res));
         console.log($scope.action);
         action.currentProgress += progress;
+        action.chart.data[0].values[action.currentPeriod-1].y += progress;
       })
       .error(function(error){
         console.log('ProgressFactory error: ' + JSON.stringify(error));
       });
 
-    console.log('actionid: ' + actionid + ', progress: ' + progress);
+    //console.log('actionid: ' + actionid + ', progress: ' + progress);
   }
 
 $scope.prepareData = function(action){
@@ -207,7 +210,68 @@ $scope.prepareData = function(action){
     };
   };
 
+  // create values array for nvd3 graph
+  action.chart = [];
+  action.chart.xAxisLabel = periodInWordsFilter(action.period, 1) + ' since ' + $filter('date')(action.date_created, "dd MMM, yyyy");
+  action.chart.data = [{key: 'progress', values: []}];
+
+  // for (var i = 0; i < totalPeriodsIncludingCurrent.length; i++) {
+  //   var value = {x: i+1, y: 0};
+  //   action.chart.data[0].values.push(value);
+  // };
+
+  // for (var i = action.summary.length - 1; i >= 0; i--) {
+  //   var period = action.summary[i].period;
+  //   action.chart.data[0].values[period-1].y = action.summary[i].progress;
+  // };
+
+for (var i = 0; i < totalPeriodsIncludingCurrent; i++) {
+  var value = {x: i+1, y: 0};
+  action.chart.data[0].values.push(value);
+};
+
+for (var i = 0; i < action.summary.length; i++) {
+  var period = action.summary[i].period;
+  action.chart.data[0].values[period-1].y = action.summary[i].progress;
+};
+
+action.chart.options = {
+            chart: {
+                type: 'multiBarChart',
+                showControls: false,
+                showLegend: false,
+                height: 130,
+                margin : {
+                    top: 20,
+                    right: 20,
+                    bottom: 50,
+                    left: 80
+                },
+                clipEdge: true,
+                duration: 500,
+                stacked: true,
+                forceY: [0, action.verb_quantity],
+                xAxis: {
+                    axisLabel: action.chart.xAxisLabel,
+                    showMaxMin: false,
+                    tickFormat: function(d){
+                        return d3.format(',f')(d);
+                    }
+                },
+                yAxis: {
+                    axisLabel: 'Progress',
+                    axisLabelDistance: -20,
+                    showMaxMin: true,
+                    tickFormat: function(d){
+                        return d3.format(',f')(d);
+                    }
+                }
+            }
+        };
+
+
   action.currentProgress = currentProgress;
+
 
   return null;
 
@@ -215,6 +279,7 @@ $scope.prepareData = function(action){
   // action.deadline = deadline;
   // action.currentPeriod = totalPeriodsIncludingCurrent;
   // action.currentProgress = 0;
+
 }
 
 
@@ -249,6 +314,7 @@ $scope.getGoalsActionsProgress = function(){
         };
 
           console.log(goalActionProgress);
+
           return null;
         })
         .error(function(error){
@@ -258,6 +324,7 @@ $scope.getGoalsActionsProgress = function(){
     }
 
     $scope.getGoalsActionsProgress();
+
 
 });
 
@@ -352,30 +419,34 @@ app.filter('daysRemainingDescription', function() {
 });
 
 app.filter('periodInWords', function() {
-  return function(period) {
-
+  return function(period, format) {
+    // format 0 - once, every x, etc.
+    // format 1 - Days, Weeks, Months, etc.
     switch(period){
       case 0:
-        return 'once';
+        return ['once', 'One time'][format];
         break;
       case 1:
-        return 'every day';
+        return ['every day', 'Days'][format];
         break;
       case 7:
-        return 'every week';
+        return ['every week', 'Weeks'][format];
         break;
       case 30:
-        return 'every month';
+        return ['every month', 'Months'][format];
         break;
       case 180:
-        return 'every six months';
+        return ['every six months', 'Half Years'][format];
         break;
       case 365:
-        return 'every year';
+        return ['every year', 'Years'][format];
         break;
       default:
-        return 'every ' + period + ' days';
+        return ['every ' + period + ' days', period + ' day period'][format];
         break;
     }
   };
 });
+
+// DIRECTIVES
+

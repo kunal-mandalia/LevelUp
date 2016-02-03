@@ -43,10 +43,13 @@
 		</div>
 		<div>{{ a.deadline | date: 'MMM d'}}</div>
 	</div>
-	<div flex class="graph-placeholder"></div>
+
+	<div class="graph-placeholder hide-sm">
+		<nvd3 options="a.chart.options" data="a.chart.data"></nvd3>
+	</div>
 </div>
 <div layout="row" class="small-pad-top-bottom">
-	<div flex layout="row" layout-align="center center">{{a.verb}} {{a.verb_quantity}} {{a.noun}} {{a.period | periodInWords}} until {{a.due | date}}</div>
+	<div flex layout="row" layout-align="center center">{{a.verb}} {{a.verb_quantity}} {{a.noun}} {{a.period | periodInWords:0}} until {{a.due | date}}</div>
 </div>
 
 </div>

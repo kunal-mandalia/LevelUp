@@ -271,17 +271,15 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 
 			console.log( JSON.stringify(action));
 
-			var now = new Date(Date.now());
+			var nowString = req.body.date_created || Date.now();
+			var now = new Date(nowString);
 			var progressCount = req.body.counter;
-
-
-			// console.log (action.updateSummary(now, progressCount));
-
 
 			var progress = new Progress({ 
 			    _actionid		: req.body._actionid,
 			    counter			: req.body.counter,
-			    comment			: req.body.comment
+			    comment			: req.body.comment,
+			    date_created    : req.body.date_created
 			});
 
 			progress.save(function (err, createdProgress) {

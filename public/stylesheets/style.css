@@ -82,10 +82,11 @@ body {
 	padding-bottom: 1em;
 }
 
+
 .graph-placeholder{
 	background-color: #FFFCE4;
 	min-height: 80px;
-	min-width: 250px;
+	min-width: 50%;
 	margin-left: 1em;
 }
 
