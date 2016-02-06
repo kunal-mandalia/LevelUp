@@ -1,5 +1,5 @@
 
-<div ng-repeat="g in goal" >
+<div ng-repeat="g in goal | orderBy: getDateCreated : true" >
 	<div layout="row" layout-align="center center" layout-wrap class="page">
 
 		<md-card layout-xs="95" flex="80" layout-wrap>
@@ -60,6 +60,98 @@
 </div>
 </div>
 
-<div class="page">
-<md-button href="#/login" ng-click="logout()">Logout</md-button>
+<!-- <md-sidenav md-component-id="left" class="md-sidenav-right">
+    Left Nav!
+</md-sidenav> -->
+
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-z2" md-component-id="create" scroll>
+<div ng-cloak>
+  <md-toolbar class="menu-toolbar md-hue-2" layout-align="center start">
+  	<div class="large-pad-left">Create new</div>
+  </md-toolbar>
+  <md-content>
+    <md-tabs md-dynamic-height md-border-bottom>
+      <md-tab label="Goal">
+        <md-content class="md-padding">
+          	<md-input-container class="md-block">
+	          <label>Goal description</label>
+	          <textarea required ng-model="goal.description" md-maxlength="150" rows="5" md-select-on-focus></textarea>
+	        </md-input-container>
+	        <md-datepicker ng-model="goal.due" required md-placeholder="Due date"></md-datepicker>
+	        <div class="small-pad-top">
+		        <md-button class="md-raised md-primary" ng-click="createGoal(goal.description, goal.due);">Save</md-button>
+		        <md-button ng-click="toggleMenu('create')">Cancel</md-button>
+	    	</div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Action">
+        <md-content class="md-padding">
+<!--            public			: Boolean,
+    verb 			: String,
+    verb_quantity	: Number,
+    noun			: String,
+    period 			: Number, // TODO: Store period as Number, apply Angular filter clientside to show 'every month' for 30 days, 'every week' for 7 days, 'every 120 days' for 120 day custom period. 0: one time
+    due 			: Date, -->
+		    <md-input-container>
+		        <label>Goal</label>
+		        <md-select required ng-model="goalSelected">
+		          <md-option ng-repeat="g in goal" value="{{g._id}}">
+		            {{g.description}}
+		          </md-option>
+		        </md-select>
+		      </md-input-container>
+			<md-input-container class="md-block" flex-gt-sm>
+	          <label>Action</label>
+	          <input md-maxlength="30" required name="actionverb" ng-model="action.verb" />
+	          <div class="hint">E.g. Walk, Read, Study, Attend, etc.</div>
+	          <div ng-messages="userForm.name.$error">
+	          </div>
+	        </md-input-container>
+	        <md-input-container class="md-block" flex-gt-sm>
+	          <label>Repetitons</label>
+	          <input type="number" required name="actionverbfrequency" ng-model="action.verb_quantity" />
+	          <div class="hint">E.g. 1, 2, 3, etc.</div>
+	          <div ng-messages="userForm.name.$error">
+	          </div>
+	        </md-input-container>
+	        <md-input-container class="md-block" flex-gt-sm>
+	          <label>Acting on</label>
+	          <input md-maxlength="30" required name="actionnoun" ng-model="action.noun" />
+	          <div class="hint">E.g. Miles, Books, Gym sessions, etc.</div>
+	          <div ng-messages="userForm.name.$error">
+	          </div>
+	        </md-input-container>
+	        <md-input-container class="md-block" flex-gt-sm>
+	          <label>Per number of days</label>
+	          <input type="number" required name="actionperiod" ng-model="action.period" />
+	          <div class="hint">E.g. 1, 7 (1 week), 30 (1 month), etc.</div>
+	          <div ng-messages="userForm.name.$error">
+	          </div>
+	        </md-input-container>
+        	<md-datepicker ng-model="action.due" required md-placeholder="Until"></md-datepicker>
+	        </md-input-container>
+	        <div class="small-pad-top">
+		        <md-button class="md-raised md-primary" ng-click="createAction(goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due)">Save</md-button>
+		        <md-button ng-click="toggleMenu('create')">Cancel</md-button>
+	    	</div>
+        </md-content>
+      </md-tab>
+    </md-tabs>
 </div>
+</md-sidenav>
+
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-z2" md-component-id="settings">
+<md-toolbar class="md-hue-2">
+        <span flex></span>
+        <div layout="column" class="md-toolbar-tools-bottom inset">
+          <div class="large-pad-left">Settings</div>
+        </div>
+      </md-toolbar>
+</md-sidenav>
+
+<div>
+
+
+<!-- <div class="page">
+<md-button href="#/login" ng-click="logout()">Logout</md-button>
+</div> -->

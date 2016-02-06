@@ -87,7 +87,10 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     //================================================
 
   }) // end of config()
-  .run(function($rootScope, $http){
+  .run(function($rootScope, $http, $location){
+
+    $rootScope.location = $location;
+
     $rootScope.message = '';
 
     // Logout function is available in any pages
@@ -95,6 +98,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       $rootScope.message = 'Logged out.';
       $http.post('/logout');
     };
+
   });
 
 
@@ -147,7 +151,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter) {
+app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
@@ -156,15 +160,55 @@ app.controller('DashboardCtrl', function(UserFactory, GoalActionProgressFactory,
   $scope.progress = [];
   $scope.chart = [];
 
-  $scope.currentPeriod = -1;
-  $scope.currentPeriodIndex = -1;
 
-  $scope.currentDate = new Date(Date.now());
-  $scope.daysLeft = -1;
-  $scope.currentProgress = -1;
-  $scope.currentPeriodDeadline = new Date();
+// http://stackoverflow.com/questions/16261348/descending-order-by-date-filter-in-angularjs
+  $scope.getDateCreated = function(item) {
+    var date = new Date(item.date_created);
+    return date;
+};
 
-  console.log(periodInWordsFilter(7,1));
+$scope.appendGoal = function(){
+  var goal1 = {description: 'test' };
+  $scope.goal.splice(0, 0, goal1);
+  console.log($scope.goal);
+}
+  $scope.createGoal = function(description, due){
+    var dueDate = new Date(due);
+    console.log('Create goal: ' + description + ' due: ' + dueDate);
+    GoalFactory.post(description,dueDate)
+      .success(function(res){
+        console.log('Successfully created goal');
+        // recalculate goals, etc. so they're rendered
+        console.log(res);
+        $scope.goal.push(res);
+        // $scope.goal.splice(0, 0, res);
+
+        console.log($scope.goal);
+      })
+      .error(function(error){
+        console.log('Could not create goal');
+      });
+  }
+//goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due
+  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due){
+    // $scope.goal to find goal, splice(0,0, action)
+    // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
+    var now = new Date(Date.now());
+    console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
+    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now)
+      .success(function(res){
+       console.log('Successfully created action');
+       $scope.action.push(res);
+       $scope.prepareData(res);
+      })
+      .error(function(error){
+       console.log('Unsuccessful at creating action');
+      });
+  }
+  // console.log(periodInWordsFilter(7,1));
+  $scope.toggleMenu = function(id) {
+    $mdSidenav(id).toggle();
+  };
 
   $scope.updateProgress = function(action, progress){
 
@@ -271,15 +315,12 @@ action.chart.options = {
 
 
   action.currentProgress = currentProgress;
-
-
   return null;
 
   // action.daysRemaining = daysRemaining;
   // action.deadline = deadline;
   // action.currentPeriod = totalPeriodsIncludingCurrent;
   // action.currentProgress = 0;
-
 }
 
 
@@ -325,6 +366,10 @@ $scope.getGoalsActionsProgress = function(){
 
     $scope.getGoalsActionsProgress();
 
+    MenuService.add({ type: 'button', icon:'face', ngClick: 'hello', href: ''});
+    // MenuService.add({ type: 'button', icon:'logout', ngClick: 'logout', href: 'login'});
+    // MenuService.add({ type: 'input', icon:'logout', ngClick: 'logout', href: 'login'});
+
 
 });
 
@@ -361,8 +406,59 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
 });
 
 
-// FACTORIES
+/**********************************************************************
+ * Root page controller
+ **********************************************************************/
+app.controller('RootCtrl', ['MenuService', '$scope', '$rootScope', '$location', '$mdSidenav', function(MenuService, $scope, $rootScope, $location, $mdSidenav) {
+  $scope.menu = MenuService.menu;
+  $scope.newItem = $scope.menu.length;
 
+  $scope.toggleMenu = function(id) {
+    $mdSidenav(id).toggle();
+  };
+
+  $scope.pagename = function() { return $location.path(); };
+
+  $scope.addItem = function() {
+    MenuService.add( $scope.newItem );  
+   };
+
+   $scope.hello = function(){
+    console.log('hello world');
+   }
+
+   $scope.functionRunner = function(f){
+    switch(f){
+      case 'hello':
+        console.log('hey there..location: ' + $location.path());
+        return $location.path();
+        break;
+      case 'world':
+        console.log('worldy');
+        break;
+      case 'logout':
+        $rootScope.logout();
+        break;
+      default:
+        console.log('Come again?');
+        break;
+    }
+   }
+
+}]);
+
+
+// SERVICES
+ app.service( 'MenuService', [ '$rootScope', function( $rootScope ) {
+   return {
+      menu: [{ type: 'button', icon:'settings', ngClick: '', href: ''}],
+      add: function( item ) {
+        this.menu.push( item );
+      }
+   };
+ }])
+
+// FACTORIES
 app.factory('UserFactory', function($http) {
      
     var factory = {};
@@ -379,8 +475,22 @@ app.factory('GoalFactory', function($http) {
     return {
         get: function() {
             return $http.get('/api/v1/goal');
+        },
+        post: function(description, dueDate){
+            var body = {description: description, due: dueDate};
+            return $http.post('/api/v1/goal', body);
         }
     };
+});
+
+app.factory('ActionFactory', function($http){
+  var factory = {};
+  return {
+    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created){
+      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created};
+      return $http.post('/api/v1/action', body);
+    }
+  };
 });
 
 app.factory('GoalActionProgressFactory', function($http) {
@@ -417,6 +527,7 @@ app.filter('daysRemainingDescription', function() {
     return (daysLeft == 1) ? 'day left' : 'days left';
   };
 });
+
 
 app.filter('periodInWords', function() {
   return function(period, format) {
