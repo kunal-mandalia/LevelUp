@@ -148,7 +148,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 
 	app.post('/api/v1/goal', auth, function(req, res){
 		//get currently logged in user id through req.user._id
-		var goal = new Goal({ _userid: req.user._id, description: req.body.description, due: req.body.due, status: req.body.status, public: req.body.public });
+		var goal = new Goal({ _userid: req.user._id, description: req.body.description, due: req.body.due, status: req.body.status, is_public: req.body.is_public });
 		goal.save(function (err, createdGoal) {
 		  if (err){
 		  	res.status(400);
@@ -203,7 +203,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			// goal found and it belongs to current user
 			var action = new Action({ 
 			    _goalid			: req.body._goalid,
-			    public			: req.body.public,
+			    is_public		: req.body.is_public,
 			    verb 			: req.body.verb,
 			    verb_quantity	: req.body.verb_quantity,
 			    verb_unit 		: req.body.verb_unit,
@@ -211,7 +211,8 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			    period 			: req.body.period,
 			    due 			: req.body.due,
 			    date_created 	: req.body.date_created,
-			    date_modified	: req.body.date_modified
+			    date_modified	: req.body.date_modified,
+			    status			: req.body.status
 			});
 
 			action.save(function (err, createdAction) {

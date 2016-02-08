@@ -160,22 +160,51 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
   $scope.progress = [];
   $scope.chart = [];
 
+  $scope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
 
+  $scope.editGoal = [];
+  $scope.editAction = [];
+
+  $scope.preEditGoal = [];
+  $scope.preEditAction = [];
+
+  $scope.showEditGoalMenu = function(goal){
+    // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object
+    $scope.preEditGoal = Object.assign({}, goal);
+    $scope.editGoal = goal;
+    $scope.editGoal.due = new Date(goal.due);
+    console.log('goal:');
+    console.log(goal);
+
+    $mdSidenav('editGoal').toggle();
+  }
+
+  $scope.showEditActionMenu = function(goal, action){
+    $scope.preEditAction = Object.assign({}, action);
+    $scope.preEditAction.due = new Date(action.due);
+    $scope.preEditAction._goalid = goal._goalid;
+    $scope.preEditAction._id = action._id;
+
+    $scope.editAction = action;
+    $scope.editAction.due = new Date(action.due);
+    $scope.editAction._goalid = goal._id;
+    $scope.editAction._id = action._id;
+    console.log($scope.editAction.pre);
+    
+    $mdSidenav('editAction').toggle();
+  }
 // http://stackoverflow.com/questions/16261348/descending-order-by-date-filter-in-angularjs
   $scope.getDateCreated = function(item) {
     var date = new Date(item.date_created);
     return date;
-};
+  };
 
-$scope.appendGoal = function(){
-  var goal1 = {description: 'test' };
-  $scope.goal.splice(0, 0, goal1);
-  console.log($scope.goal);
-}
-  $scope.createGoal = function(description, due){
+  $scope.createGoal = function(description, due, status, is_public){
     var dueDate = new Date(due);
+    if (status){status=status.trim();}
+
     console.log('Create goal: ' + description + ' due: ' + dueDate);
-    GoalFactory.post(description,dueDate)
+    GoalFactory.post(description, dueDate, status, is_public)
       .success(function(res){
         console.log('Successfully created goal');
         // recalculate goals, etc. so they're rendered
@@ -189,13 +218,110 @@ $scope.appendGoal = function(){
         console.log('Could not create goal');
       });
   }
-//goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due
-  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due){
+
+  $scope.deleteGoal = function(goal){
+    GoalFactory.delete(goal._id)
+      .success(function(res){
+        console.log('successfully deleting goal');
+        var index = $scope.goal.indexOf(goal);
+        console.log('index:');
+        console.log(index);
+        $scope.goal.splice(index, 1);
+        $mdSidenav('editGoal').toggle();
+
+      })
+      .error(function(error){
+        console.log('error deleting goal');
+      });
+  }
+
+  $scope.deleteAction = function(action){
+    ActionFactory.delete(action._id)
+      .success(function(res){
+        console.log('successfully deleting goal');
+        var index = $scope.action.indexOf(action);
+        console.log('index:');
+        console.log(index);
+        $scope.action.splice(index, 1);
+        $mdSidenav('editAction').toggle();
+        
+      })
+      .error(function(error){
+        console.log('error deleting goal');
+      });
+  }
+
+  $scope.updateGoal = function(_goalid, description, due, status, publicallyViewable){
+    var dueDate = new Date(due);
+    GoalFactory.put(_goalid, description, dueDate, status, publicallyViewable)
+      .success(function(res){
+        console.log('Successfully updated goal');
+        $mdSidenav('editGoal').toggle();
+      })
+      .error(function(error){
+        console.log('Could not update goal');
+
+      });
+  }
+
+  $scope.updateAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id){
     // $scope.goal to find goal, splice(0,0, action)
     // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
     var now = new Date(Date.now());
+    status = status.trim();
+
     console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
-    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now)
+    ActionFactory.put(_goalid, verb, verb_quantity, noun, period, due, now, status, is_public, _id)
+      .success(function(res){
+       console.log('Successfully created action');
+       //$scope.action.push(res);
+       // $scope.prepareData(res); Necessary?
+      $mdSidenav('editAction').toggle();
+
+      })
+      .error(function(error){
+       console.log('Unsuccessful at creating action');
+      });
+  }
+  // console.log(periodInWordsFilter(7,1));
+  $scope.toggleMenu = function(id) {
+    $mdSidenav(id).toggle();
+  };
+
+  $scope.cancelUpdateGoal = function(){
+    console.log('preEditGoal');
+    console.log($scope.preEditGoal);
+    $scope.editGoal.description = $scope.preEditGoal.description;
+    $scope.editGoal.due         = new Date($scope.preEditGoal.due);
+    $scope.editGoal.status      = $scope.preEditGoal.status;
+    $scope.editGoal.is_public   = $scope.preEditGoal.is_public;
+    $mdSidenav('editGoal').toggle();
+  }
+
+  // goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due, action.status, action.is_public
+
+  $scope.cancelUpdateAction = function(){
+    console.log('preEditGoal');
+    console.log($scope.preEditAction);
+    $scope.editAction.verb           = $scope.preEditAction.verb;
+    $scope.editAction.verb_quantity  = $scope.preEditAction.verb_quantity;
+    $scope.editAction.noun           = $scope.preEditAction.noun;
+    $scope.editAction.period         = $scope.preEditAction.period;
+    $scope.editAction.due            = new Date($scope.preEditAction.due);
+    $scope.editAction.status         = $scope.preEditAction.status;
+    $scope.editAction.is_public      = $scope.preEditAction.is_public;
+    $mdSidenav('editAction').toggle();
+  }
+
+//goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due
+  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public){
+    // $scope.goal to find goal, splice(0,0, action)
+    // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
+    var now = new Date(Date.now());
+    status = status.trim();
+
+    console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
+    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now, status, is_public)
       .success(function(res){
        console.log('Successfully created action');
        $scope.action.push(res);
@@ -476,9 +602,16 @@ app.factory('GoalFactory', function($http) {
         get: function() {
             return $http.get('/api/v1/goal');
         },
-        post: function(description, dueDate){
-            var body = {description: description, due: dueDate};
+        post: function(description, dueDate, status, is_public){
+            var body = {description: description, due: dueDate, status: status, is_public: is_public};
             return $http.post('/api/v1/goal', body);
+        },
+        put: function(_goalid, description, dueDate, status, is_public){
+            var body = {description: description, due: dueDate, status: status, is_public: is_public};
+            return $http.put('/api/v1/goal/' + _goalid, body);
+        },
+        delete: function(_goalid){
+          return $http.delete('/api/v1/goal/' + _goalid);
         }
     };
 });
@@ -486,9 +619,16 @@ app.factory('GoalFactory', function($http) {
 app.factory('ActionFactory', function($http){
   var factory = {};
   return {
-    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created){
-      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created};
+    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created, status, is_public){
+      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, status: status, is_public: is_public};
       return $http.post('/api/v1/action', body);
+    },
+    put: function(_goalid, verb, verb_quantity, noun, period, due, date_created, status, is_public, _id){
+    var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, status: status, is_public: is_public};
+      return $http.put('/api/v1/action/' + _id, body);
+    },
+    delete: function(_id){
+      return $http.delete('/api/v1/action/' + _id);
     }
   };
 });
