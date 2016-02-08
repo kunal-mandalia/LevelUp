@@ -288,7 +288,7 @@
         	<md-datepicker ng-model="editAction.due" required md-placeholder="Until"></md-datepicker>
 	        </md-input-container>
 	        <div class="small-pad-top">
-		        <md-button class="md-raised md-primary" ng-click="updateAction(editAction._goalid, editAction.verb, editAction.verb_quantity, editAction.noun, editAction.period, editAction.due, editAction.status, editAction.is_public, editAction._id)">Save</md-button>
+		        <md-button class="md-raised md-primary" ng-click="updateAction(editAction._goalid, editAction.verb, editAction.verb_quantity, editAction.noun, editAction.period, editAction.due, editAction.status, editAction.is_public, editAction._id, editAction)">Save</md-button>
 		        <md-button ng-click="cancelUpdateAction()">Cancel</md-button>
 	    	</div>
 
@@ -310,16 +310,18 @@
 </md-sidenav>
 <!-- Settings -->
 
-<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-z2" md-component-id="settings">
-<md-toolbar class="md-hue-2">
-        <span flex></span>
-        <div layout="column" class="md-toolbar-tools-bottom inset">
-          <div class="large-pad-left">Settings</div>
-        </div>
-      </md-toolbar>
-</md-sidenav>
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-z2" md-component-id="settings" scroll>
+<div ng-cloak>
+  <md-toolbar class="menu-toolbar md-hue-2" layout-align="center start">
+  	<div class="large-pad-left">Settings</div>
+  </md-toolbar>
+  
+		<md-button class="md-raised md-warn" ng-click="logout()" href="#/login">Logout</md-button>
+		</form>
 
-<div>
+  </md-content>
+</div>
+</md-sidenav>
 
 
 <!-- <div class="page">

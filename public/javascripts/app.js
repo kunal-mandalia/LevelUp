@@ -264,18 +264,19 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
       });
   }
 
-  $scope.updateAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id){
+  $scope.updateAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id, action){
     // $scope.goal to find goal, splice(0,0, action)
     // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
-    var now = new Date(Date.now());
+    //var now = new Date(Date.now());
     status = status.trim();
 
     console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
-    ActionFactory.put(_goalid, verb, verb_quantity, noun, period, due, now, status, is_public, _id)
+    ActionFactory.put(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id)
       .success(function(res){
        console.log('Successfully created action');
        //$scope.action.push(res);
        // $scope.prepareData(res); Necessary?
+       //$scope.prepareData(action);
       $mdSidenav('editAction').toggle();
 
       })
@@ -623,8 +624,8 @@ app.factory('ActionFactory', function($http){
       var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, status: status, is_public: is_public};
       return $http.post('/api/v1/action', body);
     },
-    put: function(_goalid, verb, verb_quantity, noun, period, due, date_created, status, is_public, _id){
-    var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, status: status, is_public: is_public};
+    put: function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id){
+    var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, status: status, is_public: is_public};
       return $http.put('/api/v1/action/' + _id, body);
     },
     delete: function(_id){
