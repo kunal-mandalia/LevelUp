@@ -6,7 +6,7 @@
                 <div layout="column">
                     <div layout="row" layout-align="start center">
                         <div class="md-headline"> {{g.description}} by {{ g.due | date}}</div>
-
+                        
                         <div flex layout="row" layout-align="end center">
                             <!-- <div class="md-caption goal-due"> {{ g.due | date}} </div> -->
 
@@ -432,7 +432,6 @@
             <md-datepicker ng-model="filter.action.createdEnd" required md-placeholder="Before">
             </md-datepicker>
 
-            <md-button ng-click="getGoalAndActionFilter()"> Console Filter values</md-button>
         </md-content>
     </div>
 </md-sidenav>

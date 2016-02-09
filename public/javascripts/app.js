@@ -90,9 +90,9 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
   .run(function($rootScope, $http, $location){
 
     $rootScope.location = $location;
-
     $rootScope.message = '';
 
+    $rootScope.busy = false;
     // Logout function is available in any pages
     $rootScope.logout = function(){
       $rootScope.message = 'Logged out.';
@@ -112,6 +112,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 
   // Register the login() function
   $scope.login = function(){
+    $rootScope.busy = true;
     $http.post('/login', {
       username: $scope.user.username,
       password: $scope.user.password
@@ -120,6 +121,8 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
       // No error: authentication OK
       $rootScope.message = 'Authentication successful! via google';
       $location.url('/dashboard');
+      $rootScope.busy = false;
+
     })
     .error(function(){
       // Error: authentication failed
@@ -130,19 +133,28 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
   };
 
     $scope.loginGoogle = function(){
+    $rootScope.busy = true;
     $http.get('/auth/google', {
     })
     .success(function(user){
       // No error: authentication OK
       console.log('logged in as : ' + user);
       $location.url('/#/dashboard');
+      $rootScope.busy = false;
+
     })
     .error(function(){
       // Error: authentication failed
       $rootScope.message = 'Authentication failed.';
       $location.url('/login');
+      $rootScope.busy = false;
+
     });
   };
+
+    $scope.loginGithub = function(){
+      $rootScope.busy = true;
+    }
 
 });
 
@@ -151,7 +163,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 /**********************************************************************
  * Dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout) {
+app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
@@ -358,16 +370,18 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
   };
 
   $scope.updateProgress = function(action, progress){
-
+    $rootScope.busy = true;
     ProgressFactory.post(action._id, progress)
       .success(function (res){
         console.log('ProgressFactory success: ' + JSON.stringify(res));
         console.log($scope.action);
         action.currentProgress += progress;
         action.chart.data[0].values[action.currentPeriod-1].y += progress;
+        $rootScope.busy = false;
       })
       .error(function(error){
         console.log('ProgressFactory error: ' + JSON.stringify(error));
+        $rootScope.busy = false;
       });
 
     //console.log('actionid: ' + actionid + ', progress: ' + progress);
@@ -472,7 +486,7 @@ action.chart.options = {
 
 
 $scope.getGoalsActionsProgress = function(){
-
+      $rootScope.busy = true;
       GoalActionProgressFactory.get()
         .success(function(goalActionProgress){
           $scope.goal = goalActionProgress[0];
@@ -512,21 +526,17 @@ $scope.getGoalsActionsProgress = function(){
         };
 
           console.log(goalActionProgress);
-
+          $rootScope.busy = false;
           return null;
         })
         .error(function(error){
           $scope.status = 'Unable to load goals/actions: ' + error.message;
+          $rootScope.busy = false;
           return null;
         })
     }
 
     $scope.getGoalsActionsProgress();
-
-    MenuService.add({ type: 'button', icon:'face', ngClick: 'hello', href: ''});
-    // MenuService.add({ type: 'button', icon:'logout', ngClick: 'logout', href: 'login'});
-    // MenuService.add({ type: 'input', icon:'logout', ngClick: 'logout', href: 'login'});
-
 
 });
 

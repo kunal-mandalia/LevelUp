@@ -69,8 +69,9 @@
         <h2>
           <span class="md-headline">LevelUp</span>
         </h2>
-        <span flex></span>
+        <md-progress-circular class="md-hue-1" md-mode="indeterminate" ng-hide="busy==false"></md-progress-circular>
 
+        <span flex></span>
         <div ng-switch="location.path()">
           <div ng-switch-when="/dashboard">
             
