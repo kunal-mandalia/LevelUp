@@ -70,28 +70,17 @@
           <span class="md-headline">LevelUp</span>
         </h2>
         <span flex></span>
-        <!-- <md-button class="md-icon-button menu-icon" aria-label="User">
-            <ng-md-icon icon="face"></ng-md-icon>
-        </md-button> -->
-        <!-- {{location.path()}} -->
 
         <div ng-switch="location.path()">
           <div ng-switch-when="/dashboard">
-
-
-            <md-button class="md-icon-button menu-icon" aria-label='face' ng-click="hello()" href="javaScript:void(0);">
+            
+            <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')" href="javaScript:void(0);">
+                <ng-md-icon icon="add"></ng-md-icon>
+            </md-button>
+            
+            <md-button class="md-icon-button menu-icon" aria-label='filter' ng-click="toggleMenu('filter')" href="javaScript:void(0);">
                 <ng-md-icon icon="filter_list"></ng-md-icon>
             </md-button>
-
-            <md-button class="md-icon-button menu-icon" aria-label='add_circle' ng-click="toggleMenu('create')" href="javaScript:void(0);">
-                <ng-md-icon icon="add_circle"></ng-md-icon>
-            </md-button>
-
-            
-
-            <!-- <md-button class="md-icon-button menu-icon" aria-label='logout' href="#/login" ng-click="logout()">
-                <ng-md-icon icon="logout"></ng-md-icon>
-            </md-button> -->
 
             <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')" href="javaScript:void(0);">
                 <ng-md-icon icon="settings"></ng-md-icon>

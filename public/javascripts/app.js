@@ -168,6 +168,24 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
   $scope.preEditGoal = [];
   $scope.preEditAction = [];
 
+  $scope.filter = [];
+  $scope.filter.goal = [];
+  $scope.filter.action = [];
+
+  // initialise default filters
+  // TODO: allow user to save filters and preload last viewed
+  $scope.filter.goal.open = true;
+  $scope.filter.goal.closedComplete = false;
+  $scope.filter.goal.closedIncomplete = false;
+  $scope.filter.action.open = true
+  $scope.filter.action.closedComplete = false;
+  $scope.filter.action.closedIncomplete = false;
+
+  $scope.getGoalAndActionFilter = function(){
+    console.log('Filter');
+    console.log($scope.filter);
+  }
+
   $scope.showEditGoalMenu = function(goal){
     // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object
     $scope.preEditGoal = Object.assign({}, goal);
@@ -253,6 +271,7 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
 
   $scope.updateGoal = function(_goalid, description, due, status, publicallyViewable){
     var dueDate = new Date(due);
+    if (status){status=status.trim();}
     GoalFactory.put(_goalid, description, dueDate, status, publicallyViewable)
       .success(function(res){
         console.log('Successfully updated goal');
@@ -277,6 +296,7 @@ app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory
        //$scope.action.push(res);
        // $scope.prepareData(res); Necessary?
        //$scope.prepareData(action);
+       console.log(res);
       $mdSidenav('editAction').toggle();
 
       })
@@ -476,8 +496,18 @@ $scope.getGoalsActionsProgress = function(){
             Input: 
         */
 
+        // correctly format dates from string
+        for (var i = $scope.goal.length - 1; i >= 0; i--) {
+          $scope.goal[i].date_created = new Date($scope.goal[i].date_created);
+          $scope.goal[i].date_modified = new Date($scope.goal[i].date_modified);
+          $scope.goal[i].due = new Date($scope.goal[i].due);
+        };
+
         // prepare data clientside - e.g. progress in current period, days remaining
         for (var i = $scope.action.length - 1; i >= 0; i--) {
+          $scope.action[i].date_created = new Date($scope.action[i].date_created);
+          $scope.action[i].date_modified = new Date($scope.action[i].date_modified);
+          $scope.action[i].due = new Date($scope.action[i].due);
           $scope.prepareData($scope.action[i]);
         };
 
