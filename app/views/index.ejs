@@ -70,22 +70,27 @@
           <span class="md-headline">LevelUp</span>
         </h2>
         <md-progress-circular class="md-hue-1" md-mode="indeterminate" ng-hide="busy==false"></md-progress-circular>
-
-        <span flex></span>
-        <div ng-switch="location.path()">
-          <div ng-switch-when="/dashboard">
             
-            <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')" href="javaScript:void(0);">
+            
+        <span class="small-pad-left" flex></span>{{user.first_name}}
+
+        <div ng-switch="location.path()">
+          <div ng-switch-when="/tracking">
+            
+
+            <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
                 <ng-md-icon icon="add"></ng-md-icon>
             </md-button>
             
-            <md-button class="md-icon-button menu-icon" aria-label='filter' ng-click="toggleMenu('filter')" href="javaScript:void(0);">
+            <md-button class="md-icon-button menu-icon" aria-label='filter' ng-click="toggleMenu('filter')">
                 <ng-md-icon icon="filter_list"></ng-md-icon>
             </md-button>
 
-            <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')" href="javaScript:void(0);">
+            <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')">
                 <ng-md-icon icon="settings"></ng-md-icon>
             </md-button>
+
+
 
           </div>
 

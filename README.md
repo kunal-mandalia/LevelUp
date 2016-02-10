@@ -111,7 +111,7 @@ Attend (*verb*) 2 (*verb_quantity*) JavaScript meetups (*noun*) per month (*peri
 In terms of the schema design, I’ve tried to bear in mind two principles (highlighted by Valeri Karpov in his [MongoDB and the MEAN stack course](https://www.edx.org/course/introduction-mongodb-using-mean-stack-mongodbx-m101x)):
 Store what you query for
 Principle of least cardinality - a key part being not to nest arrays which grow without bound within a mongo document.
-Despite the fact that on the dashboard screen the user is presented with goals and their associated actions, nesting actions within goals (store what you query for) would violate the principle of least cardinality - causing potential issues if the list of goals associated with a goal grows too large (which could happen for high frequency actions). In fact, any of the collections may grow without bound hence they’re separated.
+Despite the fact that on the tracking screen the user is presented with goals and their associated actions, nesting actions within goals (store what you query for) would violate the principle of least cardinality - causing potential issues if the list of goals associated with a goal grows too large (which could happen for high frequency actions). In fact, any of the collections may grow without bound hence they’re separated.
 
 
 ##### API design

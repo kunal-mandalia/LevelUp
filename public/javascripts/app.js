@@ -66,9 +66,9 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       .when('/', {
         templateUrl: '/views/main.html'
       })
-      .when('/dashboard', {
-        templateUrl: 'views/dashboard.html',
-        controller: 'DashboardCtrl',
+      .when('/tracking', {
+        templateUrl: 'views/tracking.html',
+        controller: 'trackingCtrl',
         resolve: {
           loggedin: checkLoggedin
         }
@@ -95,6 +95,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     $rootScope.busy = false;
     // Logout function is available in any pages
     $rootScope.logout = function(){
+      $rootScope.user = {};
       $rootScope.message = 'Logged out.';
       $http.post('/logout');
     };
@@ -120,7 +121,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
     .success(function(user){
       // No error: authentication OK
       $rootScope.message = 'Authentication successful! via google';
-      $location.url('/dashboard');
+      $location.url('/tracking');
       $rootScope.busy = false;
 
     })
@@ -139,7 +140,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
     .success(function(user){
       // No error: authentication OK
       console.log('logged in as : ' + user);
-      $location.url('/#/dashboard');
+      $location.url('/#/tracking');
       $rootScope.busy = false;
 
     })
@@ -161,9 +162,9 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 
 
 /**********************************************************************
- * Dashboard controller
+ * tracking controller
  **********************************************************************/
-app.controller('DashboardCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
+app.controller('trackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
@@ -538,6 +539,23 @@ $scope.getGoalsActionsProgress = function(){
 
     $scope.getGoalsActionsProgress();
 
+    $scope.getUser = function(){
+      $rootScope.busy = true;
+      UserFactory.get()
+        .success(function(user){
+          console.log(user);
+          $rootScope.user = {};
+          $rootScope.user = user;
+          console.log($rootScope.user);
+          $rootScope.busy = false
+        })
+        .error(function(error){
+          console.log('Error getting user');
+          $rootScope.busy = false
+        });
+    }
+
+    $scope.getUser();
 });
 
 /**********************************************************************
@@ -559,7 +577,7 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
         .then(function successCallback(response) {
           // this callback will be called asynchronously
           // when the response is available
-          $location.path('/dashboard');
+          $location.path('/tracking');
           console.log('angular: registered user successfully');
         }, function errorCallback(response) {
           // called asynchronously if an error occurs
@@ -568,8 +586,6 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
           console.log(response.data);
         });
   }
-
-  // console.log('newUser: ' + JSON.stringify($location.search()));
 });
 
 
@@ -630,7 +646,7 @@ app.factory('UserFactory', function($http) {
      
     var factory = {};
     return {
-        getMyDetails: function() {
+        get: function() {
             return $http.get('/api/v1/me');
         }
     };

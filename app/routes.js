@@ -37,7 +37,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/dashboard');
+	      return res.redirect('/#/tracking');
 	    });
 	  })(req, res, next);
 	});
@@ -52,7 +52,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/dashboard');
+	      return res.redirect('/#/tracking');
 	    });
 	  })(req, res, next);
 	});
@@ -100,7 +100,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 						                }else{
 						                	res.status(200);
 						                	res.end(); //redirect clientside
-						                    //return res.redirect('/#/dashboard');
+						                    //return res.redirect('/#/tracking');
 						                }
 						            });
 								  }
@@ -115,7 +115,16 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 
 	//api to be called from angular
 	app.get('/api/v1/me', auth, function(req, res){
-		res.send(req.user.email);
+		User.findOne({email: req.user.email}, function(error, user){
+			if(error){res.send(400);};
+
+			var userDetails = Object.assign({}, user);
+			delete userDetails._doc["password"];
+			// console.log('userDetails');
+			// console.log(user);
+			// console.log(userDetails);
+			res.send(userDetails._doc);
+		});
 	});
 
 	// GOALS API
