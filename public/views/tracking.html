@@ -1,7 +1,15 @@
+<div layout="row" layout-align="center center" layout-wrap class="page">
+    <div layout-xs="99" flex="90" layout-wrap>
+        <md-button class="md-raised md-accent" href="#/dashboard">
+         Dashboard
+        </md-button>
+    </div>
+</div>
+
 <div ng-repeat="g in goal | orderBy: getDateCreated : true" ng-hide="(g.status == 'Open' && filter.goal.open == false) || (g.status == 'Closed - Complete' && filter.goal.closedComplete == false) || (g.status == 'Closed - Incomplete' && filter.goal.closedIncomplete == false) || (g.due < filter.goal.dueStart) || (g.due > filter.goal.dueEnd) || (g.date_created < filter.goal.createdStart) || (g.date_created > filter.goal.createdEnd)">
     <div layout="row" layout-align="center center" layout-wrap class="page">
 
-        <md-card layout-xs="95" flex="80" layout-wrap>
+        <md-card layout-xs="99" flex="90" layout-wrap>
             <md-card-content>
                 <div layout="column">
                     <div layout="row" layout-align="start center">
@@ -25,7 +33,7 @@
                         <span layout="row"><hr flex/><hr flex/></span>
 
                         <div layout="row" layout-align="start center" class="small-pad-top">
-                            <div layout="column" layout-align="start start" class="small-pad-right">
+                            <div layout="column" layout-align="start start" class="">
 
                                 <md-button class="md-icon-button goal-card-icon progress-plus" aria-label="Up progress" ng-click="updateProgress(a, 1);">
                                     <ng-md-icon icon="keyboard_arrow_up"></ng-md-icon>

@@ -135,3 +135,51 @@ body {
  .white-fill {
  	fill: white;
  }
+
+ .dashboard-stat{
+ 	color: white;
+ 	padding-bottom: 5px;
+ 	min-width: 80px;
+ 	margin-right: 4px;
+ }
+
+ .light-blue{
+ 	background-color: #4777C3;
+ }
+
+ .light-orange{
+ 	background-color: #DA5025;
+ }
+
+ .dashboard-box{
+ 	/*background-color: rgba(235,235,235,1);*/
+ 	max-height: 440px;
+ 	/*width: 300px;*/
+/* 	margin-left: 8px;
+ 	margin-right: 8px;
+ 	margin-bottom: 8px;*/
+
+ }
+
+ .dashboardbox-top-margin{
+ 	/*margin-top: 20px;*/
+ }
+
+ .light-gray{
+ 	color: #5D5D5D;
+ }
+
+ .subtle-control{
+ 	background-color: rgba(235,235,235,0);
+ 	border: none;
+ 	color: #FF4081;
+ }
+
+ .dashboard-subhead{
+ 	margin-top: -20px;
+ 	margin-bottom: 20px;
+ }
+
+.dashboard-box-caption{
+	margin-top: -6px;
+}

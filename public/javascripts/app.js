@@ -68,7 +68,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       })
       .when('/tracking', {
         templateUrl: 'views/tracking.html',
-        controller: 'trackingCtrl',
+        controller: 'TrackingCtrl',
         resolve: {
           loggedin: checkLoggedin
         }
@@ -80,6 +80,13 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       .when('/signup', {
         templateUrl: 'views/signup.html',
         controller: 'SignupCtrl'
+      })
+      .when('/dashboard', {
+        templateUrl: 'views/dashboard.html',
+        controller: 'DashboardCtrl',
+        resolve: {
+          loggedin: checkLoggedin
+        }
       })
       .otherwise({
         redirectTo: '/'
@@ -160,11 +167,49 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 });
 
 
+/**********************************************************************
+ * dashboard controller
+ **********************************************************************/
+app.controller('DashboardCtrl', function($scope, $http, $mdSidenav, $timeout, $rootScope) {
+ $scope.goal = [];
+ $scope.action = [];
+ $scope.goal.status = {};
+ $scope.action.status = [];
+ $scope.goal.recent = [];
+ $scope.action.recent = [];
+ $scope.goal.upcoming = [];
+ $scope.action.upcoming = [];
+ $scope.lastDays = 7;
 
+ // Initialise with dummy data
+ $scope.goal.status = {"open": 5, "closed": 3, "completed": 2};
+ $scope.action.status = {"open": 11, "closed": 4, "completed": 3};
+ $scope.goal.recent = [{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"}];
+ $scope.action.recent = [{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "progress"}];
+ $scope.goal.upcoming = [{"description": "Develop habits of good health", "due": "2016-03-01"},{"description": "Become a web dev", "due": "2016-03-15"}];
+
+ // set correct dates
+ for (var i = 0; i < $scope.goal.recent.length; i++) {
+   $scope.goal.recent[i].date_modified = new Date($scope.goal.recent[i].date_modified);
+ };
+
+ for (var i = 0; i < $scope.action.recent.length; i++) {
+   $scope.action.recent[i].date_modified = new Date($scope.action.recent[i].date_modified);
+ };
+
+ for (var i = 0; i < $scope.goal.upcoming.length; i++) {
+   $scope.goal.upcoming[i].due = new Date($scope.goal.upcoming[i].due);
+ };
+
+ for (var i = 0; i < $scope.action.upcoming.length; i++) {
+   $scope.action.upcoming[i].due = new Date($scope.action.upcoming[i].due);
+ };
+
+});
 /**********************************************************************
  * tracking controller
  **********************************************************************/
-app.controller('trackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
+app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];

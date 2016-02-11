@@ -90,8 +90,19 @@
                 <ng-md-icon icon="settings"></ng-md-icon>
             </md-button>
 
+          </div>
 
-
+          <div ng-switch-when="/dashboard">
+            
+            <div layout="row" layout-align="end center">
+                <md-button class="md-icon-button menu-icon" aria-label='add' href="#/tracking">
+                    <ng-md-icon icon="list"></ng-md-icon>
+                </md-button>
+                
+                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')">
+                    <ng-md-icon icon="settings"></ng-md-icon>
+                </md-button>
+            </div>
           </div>
 
           <div ng-switch-default>
