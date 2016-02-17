@@ -1,101 +1,134 @@
-<div layout="row" layout-xs="column" layout-sm="column" class="page md-padding">
-  <div flex class="">
+<div layout="column" layout-gt-md="row" class="dashboard-pane-1">
+  <div flex="10" flex-sm="90" class="min300">
 
     <!-- <md-button class="md-primary" href="#/tracking">
         Progress tracker
     </md-button> -->
 
-    	<!-- Outlook -->
-    	<div layout="row" layout-align="start center">
-	    	<h1 class="md-display-3 light-gray"> {{lastDays}} day outlook</h1>
-		</div>
-        <div layout="row" layout-align="center center">
-	        <md-slider flex min="0" max="30" ng-model="lastDays" aria-label="due" id="due-slider" class>
-	        </md-slider>
-	        <div flex="20" layout layout-align="center center">
-                <input flex type="number" ng-model="lastDays" aria-label="due" aria-controls="due-slider" class="subtle-control">
-	        </div>
-	    </div>
+    	
 
 	    <!-- Goals -->
-        <h1 class="md-display-1 light-gray">Goals</h1>
+        <div layout="row" layout-align="start center">
+	    	<h1 class="md-display-1 light-gray">Goals</h1>
+	    	<md-button class="md-warn" href="#/tracking">
+		        Manage
+		    </md-button>
+		</div>
+
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{lastDays}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
         </div>
-	    <div layout="row" layout-align="center center">
-	        <div layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{goal.status.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
+	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
+	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
+	            <div class="md-display-2">{{data.goal.total.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
 	        </div>
-	        <div layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{goal.status.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
+	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
+	            <div class="md-display-2">{{data.goal.total.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
 	        </div>
-	        <div layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{goal.status.completed}}</div><div class="md-caption dashboard-box-caption">Completed</div>
+	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
+	            <div class="md-display-2">{{data.goal.total.complete}}</div><div class="md-caption dashboard-box-caption">Completed</div>
 	        </div>
 	    </div>
 
 	    <!-- Actions -->
         <h1 class="md-display-1 light-gray">Actions</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{lastDays}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
         </div>
-        <div layout="row" layout-align="center center">
-            <div layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{action.status.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
+        <div layout="row" layout-align="center center" class="dashboard-stat-container">
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
+                <div class="md-display-2">{{data.action.total.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
             </div>
-            <div layout="column" layout-align="center center" class="dashboard-stat light-orange ">
-                <div class="md-display-2">{{action.status.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
+                <div class="md-display-2">{{data.action.total.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
             </div>
-            <div layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{action.status.completed}}</div><div class="md-caption dashboard-box-caption">Completed</div>
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
+                <div class="md-display-2">{{data.action.total.complete}}</div><div class="md-caption dashboard-box-caption">Completed</div>
+            </div>
+        </div>
+        <!-- Action repetitions -->
+        <div layout="row" layout-align="center center" class="dashboard-stat-container">
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
+                <div class="md-display-2">{{data.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Repetitions</div>
+            </div>
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
+                <div class="md-display-2">{{data.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
+            </div>
+            <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
+                <div class="md-display-2">{{data.action.total.rep_conversion}}%</div><div class="md-caption dashboard-box-caption">Rep conversion</div>
             </div>
         </div>
 
   </div>
   <div flex>
-    
-    	<div layout="row" layout-align="start center">
-	    	<h1 class="md-display-1 light-gray">Recent</h1>
-	    	<md-button class="md-raised" href="#/tracking">
-		        Progress tracker
-		    </md-button>
-		</div>
 
-    	<!-- <h1 class="md-display-1 light-gray">Recent</h1> -->
+    	<h1 class="md-display-1 light-gray">Upcoming</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{lastDays}} days</div>
-        </div>
-        <div layout="row">
-            <md-content class="page">
-                <md-list class="dashboard-box dashboardbox-top-margin">
-
-                    <md-list-item class="md-2-line" ng-repeat="item in goal.recent">
-                    	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-                    	<ng-md-icon icon="face" class="md-avatar"></ng-md-icon>
-                        <div class="md-list-item-text" layout="column">
-                            <h3>{{item.description}}</h3>
-					        <h4>{{item.date_modified | date}}</h4>
-					        <p>{{item.update}}</p>
-                        </div>
-                        <md-divider></md-divider>
-                    </md-list-item>
-            </md-content>
-        </div>
-
-  </div>
-  <div flex>
-    	
-        <h1 class="md-display-1 light-gray">Upcoming</h1>
-        <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Next {{lastDays}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Next {{outlook}} days</div>
         </div>
         <div layout="row" >
-            <md-content class="page">
+            <md-content class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
-
-                    <md-list-item class="md-2-line" ng-repeat="item in goal.recent">
+                	<!-- Goals -->
+                    <md-list-item class="md-2-line" ng-repeat="g in data.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > outlook)">
+                    	<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
+                    		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
+                    	</md-button>
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{g.description}}</h3>
+					        <h4>{{g.remainingDays}} days remaining</h4>
+					        <p>goal</p>
+					        <!-- <ng-md-icon icon="mood" style="fill:green" class="md-avatar goal-card-icon" ng-hide="g.status != 'closed - complete'"></ng-md-icon> -->
+                        </div>
+                        <md-divider></md-divider>
+                    </md-list-item>
+                    <!-- Actions -->
+                    <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > outlook) || (a.remainingDays < 0)">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-                    	<ng-md-icon icon="thumb_up" class="md-avatar goal-card-icon"></ng-md-icon>
+                    	<md-button class="md-icon-button">
+                    		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
+                    	</md-button>
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3>
+					        <h4>{{a.remainingDays}} days remaining </h4> 
+					        <!-- TODO:  -->
+					        <p>action</p>
+					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
+					        <!-- {{ a.currentProgress }}/{{a.verb_quantity}} -->
+                        </div>
+                        <md-divider></md-divider>
+                    </md-list-item>
+            </md-content>
+        </div>
+  </div>
+  <div flex>
+
+  		<!-- Outlook -->
+    	<div layout="row" layout-align="start center">
+	    	<h1 class="md-display-1 light-gray"> {{outlook}} day outlook</h1>
+		</div>
+        <div layout="row" layout-align="center center">
+	        <md-slider flex min="1" max="31" ng-model="outlook" aria-label="due" id="due-slider" class>
+	        </md-slider>
+	        <div layout layout-align="center center">
+                <input flex type="number" ng-model="outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
+	        </div>
+	    </div>
+    
+    	<!-- Recent -->
+    	<div layout="row" layout-align="start center">
+	    	<h1 class="md-display-1 light-gray">Recent</h1>
+		</div>
+
+        <div layout="row">
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
+        </div>
+        <div layout="row">
+            <md-content class="">
+                <md-list class="dashboard-box dashboardbox-top-margin">
+                	<!-- goal -->
+                    <md-list-item class="md-2-line" ng-repeat="item in goal.recent" ng-hide="item.date_modified > compareDate">
+                    	<ng-md-icon icon="edit" class="md-avatar"></ng-md-icon>
                         <div class="md-list-item-text" layout="column">
                             <h3>{{item.description}}</h3>
 					        <h4>{{item.date_modified | date}}</h4>
@@ -103,7 +136,23 @@
                         </div>
                         <md-divider></md-divider>
                     </md-list-item>
+                    <!-- <md-list-item>
+	                    <div layout="row" layout-align="start center">
+				    	<h1 class="md-display-1 light-gray">Goals</h1>
+				    	<md-button class="md-raised md-primary" href="#/tracking">
+					        See all
+					    </md-button>
+						</div>
+                        <md-divider></md-divider>
+	                </md-list-item>
+	                <md-list-item>
+		                <div layout="row" layout-align="start center">
+					    	<h1 class="md-display-4 outlook-head light-gray"> {{outlook}} day outlook</h1>
+						</div>
+                        <md-divider></md-divider>
+		            </md-list-item> -->
             </md-content>
         </div>
+
   </div>
 </div>

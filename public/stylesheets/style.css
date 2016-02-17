@@ -1,5 +1,5 @@
 body {
-	background-color: rgba(235,235,235,1);
+	/*background-color: rgba(235,235,235,1);*/
 	/*background-image: url("/images/minimalism_gradient_glow_blue.jpg");
 	background-size:cover;*/
 }
@@ -139,8 +139,9 @@ body {
  .dashboard-stat{
  	color: white;
  	padding-bottom: 5px;
- 	min-width: 80px;
+ 	/*min-height: 100px;*/
  	margin-right: 4px;
+ 	margin-bottom:4px;
  }
 
  .light-blue{
@@ -182,4 +183,30 @@ body {
 
 .dashboard-box-caption{
 	margin-top: -6px;
+}
+
+.outlook-head{
+	font-size: 3em;
+	margin-bottom: -0.7em;
+	/*margin-top: 0.005em;*/
+}
+
+.dashboard-pane-1{
+	margin-left: 10px;
+}
+
+.greenFill{
+	fill: green;
+}
+
+.orangeFill{
+	fill: orange;
+}
+
+.dashboard-stat-container{
+	margin-right: 10px;
+}
+
+.min300{
+	min-width: 300px;
 }

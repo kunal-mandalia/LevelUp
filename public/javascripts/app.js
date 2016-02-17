@@ -88,6 +88,14 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           loggedin: checkLoggedin
         }
       })
+      .when('/analytics', {
+        templateUrl: 'views/analytics.html',
+        controller: 'AnalyticsCtrl'
+      })
+      .when('/analytics2', {
+        templateUrl: 'views/analytics2.html',
+        controller: 'AnalyticsCtrl2'
+      })
       .otherwise({
         redirectTo: '/'
       });
@@ -98,8 +106,17 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
 
     $rootScope.location = $location;
     $rootScope.message = '';
-
+    $rootScope.millisecondsInDay = 86400000;
     $rootScope.busy = false;
+
+    // init DataService data structure
+    $rootScope.data = [];
+    $rootScope.data.goal = [];
+    $rootScope.data.action = [];
+    $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
+    $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
+    $rootScope.data.outlook = 0;
+
     // Logout function is available in any pages
     $rootScope.logout = function(){
       $rootScope.user = {};
@@ -163,53 +180,36 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
     $scope.loginGithub = function(){
       $rootScope.busy = true;
     }
-
 });
 
 
 /**********************************************************************
  * dashboard controller
  **********************************************************************/
-app.controller('DashboardCtrl', function($scope, $http, $mdSidenav, $timeout, $rootScope) {
- $scope.goal = [];
- $scope.action = [];
- $scope.goal.status = {};
- $scope.action.status = [];
- $scope.goal.recent = [];
- $scope.action.recent = [];
- $scope.goal.upcoming = [];
- $scope.action.upcoming = [];
- $scope.lastDays = 7;
+app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
- // Initialise with dummy data
- $scope.goal.status = {"open": 5, "closed": 3, "completed": 2};
- $scope.action.status = {"open": 11, "closed": 4, "completed": 3};
- $scope.goal.recent = [{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"},{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "edit"},{"description": "Swim in the Pacific", "date_modified": "2016-01-30", "update": "edit"}];
- $scope.action.recent = [{"description": "Become a web dev", "date_modified": "2016-01-02", "update": "progress"}];
- $scope.goal.upcoming = [{"description": "Develop habits of good health", "due": "2016-03-01"},{"description": "Become a web dev", "due": "2016-03-15"}];
+  $scope.outlook = 7;
+  DataService.loadData($scope.outlook);
 
- // set correct dates
- for (var i = 0; i < $scope.goal.recent.length; i++) {
-   $scope.goal.recent[i].date_modified = new Date($scope.goal.recent[i].date_modified);
- };
+  $scope.$watch('outlook', function() {
+    DataService.updateOutlook($scope.outlook);
+  });
 
- for (var i = 0; i < $scope.action.recent.length; i++) {
-   $scope.action.recent[i].date_modified = new Date($scope.action.recent[i].date_modified);
- };
+  $scope.incrementProgress = function(action){
+    DataService.postProgress(action, 1);
+  };
 
- for (var i = 0; i < $scope.goal.upcoming.length; i++) {
-   $scope.goal.upcoming[i].due = new Date($scope.goal.upcoming[i].due);
- };
-
- for (var i = 0; i < $scope.action.upcoming.length; i++) {
-   $scope.action.upcoming[i].due = new Date($scope.action.upcoming[i].due);
- };
+  $scope.completeGoal = function(goal){
+    var body = {status: "Closed - Complete", }
+    // DataService.setOutlook(outlook);
+    DataService.putGoal(goal, body);
+  };
 
 });
 /**********************************************************************
  * tracking controller
  **********************************************************************/
-app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, MenuService, $mdSidenav, $timeout, $rootScope) {
+app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, $mdSidenav, $timeout, $rootScope) {
   // List of users got from the server
   //$scope.users = [];
   $scope.me = [];
@@ -429,18 +429,16 @@ app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory,
         console.log('ProgressFactory error: ' + JSON.stringify(error));
         $rootScope.busy = false;
       });
-
-    //console.log('actionid: ' + actionid + ', progress: ' + progress);
   }
 
 $scope.prepareData = function(action){
 
-  var periodLengthMilliseconds = action.period * 86400000;
+  var periodLengthMilliseconds = action.period * $rootScope.millisecondsInDay;
   var startDate = new Date(action.date_created);
   var startDateMilliseconds = startDate.getTime();
   var compareDateMilliseconds = Date.now();
   var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
-  var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/86400000);
+  var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/$rootScope.millisecondsInDay);
   action.daysRemaining = daysRemaining;
   
   var deadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
@@ -466,62 +464,52 @@ $scope.prepareData = function(action){
   action.chart.xAxisLabel = periodInWordsFilter(action.period, 1) + ' since ' + $filter('date')(action.date_created, "dd MMM, yyyy");
   action.chart.data = [{key: 'progress', values: []}];
 
-  // for (var i = 0; i < totalPeriodsIncludingCurrent.length; i++) {
-  //   var value = {x: i+1, y: 0};
-  //   action.chart.data[0].values.push(value);
-  // };
+  for (var i = 0; i < totalPeriodsIncludingCurrent; i++) {
+    var value = {x: i+1, y: 0};
+    action.chart.data[0].values.push(value);
+  };
 
-  // for (var i = action.summary.length - 1; i >= 0; i--) {
-  //   var period = action.summary[i].period;
-  //   action.chart.data[0].values[period-1].y = action.summary[i].progress;
-  // };
-
-for (var i = 0; i < totalPeriodsIncludingCurrent; i++) {
-  var value = {x: i+1, y: 0};
-  action.chart.data[0].values.push(value);
-};
-
-for (var i = 0; i < action.summary.length; i++) {
-  var period = action.summary[i].period;
-  action.chart.data[0].values[period-1].y = action.summary[i].progress;
-};
-
-action.chart.options = {
-            chart: {
-                type: 'multiBarChart',
-                showControls: false,
-                showLegend: false,
-                height: 130,
-                margin : {
-                    top: 20,
-                    right: 20,
-                    bottom: 50,
-                    left: 80
-                },
-                clipEdge: true,
-                duration: 500,
-                stacked: true,
-                forceY: [0, action.verb_quantity],
-                xAxis: {
-                    axisLabel: action.chart.xAxisLabel,
-                    showMaxMin: false,
-                    tickFormat: function(d){
-                        return d3.format(',f')(d);
-                    }
-                },
-                yAxis: {
-                    axisLabel: 'Progress',
-                    axisLabelDistance: -20,
-                    showMaxMin: true,
-                    tickFormat: function(d){
-                        return d3.format(',f')(d);
-                    }
-                }
-            }
-        };
-
+  for (var i = 0; i < action.summary.length; i++) {
+    var period = action.summary[i].period;
+    action.chart.data[0].values[period-1].y = action.summary[i].progress;
+  };
 
   action.currentProgress = currentProgress;
+
+  action.chart.options = {
+              chart: {
+                  type: 'multiBarChart',
+                  showControls: false,
+                  showLegend: false,
+                  height: 130,
+                  margin : {
+                      top: 20,
+                      right: 20,
+                      bottom: 50,
+                      left: 80
+                  },
+                  clipEdge: true,
+                  duration: 500,
+                  stacked: true,
+                  forceY: [0, action.verb_quantity],
+                  xAxis: {
+                      axisLabel: action.chart.xAxisLabel,
+                      showMaxMin: false,
+                      tickFormat: function(d){
+                          return d3.format(',f')(d);
+                      }
+                  },
+                  yAxis: {
+                      axisLabel: 'Progress',
+                      axisLabelDistance: -20,
+                      showMaxMin: true,
+                      tickFormat: function(d){
+                          return d3.format(',f')(d);
+                      }
+                  }
+              }
+          };
+
   return null;
 
   // action.daysRemaining = daysRemaining;
@@ -637,9 +625,9 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
 /**********************************************************************
  * Root page controller
  **********************************************************************/
-app.controller('RootCtrl', ['MenuService', '$scope', '$rootScope', '$location', '$mdSidenav', function(MenuService, $scope, $rootScope, $location, $mdSidenav) {
-  $scope.menu = MenuService.menu;
-  $scope.newItem = $scope.menu.length;
+app.controller('RootCtrl', ['$scope', '$rootScope', '$location', '$mdSidenav', function($scope, $rootScope, $location, $mdSidenav) {
+  // $scope.menu = MenuService.menu;
+  // $scope.newItem = $scope.menu.length;
 
   $scope.toggleMenu = function(id) {
     $mdSidenav(id).toggle();
@@ -647,9 +635,9 @@ app.controller('RootCtrl', ['MenuService', '$scope', '$rootScope', '$location', 
 
   $scope.pagename = function() { return $location.path(); };
 
-  $scope.addItem = function() {
-    MenuService.add( $scope.newItem );  
-   };
+  // $scope.addItem = function() {
+  //   MenuService.add( $scope.newItem );  
+  //  };
 
    $scope.hello = function(){
     console.log('hello world');
@@ -675,18 +663,367 @@ app.controller('RootCtrl', ['MenuService', '$scope', '$rootScope', '$location', 
 
 }]);
 
+app.controller('AnalyticsCtrl2',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
 
+  // console.log('outlook updated...');
+  $scope.data = $rootScope.data;
+  // console.log();
+
+}]);
+
+app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
+  $scope.data = $rootScope.data;
+  $scope.outlook = 7;
+  DataService.setOutlook($scope.outlook);
+  DataService.goalTotals();
+  $scope.data = DataService.getData();
+  console.log($scope.data);
+
+  $scope.$watch('outlook', function() {
+    // console.log('outlook updated...');
+    DataService.updateOutlook($scope.outlook);
+    // console.log($rootScope.data);
+  });
+
+  $scope.loadDataToRootScope = function(){
+    DataService.loadData($scope.outlook); // TODO: use promise instead?
+    // console.log($rootScope.data);
+  }
+
+  // $scope.updateOutlook = function(){
+  //   DataService.setOutlook($scope.outlook);
+  // }
+
+
+}]);
+  
 // SERVICES
- app.service( 'MenuService', [ '$rootScope', function( $rootScope ) {
-   return {
-      menu: [{ type: 'button', icon:'settings', ngClick: '', href: ''}],
-      add: function( item ) {
-        this.menu.push( item );
-      }
-   };
- }])
+ // app.service( 'MenuService', [ '$rootScope', function( $rootScope ) {
+ //   return {
+ //      menu: [{ type: 'button', icon:'settings', ngClick: '', href: ''}],
+ //      add: function( item ) {
+ //        this.menu.push( item );
+ //      }
+ //   };
+ // }])
 
 // FACTORIES
+app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScope, $http, $filter) {
+
+  //functions defined within a JSON object so they're accessible to eachother
+  var functions = {
+    prepareActionData: function(){
+        var open = 0;
+        var closed = 0;
+        var complete = 0;
+        var outlook = $rootScope.data.outlook;
+        var repetition = 0;
+        var rep_complete = 0;
+        var rep_conversion = 0;
+        var temp_rep_total = 0;
+        var temp_rep_complete = 0;
+        var temp_repetition = 0;
+        var outlookDate = new Date(Date.now() - (outlook * $rootScope.millisecondsInDay));
+        var action_date_created = new Date();
+        var progress_date = new Date();
+        var max_repetition = 0;
+        var days_since_created = 0;
+        var today = new Date(Date.now());
+
+        for (var i=0; i < $rootScope.data.action.length; i++){
+          
+          var action = $rootScope.data.action[i];
+
+          //set date objects from strings
+          action.date_modified = new Date(action.date_modified);
+          action.date_created = new Date($rootScope.data.action[i].date_created);
+
+          // vars from prepareData
+          var periodLengthMilliseconds = action.period * $rootScope.millisecondsInDay;
+          var startDate = new Date(action.date_created); // use action.date_created
+          var startDateMilliseconds = startDate.getTime();
+          var compareDateMilliseconds = Date.now();
+          var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
+          var remainingDays = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/$rootScope.millisecondsInDay);
+          action.remainingDays = remainingDays;
+          
+          var deadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
+          action.deadline = deadline;
+          action.currentPeriod = totalPeriodsIncludingCurrent;
+
+          var totalPeriodsExcludingCurrent = totalPeriodsIncludingCurrent - 1; // if totalPeriodsIncludingCurrent = 0?
+
+          var startCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsExcludingCurrent));
+          var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
+          var currentProgress = 0;
+
+          // calculate open, closed, complete
+          if (action.status == 'Open'){
+            open += 1;  
+          }
+          else if ((action.status == 'Closed - Complete') && (outlookDate < action.date_modified)){
+            closed += 1;
+          }
+          else if ((action.status == 'Closed - Incomplete') && (outlookDate < action.date_modified)){
+            complete += 1;
+          }
+
+          // handle case where no current period progress
+          // only calculate currentProgress if it's not already been calculated
+          // the user may have incremented currentProgress so we don't want to lose this value
+          // whenever updateScope is called (which in turn calls this function)
+          if (!action.currentProgress){
+            for (var j = action.summary.length - 1; j >= 0; j--) {
+              if (action.summary[j].period == action.currentPeriod) {
+                currentProgress = action.summary[j].progress;
+                break;
+              };
+            };
+            action.currentProgress = currentProgress;
+          }
+
+          // create values array for nvd3 graph
+          action.chart = [];
+          action.chart.xAxisLabel = $filter('periodInWords')(action.period, 1) + ' since ' + $filter('date')(action.date_created, "dd MMM, yyyy");
+          action.chart.data = [{key: 'progress', values: []}];
+
+          for (var j = 0; j < totalPeriodsIncludingCurrent; j++) {
+            var value = {x: j+1, y: 0};
+            action.chart.data[0].values.push(value);
+          };
+
+          for (var j = 0; j < action.summary.length; j++) {
+            var period = action.summary[j].period;
+            action.chart.data[0].values[period-1].y = action.summary[j].progress;
+          };
+
+
+          action.chart.options = {
+                      chart: {
+                          type: 'multiBarChart',
+                          showControls: false,
+                          showLegend: false,
+                          height: 130,
+                          margin : {
+                              top: 20,
+                              right: 20,
+                              bottom: 50,
+                              left: 80
+                          },
+                          clipEdge: true,
+                          duration: 500,
+                          stacked: true,
+                          forceY: [0, action.verb_quantity],
+                          xAxis: {
+                              axisLabel: action.chart.xAxisLabel,
+                              showMaxMin: false,
+                              tickFormat: function(d){
+                                  return d3.format(',f')(d);
+                              }
+                          },
+                          yAxis: {
+                              axisLabel: 'Progress',
+                              axisLabelDistance: -20,
+                              showMaxMin: true,
+                              tickFormat: function(d){
+                                  return d3.format(',f')(d);
+                              }
+                          }
+                      }
+                  };
+
+          // calculate repetition, rep_complete, both at the individual action level and running total
+          // having these stats at the individual action level means they're available for when user drills down into the action detail view.
+
+          for (var j=0; j < $rootScope.data.action[i].summary.length; j++){
+            // compare outlook date to period. Todo.
+            // action_date_created = new Date(data.action[i].date_created + )
+            // f (period, created);
+            progress_date = new Date(action.date_created.getTime() + ($rootScope.data.action[i].period * $rootScope.data.action[i].summary[j].period * $rootScope.millisecondsInDay));
+
+            if (outlookDate < progress_date){
+              temp_rep_complete += $rootScope.data.action[i].summary[j].progress;
+
+              console.log('progress...');
+              console.log($rootScope.data.action[i]);
+            }
+          }
+
+          $rootScope.data.action[i].summary.totalProgress = temp_rep_complete;
+          rep_complete += temp_rep_complete;
+
+          $rootScope.data.action[i].summary.totalRepetition = Math.round((action.verb_quantity/action.period)*outlook); // since action.period is per day, we can multiply by outlook to get expected total reps over day range
+
+          temp_repetition += $rootScope.data.action[i].summary.totalRepetition; // max rep = rep per day * days since created
+
+          // max repetition
+          days_since_created = ((today - action.date_created)/$rootScope.millisecondsInDay);
+          max_repetition = Math.round((action.verb_quantity/action.period)*(days_since_created));
+
+          if (max_repetition > temp_repetition){
+            repetition += temp_repetition;
+          }
+          else {
+            repetition += max_repetition;
+          }
+
+          // clear temp vars
+          temp_rep_total = 0;
+          temp_rep_complete = 0;
+          temp_repetition = 0;
+        }
+
+        // cap max rep
+        
+        // calculate rep_conversion
+        rep_conversion = Math.round((rep_complete/repetition)*100);
+
+        $rootScope.data.action.total.open = open;
+        $rootScope.data.action.total.closed = closed;
+        $rootScope.data.action.total.complete = complete;
+        $rootScope.data.action.total.repetition = repetition;
+        $rootScope.data.action.total.rep_complete = rep_complete;
+        $rootScope.data.action.total.rep_conversion = rep_conversion;
+    },
+    prepareGoalData: function(){
+      var open = 0;
+      var closed = 0;
+      var complete = 0;
+      var outlook = $rootScope.data.outlook;
+      var outlookDate = new Date(Date.now() - (outlook * $rootScope.millisecondsInDay));
+
+      for (var i=0; i < $rootScope.data.goal.length; i++){
+        
+        var goal = $rootScope.data.goal[i];
+        goal.date_modified = new Date(goal.date_modified);
+
+        // calculate days remaining
+        goal.remainingDays = functions.daysRemaining(null, goal.due);
+
+        // calculate open, closed, complete
+        if (goal.status == 'Open'){
+          open += 1;  
+        }
+        else if ((goal.status == 'Closed - Complete') && (outlookDate < goal.date_modified)){
+          complete += 1;
+          closed += 1;
+        }
+        else if ((goal.status == 'Closed - Incomplete') && (outlookDate < goal.date_modified)){
+          closed += 1;
+        }
+      }
+
+      $rootScope.data.goal.total.open = open;
+      $rootScope.data.goal.total.closed = closed;
+      $rootScope.data.goal.total.complete = complete;
+    },
+    setOutlook: function(outlook){
+      $rootScope.data.outlook = outlook;
+    },
+    getData: function(){
+      return $rootScope.data;
+    },
+    loadData: function(outlook){
+      $http.get('/api/v1/goalsActionsProgress')
+        .success(function(doc){
+            console.log('before loaded goal:');
+            console.log($rootScope.data.goal);
+
+            $rootScope.data.goal = doc[0];
+            $rootScope.data.action = doc[1];
+            $rootScope.data.progress = doc[2];
+
+             console.log('Loaded Goals, Actions, Progress data');
+             console.log($rootScope.data.goal);
+             console.log($rootScope.data.action);
+             console.log($rootScope.data.progress);
+
+             // initialise default values
+            $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
+            $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
+            $rootScope.data.outlook = 0;
+            
+            // update totals/stats
+            functions.updateOutlook(outlook);
+
+        })
+        .error(function(error){
+          console.log('Error loading Goals, Actions, Progress data');
+        })
+    },
+    updateOutlook: function(outlook){
+      functions.setOutlook(outlook);
+      functions.prepareGoalData();
+      functions.prepareActionData();
+    },
+    daysRemaining: function(startDate, endDate){
+      var start = new Date(startDate);
+      var end = new Date();
+      var daysDiff = 0;
+
+      if (startDate){ start = new Date(startDate);}
+      else { start = new Date(Date.now());}
+
+      if (endDate){ end = new Date(endDate);}
+      else { end = new Date(Date.now());}
+
+      daysDiff = Math.ceil((end.getTime() - start.getTime())/$rootScope.millisecondsInDay); // TODO: use const global
+      return daysDiff;
+    },
+    // CRUD goals and actions
+    postProgress: function(action, progress){
+    $rootScope.busy = true;
+
+    var body = {_actionid: action._id, counter: progress}
+    body.date_modified = new Date(Date.now());
+
+    $http.post('/api/v1/progress', body)
+      .success(function (res){
+        console.log('ProgressFactory success: ' + JSON.stringify(res));
+        console.log(action);
+        action.currentProgress += progress;
+        action.chart.data[0].values[action.currentPeriod-1].y += progress;
+        action.date_modified = body.date_modified; // necessary?
+
+        //increment action scope
+        for (var j = action.summary.length - 1; j >= 0; j--) {
+          if (action.summary[j].period == action.currentPeriod) {
+            action.summary[j].progress += 1;
+            break;
+          };
+        };
+
+        functions.prepareActionData();
+
+        $rootScope.busy = false;
+      })
+      .error(function(error){
+        console.log('ProgressFactory error: ' + JSON.stringify(error));
+        $rootScope.busy = false;
+      });
+  },
+  putGoal: function(goal, body){
+    $rootScope.busy = true;
+    // add current datetime to date_modified
+    body.date_modified = new Date(Date.now());
+
+    $http.put('/api/v1/goal/' + goal._id, body)
+      .success(function(res){
+        console.log('put goal' + JSON.stringify(goal));
+        if (body.status){goal.status = body.status};
+        goal.date_modified = body.date_modified;
+        functions.prepareGoalData();
+        $rootScope.busy = false;
+      })
+      .error(function(err){
+        console.log('error put goal: ' + err);
+        $rootScope.busy = false;
+      });
+  }
+}
+return functions;
+}]);
+
 app.factory('UserFactory', function($http) {
      
     var factory = {};
@@ -746,7 +1083,7 @@ app.factory('GoalActionProgressFactory', function($http) {
 });
 
 app.factory('ProgressFactory', function($http) {
-     
+    
     var factory = {};
     return {
         post: function(actionid, progress) {
