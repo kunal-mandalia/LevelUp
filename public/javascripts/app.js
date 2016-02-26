@@ -123,11 +123,11 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
 
     // init DataService data structure
     $rootScope.data = [];
-    $rootScope.data.goal = [];
-    $rootScope.data.action = [];
-    $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
-    $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-    $rootScope.data.outlook = 7;
+    // $rootScope.data.goal = [];
+    // $rootScope.data.action = [];
+    // $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
+    // $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
+    // $rootScope.data.outlook = 7;
 
     $rootScope.data.dashboard = [];
     // $rootScope.data.dashboard.goal = ['g1', 'g2'];
@@ -171,11 +171,11 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       }
 
       console.log('setData');
-      // $rootScope.data = [];
-      $rootScope.data.goal = goals;
-      $rootScope.data.action = actions;
-      $rootScope.data.progress = progress;
-      $rootScope.data.outlook = outlook;
+      // // $rootScope.data = [];
+      // $rootScope.data.goal = goals;
+      // $rootScope.data.action = actions;
+      // $rootScope.data.progress = progress;
+      // $rootScope.data.outlook = outlook;
     }
 
     $rootScope.setActiveGoal = function(goal){
@@ -262,17 +262,18 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
   $rootScope.busy=true;
+  $rootScope.data.dashboard.outlook = 7;
 
   var options = {branch: 'dashboard'};
 
-  DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
+  DataService.loadData($rootScope.data.dashboard.outlook, $rootScope.setData, options);
 
   // $scope.data = Object.assign({}, $rootScope.data);
 
   // $rootScope.activeGoal.due = new Date($rootScope.activeGoal.due);
 
-  $scope.$watch('data.outlook', function() {
-    DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
+  $scope.$watch('data.dashboard.outlook', function() {
+    DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.dashboard.outlook);
   });
 
   $scope.incrementProgress = function(action){
@@ -844,9 +845,9 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
   //functions defined within a JSON object so they're accessible to eachother
   var functions = {
     prepareActionData: function(actions, outlook){
-        var open = 0;
-        var closed = 0;
-        var complete = 0;
+        var total = 0;
+        var on = 0;
+        var off = 0;
         // var outlook = $rootScope.data.outlook;
         var repetition = 0;
         var rep_complete = 0;
@@ -894,15 +895,14 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
           var currentProgress = 0;
 
-          // calculate open, closed, complete
-          if (action.status == 'Open'){
-            open += 1;  
+          // check most recent status
+          if (action.status[action.status.length-1].on == true){
+            on += 1;
+            total += 1;  
           }
-          else if ((action.status == 'Closed - Complete') && (outlookDate < action.date_modified)){
-            closed += 1;
-          }
-          else if ((action.status == 'Closed - Incomplete') && (outlookDate < action.date_modified)){
-            complete += 1;
+          else if (action.status[action.status.length-1].on == false){
+            off += 1;
+            total += 1;  
           }
           // Total, On, Off
 
@@ -1017,9 +1017,9 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
 
         actions.total = {};
 
-        actions.total.open = open;
-        actions.total.closed = closed;
-        actions.total.complete = complete;
+        actions.total.total = total;
+        actions.total.on = on;
+        actions.total.off = off;
         actions.total.repetition = repetition;
         actions.total.rep_complete = rep_complete;
         actions.total.rep_conversion = rep_conversion;
@@ -1223,6 +1223,11 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         action.currentProgress += progress;
         action.chart.data[0].values[action.currentPeriod-1].y += progress;
         action.date_modified = body.date_modified; // necessary?
+
+        // attempt at bug fix: progress not updating after creating/updating new action
+        if (action.summary.length == 0){
+          action.summary = [{progress: 0, period: 1}];
+        }
 
         //increment action scope
         for (var j = action.summary.length - 1; j >= 0; j--) {
