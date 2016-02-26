@@ -139,7 +139,7 @@ body {
  .dashboard-stat{
  	color: white;
  	padding-bottom: 5px;
- 	/*min-height: 100px;*/
+ 	height: 77px;
  	margin-right: 4px;
  	margin-bottom:4px;
  }
@@ -174,6 +174,7 @@ body {
  	background-color: rgba(235,235,235,0);
  	border: none;
  	color: #FF4081;
+ 	margin-left: 15px;
  }
 
  .dashboard-subhead{
@@ -195,6 +196,11 @@ body {
 	margin-left: 10px;
 }
 
+.dashboard-pane-2{
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
 .greenFill{
 	fill: green;
 }
@@ -208,5 +214,14 @@ body {
 }
 
 .min300{
+	min-width: 300px;
+}
+
+.href-link{
+	color: #3470CE;
+	text-decoration: none;
+}
+
+.min-goal{
 	min-width: 300px;
 }

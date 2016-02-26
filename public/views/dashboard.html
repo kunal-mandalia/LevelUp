@@ -1,3 +1,5 @@
+<div class="md-padding">
+
 <div layout="column" layout-gt-md="row" class="dashboard-pane-1">
   <div flex="10" flex-sm="90" class="min300">
 
@@ -5,18 +7,16 @@
         Progress tracker
     </md-button> -->
 
-    	
-
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray">Goals</h1>
-	    	<md-button class="md-warn" href="#/tracking">
-		        Manage
+	    	<md-button class="md-raised" href="#/tracking">
+		        List
 		    </md-button>
 		</div>
 
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
@@ -33,7 +33,7 @@
 	    <!-- Actions -->
         <h1 class="md-display-1 light-gray">Actions</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
@@ -64,18 +64,19 @@
 
     	<h1 class="md-display-1 light-gray">Upcoming</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Next {{outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} days. {{data.goal.total.open + data.goal.total.closed}} goals. {{ data.action.total.open + data.action.total.closed}} actions.</div>
         </div>
+
         <div layout="row" >
             <md-content class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
-                    <md-list-item class="md-2-line" ng-repeat="g in data.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > outlook)">
+                    <md-list-item class="md-2-line" ng-repeat="g in data.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
                     	<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
                     		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
-                            <h3>{{g.description}}</h3>
+                            <h3><a ng-click="setActiveGoal(g)" href="#/goal" class="href-link">{{g.description}}</a></h3>
 					        <h4>{{g.remainingDays}} days remaining</h4>
 					        <p>goal</p>
 					        <!-- <ng-md-icon icon="mood" style="fill:green" class="md-avatar goal-card-icon" ng-hide="g.status != 'closed - complete'"></ng-md-icon> -->
@@ -83,13 +84,14 @@
                         <md-divider></md-divider>
                     </md-list-item>
                     <!-- Actions -->
-                    <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > outlook) || (a.remainingDays < 0)">
+                    <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0)">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
                     	<md-button class="md-icon-button">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
-                            <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3>
+                            <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
+                            <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
 					        <h4>{{a.remainingDays}} days remaining </h4> 
 					        <!-- TODO:  -->
 					        <p>action</p>
@@ -103,15 +105,15 @@
   </div>
   <div flex>
 
-  		<!-- Outlook -->
+  		<!-- data.outlook -->
     	<div layout="row" layout-align="start center">
-	    	<h1 class="md-display-1 light-gray"> {{outlook}} day outlook</h1>
+	    	<h1 class="md-display-1 light-gray"> {{data.outlook}} day outlook</h1>
 		</div>
         <div layout="row" layout-align="center center">
-	        <md-slider flex min="1" max="31" ng-model="outlook" aria-label="due" id="due-slider" class>
+	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
 	        </md-slider>
 	        <div layout layout-align="center center">
-                <input flex type="number" ng-model="outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
+                <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
 	        </div>
 	    </div>
     
@@ -121,7 +123,7 @@
 		</div>
 
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
         <div layout="row">
             <md-content class="">
@@ -147,7 +149,7 @@
 	                </md-list-item>
 	                <md-list-item>
 		                <div layout="row" layout-align="start center">
-					    	<h1 class="md-display-4 outlook-head light-gray"> {{outlook}} day outlook</h1>
+					    	<h1 class="md-display-4 data.outlook-head light-gray"> {{data.outlook}} day data.outlook</h1>
 						</div>
                         <md-divider></md-divider>
 		            </md-list-item> -->
@@ -155,4 +157,6 @@
         </div>
 
   </div>
+</div>
+
 </div>

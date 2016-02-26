@@ -1,0 +1,160 @@
+<script>
+
+actionDurationOn = function(action, dateRange){
+
+	var durationOn = 0;
+
+	var s = dateRange.start;
+	var e = dateRange.end;
+
+	var A = []; // actions before s
+	var B = []; // actions between s and e
+
+	var k = 0;
+	var r = 0;
+	var isEven = false; // |B| is even
+	var N = 0; // = |B|
+
+	var msd = 86400000; //ms in day
+
+	// populate A and B with action.status
+	for (var i = 0; i < action.status.length; i++) {
+
+		if (action.status[i].date < s)
+		{
+			A.push(action.status[i]);
+		}
+		else if (action.status[i].date > s && action.status[i].date < e)
+		{
+			B.push(action.status[i]);
+		};
+	};
+
+	// alpha
+	if (A.length > 0 && A[A.length-1].on == true){
+
+		if (B.length > 0) {
+			durationOn += B[0].date - s;
+		} else {
+			durationOn += e - s;
+		}
+	}
+
+	// beta
+	if (B.length > 0 && B[B.length-1].on == true) {
+		durationOn += e - B[B.length-1].date;
+	};
+
+	// gamma
+	if (B.length > 2 || (B.length == 2 && B[0].on == false)) {
+
+		// initialise formula variable r
+		if (B[0].on == false) {
+			r = 1;
+		} else {
+			r = 0;
+		}
+
+		// even/odd number of B elements - required for obtaining k
+		N = B.length;
+
+		(N % 2 == 0) ? (isEven = true) : (isEven = false);
+
+		// initialise formula variable k
+		switch (true){
+			case (N > 1 && isEven == true && B[0].on == true):
+				k = (N / 2) - 1;
+				break;
+			case (N > 2 && isEven == false):
+				k = ((N - 1)/2) - 1;
+				break;
+			case (N > 3 && isEven == true && B[0].on == false):
+				k = (N / 2) - 2;
+				break;
+			default:
+				k = -1; // do not loop
+				break;
+		}
+
+		if (k >= 0){
+			for (var i = 0; i < k + 1; i++) {
+				// console.log('loop: ' + i);
+				durationOn += B[(2*i) + 1 + r].date - B[(2*i) + r].date;
+			};
+		}
+
+	};
+
+	return durationOn/msd; // return days instead of milliseconds
+
+}
+
+test_actionDurationOn = function(){
+
+	var action = [];
+
+	//test 1.0
+	action.status = [{date: "2016-01-01", on: true}, {date: "2016-02-01", on: false}, {date: "2016-03-01", on: true}, {date: "2016-04-01", on: false}];
+	var dateRange = {start: "2010-01-02", end: "2019-03-03"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 62){ throw ('test_functions.actionDurationOn: 62 != ' + durationOn); }
+
+	//test 1.1
+	// action.status = [{date: "2016-01-01", on: true}, {date: "2016-02-01", on: false}, {date: "2016-03-01", on: true}, {date: "2016-04-01", on: false}];
+	var dateRange = {start: "2016-01-10", end: "2016-01-12"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 2){ throw ('test_functions.actionDurationOn: 2 != ' + durationOn); }
+
+	//test 1.2
+	// action.status = [{date: "2016-01-01", on: true}, {date: "2016-02-01", on: false}, {date: "2016-03-01", on: true}, {date: "2016-04-01", on: false}];
+	var dateRange = {start: "2016-01-10", end: "2016-02-12"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 22){ throw ('test_functions.actionDurationOn: 22 != ' + durationOn); }
+
+	//test 1.3
+	// action.status = [{date: "2016-01-01", on: true}, {date: "2016-02-01", on: false}, {date: "2016-03-01", on: true}, {date: "2016-04-01", on: false}];
+	var dateRange = {start: "2016-01-25", end: "2016-03-15"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 21){ throw ('test_functions.actionDurationOn: 21 != ' + durationOn); }
+
+	//test 2.0
+	action.status = [{date: "2016-01-01", on: true}];
+	var dateRange = {start: "2016-01-25", end: "2016-03-15"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 50){ throw ('test_functions.actionDurationOn: 50 != ' + durationOn); }
+
+	//test 2.1
+	// action.status = [{date: "2016-01-01", on: true}];
+	var dateRange = {start: "2015-01-25", end: "2016-01-05"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 4){ throw ('test_functions.actionDurationOn: 4 != ' + durationOn); }
+
+	//test 3.0
+	action.status = [{date: "2019-01-01", on: true}];
+	var dateRange = {start: "2015-01-25", end: "2016-01-05"};
+	setJsDates(action, dateRange);
+	var durationOn = actionDurationOn(action, dateRange);
+	if (durationOn != 0){ throw ('test_functions.actionDurationOn: 0 != ' + durationOn); }
+
+
+
+	console.log('All tests passed');
+}
+
+setJsDates = function(action, dateRange){
+	// set js dates
+	for (var i = 0; i < action.status.length; i++) {
+		action.status[i].date = new Date(action.status[i].date);
+	};
+	dateRange.start = new Date(dateRange.start);
+	dateRange.end = new Date(dateRange.end);
+}
+
+
+</script>

@@ -9,7 +9,7 @@ var actionSchema = mongoose.Schema({
     period 			: Number, // TODO: Store period as Number, apply Angular filter clientside to show 'every month' for 30 days, 'every week' for 7 days, 'every 120 days' for 120 day custom period. 0: one time
     due 			: Date,
     summary			: [], // [{period: 1, progress: 2}, {period: 2, progress: 3}]. Similar to how Angular nvD3 requires data format
-    status			: { type: String, default: 'Open'},
+    status			: [], // [{date: '2016-01-01', on: true}, {date: '2016-02-01', on: false}]
     date_created    : { type: Date, default: Date.now }, // TODO: use start date instead of created
     date_modified   : { type: Date, default: Date.now }
 });
@@ -47,10 +47,25 @@ actionSchema.methods.updateSummary = function(compareDate, progress, cb){
 	this.markModified('summary');
 
 	this.save(function (err) {
-	    if (err) return handleError(err);
+	    if (err) return (err);
 	    return this;
 	  });
 }
+
+// actionSchema.methods.updateSummary = function(on, cb){
+// 	var status = this.status;
+// 	var now = new Date(Date.now());
+
+// 	var summaryItem = {date: now, on: on};
+// 	status.push(summaryItem);
+
+// 	this.save(function (err) {
+// 	    if (err) return handleError(err);
+// 	    return this;
+// 	  });
+// }
+
+
 
 // create the model for goal and expose it to our app
 module.exports = mongoose.model('Action', actionSchema);

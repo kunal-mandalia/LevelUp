@@ -1,0 +1,141 @@
+<script>
+
+functions = {
+    actionDurationOn: function(action, start, end){
+      var durationOn = 0;
+      var lastStatus = action.status.length-1;
+      var statusWithinRange = [];
+      // TODO
+      // case: (last ------- start ------ end) or (----start----end ---- first). Out of range
+      // if ((action.status[lastStatus].date < start) || ( end < action.status[0].date)) {
+      //   return 0;
+      // };
+
+      // if the last relevant status update was before outlook range then work with the outlook range and last status
+      // and since it's only the last status which is relevant, set lastPeriod to true
+      if (action.status[lastStatus].date < start){
+        durationOn = functions.onDaysBetween(action.status[lastStatus].on, true, start, end);
+        return durationOn;
+         // (end.getTime() - start.getTime())/86400000;
+      }
+
+      for (var i = 0; i < action.status.length; i++) {
+
+        if ( action.status[i].date > start && action.status[i].date < end ){
+          //
+          statusWithinRange.push(action.status[i]);
+        }
+      };
+
+      if (statusWithinRange.length == 0){ return 0;}
+
+      var currentStatusDate = new Date();
+      var nextStatusDate = new Date();
+      var nextStatusOn = false;
+      var lastPeriod = false;
+
+      if ( (statusWithinRange.length == 1) && statusWithinRange[0].on == false){ return 0;}
+
+      for (var i = 0; i < statusWithinRange.length + 1; i++) {
+
+        if (i == statusWithinRange.length) { 
+          currentStatusDate = new Date(statusWithinRange[statusWithinRange.length-1].date);
+          nextStatusDate = new Date(end);
+          nextStatusOn = statusWithinRange[statusWithinRange.length-1].on;
+          lastPeriod = true;
+        }
+        else if (i == 0){
+          currentStatusDate = new Date(start);
+          nextStatusDate = new Date(statusWithinRange[0].date);
+          nextStatusOn = statusWithinRange[0].on;
+        }
+        else {
+          currentStatusDate = new Date(statusWithinRange[i-1].date);
+          nextStatusDate = new Date(statusWithinRange[i].date);
+          nextStatusOn = statusWithinRange[i].on;
+
+        }
+
+        durationOn += functions.onDaysBetween(nextStatusOn, lastPeriod, currentStatusDate, nextStatusDate);
+      };
+
+      return durationOn;
+    },
+    onDaysBetween: function(nextStatusOn, lastPeriod, currentStatusDate, nextStatusDate){
+      var duration = 0;
+
+      if (nextStatusOn){
+        if (lastPeriod){
+          duration = ((nextStatusDate.getTime() - currentStatusDate.getTime())/86400000);
+        } else {
+          duration = 0;
+        }
+      } else {
+        if (lastPeriod){
+          duration = 0;
+        } else {
+          duration = ((nextStatusDate.getTime() - currentStatusDate.getTime())/86400000);
+        }
+      }
+      return duration;
+    }
+}
+
+test_actionDurationOn = function(){
+	var action = [{description: "test-action"}];
+	action.status = [{date: "2016-01-01", on: true}, {date: "2016-02-01", on: false}, {date: "2016-03-01", on: true}, {date: "2016-04-01", on: false}];
+
+	// set date objects
+	for (var i = 0; i < action.status.length; i++) {
+		action.status[i].date = new Date(action.status[i].date);
+	};
+
+	// test1
+	var start = new Date('2016-01-15');
+	var end = new Date('2016-03-15');
+	var durationOn = functions.actionDurationOn(action,start, end );
+
+	if (durationOn != 31){ throw ('test_functions.actionDurationOn:test1 31 != ' + durationOn); }
+
+	// test1.1
+	var start = new Date('2016-01-15');
+	var end = new Date('2016-02-15');
+	var durationOn = functions.actionDurationOn(action,start, end );
+	console.log(durationOn);
+	if (durationOn != 15){ throw ('test_functions.actionDurationOn:test1.1 15 != ' + durationOn); }
+
+	// test2
+	var start = new Date('2015-01-01');
+	var end = new Date('2019-04-15');
+	var durationOn = functions.actionDurationOn(action,start, end );
+
+	if (durationOn != 62){ throw ('test_functions.actionDurationOn:test2 62 != ' + durationOn); }
+
+	// test3
+	var start = new Date('2016-01-30');
+	var end = new Date('2016-03-02');
+	var durationOn = functions.actionDurationOn(action,start, end );
+
+	if (durationOn != 3){ throw ('test_functions.actionDurationOn:test3 3 != ' + durationOn); }
+
+	// test4: out of range
+	var start = new Date('2013-01-05');
+	var end = new Date('2014-03-02');
+	var durationOn = functions.actionDurationOn(action,start, end );
+
+	if (durationOn != 0){ throw ('test_functions.actionDurationOn:test4 0 != ' + durationOn); }
+
+	// test5: one off action
+	action.status = [{date: "2016-01-01", on: false}];
+
+	var start = new Date('2016-01-05');
+	var end = new Date('2014-03-02');
+	var durationOn = functions.actionDurationOn(action,start, end );
+
+	if (durationOn != 0){ throw ('test_functions.actionDurationOn:test5 0 != ' + durationOn); }
+
+	console.log('test_functions.actionDurationOn: tests passed');
+
+}
+
+</script>

@@ -96,6 +96,18 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         templateUrl: 'views/analytics2.html',
         controller: 'AnalyticsCtrl2'
       })
+      .when('/goal', {
+        templateUrl: 'views/goal.html',
+        controller: 'GoalCtrl'
+      })
+      // .when('/goal2', {
+      //   templateUrl: 'views/goal2.html',
+      //   controller: 'GoalCtrl'
+      // })
+      .when('/action', {
+        templateUrl: 'views/action.html',
+        controller: 'ActionCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
@@ -115,8 +127,69 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     $rootScope.data.action = [];
     $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
     $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-    $rootScope.data.outlook = 0;
+    $rootScope.data.outlook = 7;
 
+    $rootScope.data.dashboard = [];
+    // $rootScope.data.dashboard.goal = ['g1', 'g2'];
+
+    $rootScope.activeGoal = {description: "test desc"};
+    $rootScope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
+
+    $rootScope.setData = function(goals, actions, progress, outlook, options){
+
+
+      switch(options.branch){
+        case "dashboard":
+
+          $rootScope.data.dashboard = [];
+          $rootScope.data.dashboard.goal = goals;
+          $rootScope.data.dashboard.action = actions;
+          $rootScope.data.dashboard.progress = progress;
+          $rootScope.data.dashboard.outlook = outlook;
+          break;
+
+        case "goal":
+
+          $rootScope.data.activeGoal = [];
+          $rootScope.data.activeGoal.goal = goals;
+          $rootScope.data.activeGoal.action = actions;
+          $rootScope.data.activeGoal.progress = progress;
+          $rootScope.data.activeGoal.outlook = outlook;
+          break;
+
+        case "action":
+
+          $rootScope.data.activeAction = [];
+          $rootScope.data.activeAction.goal = goals;
+          $rootScope.data.activeAction.action = actions;
+          $rootScope.data.activeAction.progress = progress;
+          $rootScope.data.activeAction.outlook = outlook;
+          break;
+
+        default:
+          break;
+      }
+
+      console.log('setData');
+      // $rootScope.data = [];
+      $rootScope.data.goal = goals;
+      $rootScope.data.action = actions;
+      $rootScope.data.progress = progress;
+      $rootScope.data.outlook = outlook;
+    }
+
+    $rootScope.setActiveGoal = function(goal){
+      $rootScope.activeGoal = goal;
+      $rootScope.activeGoal.due = new Date(goal.due);
+      $rootScope.activeGoal.date_created = new Date($rootScope.activeGoal.date_created);
+      $rootScope.activeGoal.date_modified = new Date($rootScope.activeGoal.date_modified);
+
+      $rootScope.activeGoalPreEdit = Object.assign({}, $rootScope.activeGoal);
+    }
+
+    $rootScope.setActiveAction = function(action){
+      $rootScope.activeAction = action;
+    }
     // Logout function is available in any pages
     $rootScope.logout = function(){
       $rootScope.user = {};
@@ -145,7 +218,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
     .success(function(user){
       // No error: authentication OK
       $rootScope.message = 'Authentication successful! via google';
-      $location.url('/tracking');
+      $location.url('/dashboard');
       $rootScope.busy = false;
 
     })
@@ -164,7 +237,7 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
     .success(function(user){
       // No error: authentication OK
       console.log('logged in as : ' + user);
-      $location.url('/#/tracking');
+      $location.url('/#/dashboard');
       $rootScope.busy = false;
 
     })
@@ -188,15 +261,22 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
  **********************************************************************/
 app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
-  $scope.outlook = 7;
-  DataService.loadData($scope.outlook);
+  $rootScope.busy=true;
 
-  $scope.$watch('outlook', function() {
-    DataService.updateOutlook($scope.outlook);
+  var options = {branch: 'dashboard'};
+
+  DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
+
+  // $scope.data = Object.assign({}, $rootScope.data);
+
+  // $rootScope.activeGoal.due = new Date($rootScope.activeGoal.due);
+
+  $scope.$watch('data.outlook', function() {
+    DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
   });
 
   $scope.incrementProgress = function(action){
-    DataService.postProgress(action, 1);
+    DataService.postProgress($rootScope.data.dashboard.action, action, 1, $rootScope.data.outlook);
   };
 
   $scope.completeGoal = function(goal){
@@ -206,6 +286,56 @@ app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav,
   };
 
 });
+
+/**********************************************************************
+ * goal controller
+ **********************************************************************/
+app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
+
+// $scope.outlook = 7;
+$scope.preEditGoal = Object.assign({}, $rootScope.activeGoal);
+// $scope.editGoal = Object.assign({}, $rootScope.activeGoal);
+
+$scope.showEditButtons = false;
+
+$scope.updateStatus = function(){
+  $rootScope.activeGoal.status = $rootScope.statusList[1];
+}
+
+
+$scope.save = function(){
+  $scope.showEditButtons = false;
+}
+
+$scope.cancel = function(){
+  // $scope.editGoal = Object.assign({}, $scope.preEditGoal);
+
+    $rootScope.activeGoal.description = $rootScope.activeGoalPreEdit.description;
+    $rootScope.activeGoal.due         = new Date($rootScope.activeGoalPreEdit.due);
+    $rootScope.activeGoal.status      = $rootScope.activeGoalPreEdit.status;
+    $rootScope.activeGoal.is_public   = $rootScope.activeGoalPreEdit.is_public;
+    $rootScope.activeGoal.date_created = new Date($rootScope.activeGoalPreEdit.date_created);
+    $rootScope.activeGoal.date_modified = new Date($rootScope.activeGoalPreEdit.date_modified);
+
+    $scope.showEditButtons = false;
+}
+
+$scope.goalDataChanged = function(){
+  $scope.showEditButtons = true;
+}
+
+
+
+
+});
+
+/**********************************************************************
+ * action controller
+ **********************************************************************/
+app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
+
+});
+
 /**********************************************************************
  * tracking controller
  **********************************************************************/
@@ -235,7 +365,7 @@ app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory,
   $scope.filter.goal.open = true;
   $scope.filter.goal.closedComplete = false;
   $scope.filter.goal.closedIncomplete = false;
-  $scope.filter.action.open = true
+  $scope.filter.action.statusOn = true
   $scope.filter.action.closedComplete = false;
   $scope.filter.action.closedIncomplete = false;
 
@@ -393,14 +523,14 @@ app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory,
   }
 
 //goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due
-  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public){
+  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due, statusOn, is_public){
     // $scope.goal to find goal, splice(0,0, action)
     // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
     var now = new Date(Date.now());
     status = status.trim();
 
     console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
-    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now, status, is_public)
+    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now, statusOn, is_public)
       .success(function(res){
        console.log('Successfully created action');
        $scope.action.push(res);
@@ -710,13 +840,14 @@ app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(
 // FACTORIES
 app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScope, $http, $filter) {
 
+  var dataSet = [];
   //functions defined within a JSON object so they're accessible to eachother
   var functions = {
-    prepareActionData: function(){
+    prepareActionData: function(actions, outlook){
         var open = 0;
         var closed = 0;
         var complete = 0;
-        var outlook = $rootScope.data.outlook;
+        // var outlook = $rootScope.data.outlook;
         var repetition = 0;
         var rep_complete = 0;
         var rep_conversion = 0;
@@ -728,16 +859,22 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         var progress_date = new Date();
         var max_repetition = 0;
         var days_since_created = 0;
+        var days_since_modified = 0;
         var today = new Date(Date.now());
 
-        for (var i=0; i < $rootScope.data.action.length; i++){
+        var actionDurOn = 0;
+
+        for (var i=0; i < actions.length; i++){
           
-          var action = $rootScope.data.action[i];
+          var action = actions[i];
 
           //set date objects from strings
           action.date_modified = new Date(action.date_modified);
-          action.date_created = new Date($rootScope.data.action[i].date_created);
+          action.date_created = new Date(action.date_created);
 
+          for (var j = 0; j < action.status.length; j++) {
+            action.status[j].date = new Date(action.status[j].date);
+          };
           // vars from prepareData
           var periodLengthMilliseconds = action.period * $rootScope.millisecondsInDay;
           var startDate = new Date(action.date_created); // use action.date_created
@@ -767,6 +904,8 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           else if ((action.status == 'Closed - Incomplete') && (outlookDate < action.date_modified)){
             complete += 1;
           }
+          // Total, On, Off
+
 
           // handle case where no current period progress
           // only calculate currentProgress if it's not already been calculated
@@ -835,38 +974,34 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           // calculate repetition, rep_complete, both at the individual action level and running total
           // having these stats at the individual action level means they're available for when user drills down into the action detail view.
 
-          for (var j=0; j < $rootScope.data.action[i].summary.length; j++){
+          for (var j=0; j < actions[i].summary.length; j++){
             // compare outlook date to period. Todo.
             // action_date_created = new Date(data.action[i].date_created + )
             // f (period, created);
-            progress_date = new Date(action.date_created.getTime() + ($rootScope.data.action[i].period * $rootScope.data.action[i].summary[j].period * $rootScope.millisecondsInDay));
+            progress_date = new Date(action.date_created.getTime() + (actions[i].period * actions[i].summary[j].period * $rootScope.millisecondsInDay));
 
             if (outlookDate < progress_date){
-              temp_rep_complete += $rootScope.data.action[i].summary[j].progress;
+              temp_rep_complete += actions[i].summary[j].progress;
 
-              console.log('progress...');
-              console.log($rootScope.data.action[i]);
+              // console.log('progress...');
+              // console.log(actions[i]);
             }
           }
 
-          $rootScope.data.action[i].summary.totalProgress = temp_rep_complete;
+          actions[i].summary.totalProgress = temp_rep_complete;
           rep_complete += temp_rep_complete;
 
-          $rootScope.data.action[i].summary.totalRepetition = Math.round((action.verb_quantity/action.period)*outlook); // since action.period is per day, we can multiply by outlook to get expected total reps over day range
+          // actionDurationOn
+          // totalRepetitions depend on whether the action was 'on' or 'off'
+          var dateRange = {start: outlookDate, end: today};
+          actionDurOn = Math.ceil(functions.actionDurationOn(actions[i], dateRange));
+          console.log('actionDurOn: ' + actionDurOn);
 
-          temp_repetition += $rootScope.data.action[i].summary.totalRepetition; // max rep = rep per day * days since created
+          actions[i].summary.totalRepetition = Math.ceil((action.verb_quantity/action.period)*actionDurOn); // since action.period is per day, we can multiply by outlook to get expected total reps over day range
+          
+          temp_repetition += actions[i].summary.totalRepetition; // max rep = rep per day * days since created
 
-          // max repetition
-          days_since_created = ((today - action.date_created)/$rootScope.millisecondsInDay);
-          max_repetition = Math.round((action.verb_quantity/action.period)*(days_since_created));
-
-          if (max_repetition > temp_repetition){
-            repetition += temp_repetition;
-          }
-          else {
-            repetition += max_repetition;
-          }
-
+          repetition += temp_repetition;
           // clear temp vars
           temp_rep_total = 0;
           temp_rep_complete = 0;
@@ -876,25 +1011,30 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         // cap max rep
         
         // calculate rep_conversion
-        rep_conversion = Math.round((rep_complete/repetition)*100);
+        // if repetition == 0 .. waiting for more data
+        if (repetition==0){ rep_conversion = ''}
+        else { rep_conversion = Math.round((rep_complete/repetition)*100); }
 
-        $rootScope.data.action.total.open = open;
-        $rootScope.data.action.total.closed = closed;
-        $rootScope.data.action.total.complete = complete;
-        $rootScope.data.action.total.repetition = repetition;
-        $rootScope.data.action.total.rep_complete = rep_complete;
-        $rootScope.data.action.total.rep_conversion = rep_conversion;
+        actions.total = {};
+
+        actions.total.open = open;
+        actions.total.closed = closed;
+        actions.total.complete = complete;
+        actions.total.repetition = repetition;
+        actions.total.rep_complete = rep_complete;
+        actions.total.rep_conversion = rep_conversion;
+
+        return actions;
     },
-    prepareGoalData: function(){
+    prepareGoalData: function(goals, outlook){
       var open = 0;
       var closed = 0;
       var complete = 0;
-      var outlook = $rootScope.data.outlook;
       var outlookDate = new Date(Date.now() - (outlook * $rootScope.millisecondsInDay));
 
-      for (var i=0; i < $rootScope.data.goal.length; i++){
+      for (var i=0; i < goals.length; i++){
         
-        var goal = $rootScope.data.goal[i];
+        var goal = goals[i];
         goal.date_modified = new Date(goal.date_modified);
 
         // calculate days remaining
@@ -913,48 +1053,147 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         }
       }
 
-      $rootScope.data.goal.total.open = open;
-      $rootScope.data.goal.total.closed = closed;
-      $rootScope.data.goal.total.complete = complete;
+      goals.total = {};
+      goals.total.open = open;
+      goals.total.closed = closed;
+      goals.total.complete = complete;
     },
     setOutlook: function(outlook){
       $rootScope.data.outlook = outlook;
     },
     getData: function(){
-      return $rootScope.data;
+      return dataSet;
     },
-    loadData: function(outlook){
+    actionDurationOn: function(action, dateRange){
+
+      var durationOn = 0;
+
+      var s = dateRange.start;
+      var e = dateRange.end;
+
+      var A = []; // actions before s
+      var B = []; // actions between s and e
+
+      var k = 0;
+      var r = 0;
+      var isEven = false; // |B| is even
+      var N = 0; // = |B|
+
+      var msd = 86400000; //ms in day
+
+      // populate A and B with action.status
+      for (var i = 0; i < action.status.length; i++) {
+
+        if (action.status[i].date < s)
+        {
+          A.push(action.status[i]);
+        }
+        else if (action.status[i].date > s && action.status[i].date < e)
+        {
+          B.push(action.status[i]);
+        };
+      };
+
+      // alpha
+      if (A.length > 0 && A[A.length-1].on == true){
+
+        if (B.length > 0) {
+          durationOn += B[0].date - s;
+        } else {
+          durationOn += e - s;
+        }
+      }
+
+      // beta
+      if (B.length > 0 && B[B.length-1].on == true) {
+        durationOn += e - B[B.length-1].date;
+      };
+
+      // gamma
+      if (B.length > 2 || (B.length == 2 && B[0].on == false)) {
+
+        // initialise formula variable r
+        if (B[0].on == false) {
+          r = 1;
+        } else {
+          r = 0;
+        }
+
+        // even/odd number of B elements - required for obtaining k
+        N = B.length;
+
+        (N % 2 == 0) ? (isEven = true) : (isEven = false);
+
+        // initialise formula variable k
+        switch (true){
+          case (N > 1 && isEven == true && B[0].on == true):
+            k = (N / 2) - 1;
+            break;
+          case (N > 2 && isEven == false):
+            k = ((N - 1)/2) - 1;
+            break;
+          case (N > 3 && isEven == true && B[0].on == false):
+            k = (N / 2) - 2;
+            break;
+          default:
+            k = -1; // do not loop
+            break;
+        }
+
+        if (k >= 0){
+          for (var i = 0; i < k + 1; i++) {
+            // console.log('loop: ' + i);
+            durationOn += B[(2*i) + 1 + r].date - B[(2*i) + r].date;
+          };
+        }
+
+      };
+
+      return durationOn/msd; // return days instead of milliseconds
+
+    },
+    loadData: function(outlook, callback, options){
       $http.get('/api/v1/goalsActionsProgress')
         .success(function(doc){
             console.log('before loaded goal:');
-            console.log($rootScope.data.goal);
+            console.log(goals);
 
-            $rootScope.data.goal = doc[0];
-            $rootScope.data.action = doc[1];
-            $rootScope.data.progress = doc[2];
+            var goals = doc[0];
+            var actions = doc[1];
+            var progress = doc[2];
 
              console.log('Loaded Goals, Actions, Progress data');
-             console.log($rootScope.data.goal);
-             console.log($rootScope.data.action);
-             console.log($rootScope.data.progress);
+             console.log(goals);
 
              // initialise default values
-            $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
-            $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-            $rootScope.data.outlook = 0;
+            // goals.total = {open: 0, closed: 0, complete: 0};
+            // actions.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
+            // $rootScope.data.outlook = 7;
             
-            // update totals/stats
-            functions.updateOutlook(outlook);
+            // set date format
 
+            // update totals/stats
+            dataSet = functions.updateOutlook(goals, actions, outlook);
+            console.log(dataSet);
+            callback(goals, actions, progress, outlook, options);
+            // return dataSet;
         })
         .error(function(error){
           console.log('Error loading Goals, Actions, Progress data');
         })
     },
-    updateOutlook: function(outlook){
-      functions.setOutlook(outlook);
-      functions.prepareGoalData();
-      functions.prepareActionData();
+    //TODO: generalise to operate on not just on rootscope.data.action, etc. but rather function (goal, action, outlook)
+    updateOutlook: function(goals, actions, outlook){
+      if (!goals || !actions){ return null; } //not loaded
+      functions.setOutlook(outlook); // required?
+      functions.prepareGoalData(goals, outlook);
+      functions.prepareActionData(actions, outlook);
+      $rootScope.busy = false;
+
+      var dataSet = {goals: goals, actions: actions, outlook: outlook};
+      console.log('dataSet:');
+      console.log(dataSet);
+      return dataSet;
     },
     daysRemaining: function(startDate, endDate){
       var start = new Date(startDate);
@@ -971,7 +1210,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
       return daysDiff;
     },
     // CRUD goals and actions
-    postProgress: function(action, progress){
+    postProgress: function(actions, action, progress, outlook){
     $rootScope.busy = true;
 
     var body = {_actionid: action._id, counter: progress}
@@ -993,7 +1232,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           };
         };
 
-        functions.prepareActionData();
+        functions.prepareActionData(actions, outlook);
 
         $rootScope.busy = false;
       })
@@ -1058,8 +1297,8 @@ app.factory('GoalFactory', function($http) {
 app.factory('ActionFactory', function($http){
   var factory = {};
   return {
-    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created, status, is_public){
-      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, status: status, is_public: is_public};
+    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created, statusOn, is_public){
+      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, statusOn: statusOn, is_public: is_public};
       return $http.post('/api/v1/action', body);
     },
     put: function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id){
@@ -1107,6 +1346,17 @@ app.filter('daysRemainingDescription', function() {
   };
 });
 
+app.filter('is_publicFormat', function() {
+  return function(is_public) {
+    return (is_public == 0) ? 'Private' : 'Public';
+  };
+});
+
+app.filter('statusFilter', function() {
+  return function(statusFilter) {
+    return (statusFilter == true) ? 'On' : 'Off';
+  };
+});
 
 app.filter('periodInWords', function() {
   return function(period, format) {

@@ -197,7 +197,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 		//     noun				: String,
 		//     period 			: String,
 		//     expire 			: Date
-
+		var now = new Date(Date.now());
 		// 1. find goal (to attach action to) and ensure it belongs to current user
 		Goal.findOne({_userid: req.user._id, _id: req.body._goalid}, function(err, goal){
 			if (err){return res.send(err);}
@@ -210,6 +210,9 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			}
 
 			// goal found and it belongs to current user
+
+			// var testDate = new Date('2016-02-11');
+
 			var action = new Action({ 
 			    _goalid			: req.body._goalid,
 			    is_public		: req.body.is_public,
@@ -221,7 +224,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			    due 			: req.body.due,
 			    date_created 	: req.body.date_created,
 			    date_modified	: req.body.date_modified,
-			    status			: req.body.status
+			    status			: [{date: now, on: req.body.statusOn}]
 			});
 
 			action.save(function (err, createdAction) {
@@ -233,6 +236,8 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			});
 		});
 	});
+
+	
 
 	app.put('/api/v1/action/:id', auth, function(req, res){
 		// Todo: check if Action belongs to current user

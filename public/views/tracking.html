@@ -166,23 +166,20 @@
                             <div ng-messages="userForm.name.$error">
                             </div>
                         </md-input-container>
-                        <md-input-container>
-                            <label>Status</label>
-                            <md-select required ng-model="action.status">
-                                <md-option ng-repeat="s in statusList">
-                                    {{s}}
-                                </md-option>
-                            </md-select>
+
+                        <md-datepicker ng-model="action.due" required md-placeholder="Until"></md-datepicker>
                         </md-input-container>
 
                         <md-checkbox ng-model="action.is_public" aria-label="Is public">
                             Public
                         </md-checkbox>
 
-                        <md-datepicker ng-model="action.due" required md-placeholder="Until"></md-datepicker>
-                        </md-input-container>
+                        <md-switch ng-model="action.statusOn" aria-label="Status">
+                            Status: {{  action.statusOn  | statusFilter}}
+                        </md-switch>
+
                         <div class="small-pad-top">
-                            <md-button class="md-raised md-primary" ng-click="createAction(goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due, action.status, action.is_public)">Save</md-button>
+                            <md-button class="md-raised md-primary" ng-click="createAction(goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due, action.statusOn, action.is_public)">Save</md-button>
                             <md-button ng-click="toggleMenu('create')">Cancel</md-button>
                         </div>
                     </md-content>
