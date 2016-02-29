@@ -108,6 +108,10 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         templateUrl: 'views/action.html',
         controller: 'ActionCtrl'
       })
+      .when('/list', {
+        templateUrl: 'views/list.html',
+        controller: 'listCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
@@ -127,12 +131,15 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     // $rootScope.data.action = [];
     // $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
     // $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-    // $rootScope.data.outlook = 7;
+   $rootScope.data.outlook = 7;
 
     $rootScope.data.dashboard = [];
+    $rootScope.data.activeGoal = [];
+    $rootScope.data.activeAction = [];
+
     // $rootScope.data.dashboard.goal = ['g1', 'g2'];
 
-    $rootScope.activeGoal = {description: "test desc"};
+    // $rootScope.activeGoal = {description: "test desc"};
     $rootScope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
 
     $rootScope.setData = function(goals, actions, progress, outlook, options){
@@ -145,7 +152,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           $rootScope.data.dashboard.goal = goals;
           $rootScope.data.dashboard.action = actions;
           $rootScope.data.dashboard.progress = progress;
-          $rootScope.data.dashboard.outlook = outlook;
+          $rootScope.data.outlook = outlook;
           break;
 
         case "goal":
@@ -154,7 +161,8 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           $rootScope.data.activeGoal.goal = goals;
           $rootScope.data.activeGoal.action = actions;
           $rootScope.data.activeGoal.progress = progress;
-          $rootScope.data.activeGoal.outlook = outlook;
+          $rootScope.data.activeGoal.preEdit = Object.assign({}, goals);
+
           break;
 
         case "action":
@@ -163,14 +171,15 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           $rootScope.data.activeAction.goal = goals;
           $rootScope.data.activeAction.action = actions;
           $rootScope.data.activeAction.progress = progress;
-          $rootScope.data.activeAction.outlook = outlook;
+          $rootScope.data.activeAction.preEdit = Object.assign({}, actions);
+
           break;
 
         default:
           break;
       }
 
-      console.log('setData');
+      // console.log('setData');
       // // $rootScope.data = [];
       // $rootScope.data.goal = goals;
       // $rootScope.data.action = actions;
@@ -179,16 +188,38 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     }
 
     $rootScope.setActiveGoal = function(goal){
-      $rootScope.activeGoal = goal;
-      $rootScope.activeGoal.due = new Date(goal.due);
-      $rootScope.activeGoal.date_created = new Date($rootScope.activeGoal.date_created);
-      $rootScope.activeGoal.date_modified = new Date($rootScope.activeGoal.date_modified);
+      var actions = [];
 
-      $rootScope.activeGoalPreEdit = Object.assign({}, $rootScope.activeGoal);
+      for (var i = 0; i < $rootScope.data.dashboard.action.length; i++) {
+
+        if ($rootScope.data.dashboard.action[i]._goalid == goal._id){
+          actions.push($rootScope.data.dashboard.action[i]);
+        }
+      };
+      // setdata
+      // is progress required?
+      var options = {branch: "goal"};
+      $rootScope.setData(goal, actions, null, 7, options);
+      // function(goals, actions, progress, outlook, options)
     }
 
     $rootScope.setActiveAction = function(action){
-      $rootScope.activeAction = action;
+      // find goal
+      var goals = [];
+      var actions = [];
+      actions.push(action);
+
+      for (var i = 0; i < $rootScope.data.dashboard.goal.length; i++) {
+
+        if ($rootScope.data.dashboard.goal[i]._id == action._goalid){
+          goals.push($rootScope.data.dashboard.goal[i]);
+          break;
+        }
+      };
+
+      var options = {branch: "action"};
+      $rootScope.setData(goals, actions, null, 7, options);
+
     }
     // Logout function is available in any pages
     $rootScope.logout = function(){
@@ -262,18 +293,18 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
   $rootScope.busy=true;
-  $rootScope.data.dashboard.outlook = 7;
+  // $rootScope.data.outlook = 7;
 
   var options = {branch: 'dashboard'};
 
-  DataService.loadData($rootScope.data.dashboard.outlook, $rootScope.setData, options);
+  DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
 
   // $scope.data = Object.assign({}, $rootScope.data);
 
   // $rootScope.activeGoal.due = new Date($rootScope.activeGoal.due);
 
-  $scope.$watch('data.dashboard.outlook', function() {
-    DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.dashboard.outlook);
+  $scope.$watch('data.outlook', function() {
+    DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
   });
 
   $scope.incrementProgress = function(action){
@@ -294,7 +325,7 @@ app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav,
 app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
 // $scope.outlook = 7;
-$scope.preEditGoal = Object.assign({}, $rootScope.activeGoal);
+// $scope.preEditGoal = Object.assign({}, $rootScope.activeGoal);
 // $scope.editGoal = Object.assign({}, $rootScope.activeGoal);
 
 $scope.showEditButtons = false;
@@ -309,14 +340,13 @@ $scope.save = function(){
 }
 
 $scope.cancel = function(){
-  // $scope.editGoal = Object.assign({}, $scope.preEditGoal);
 
-    $rootScope.activeGoal.description = $rootScope.activeGoalPreEdit.description;
-    $rootScope.activeGoal.due         = new Date($rootScope.activeGoalPreEdit.due);
-    $rootScope.activeGoal.status      = $rootScope.activeGoalPreEdit.status;
-    $rootScope.activeGoal.is_public   = $rootScope.activeGoalPreEdit.is_public;
-    $rootScope.activeGoal.date_created = new Date($rootScope.activeGoalPreEdit.date_created);
-    $rootScope.activeGoal.date_modified = new Date($rootScope.activeGoalPreEdit.date_modified);
+    $rootScope.data.activeGoal.goal.description = $rootScope.data.activeGoal.preEdit.description;
+    $rootScope.data.activeGoal.goal.due         = new Date($rootScope.data.activeGoal.preEdit.due);
+    $rootScope.data.activeGoal.goal.status      = $rootScope.data.activeGoal.preEdit.status;
+    $rootScope.data.activeGoal.goal.is_public   = $rootScope.data.activeGoal.preEdit.is_public;
+    $rootScope.data.activeGoal.goal.date_created = new Date($rootScope.data.activeGoal.preEdit.date_created);
+    $rootScope.data.activeGoal.goal.date_modified = new Date($rootScope.data.activeGoal.preEdit.date_modified);
 
     $scope.showEditButtons = false;
 }
@@ -325,15 +355,33 @@ $scope.goalDataChanged = function(){
   $scope.showEditButtons = true;
 }
 
+$scope.$watch('data.outlook', function() {
+    DataService.updateOutlook($rootScope.data.activeGoal.goal, $rootScope.data.activeGoal.action, $rootScope.data.outlook);
+  });
 
-
-
+// Increment progress
+  $scope.incrementProgress = function(action){
+    DataService.postProgress($rootScope.data.activeGoal.action, action, 1, $rootScope.data.outlook);
+  };
+  
 });
 
 /**********************************************************************
  * action controller
  **********************************************************************/
 app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
+
+$scope.$watch('data.outlook', function() {
+    DataService.updateOutlook($rootScope.data.activeAction.goal, $rootScope.data.activeAction.action, $rootScope.data.outlook);
+  });
+
+$scope.incrementProgress = function(action){
+    DataService.postProgress($rootScope.data.activeAction.action, action, 1, $rootScope.data.outlook);
+  };
+
+$scope.decrementProgress = function(action){
+    DataService.postProgress($rootScope.data.activeAction.action, action, -1, $rootScope.data.outlook);
+  };
 
 });
 
@@ -828,6 +876,14 @@ app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(
 
 }]);
   
+app.controller('listCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
+
+  // console.log('outlook updated...');
+  // $scope.data = $rootScope.data;
+  // console.log();
+
+}]);
+
 // SERVICES
  // app.service( 'MenuService', [ '$rootScope', function( $rootScope ) {
  //   return {
@@ -1036,7 +1092,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         
         var goal = goals[i];
         goal.date_modified = new Date(goal.date_modified);
-
+        goal.due = new Date(goal.due);
         // calculate days remaining
         goal.remainingDays = functions.daysRemaining(null, goal.due);
 
@@ -1232,11 +1288,12 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         //increment action scope
         for (var j = action.summary.length - 1; j >= 0; j--) {
           if (action.summary[j].period == action.currentPeriod) {
-            action.summary[j].progress += 1;
+            action.summary[j].progress += progress;
             break;
           };
         };
 
+        // TODO prepare across multiple locations: use options obj? prepareActionData across data.dashboard.action, data.activeGoal.action, and data.activeAction.action
         functions.prepareActionData(actions, outlook);
 
         $rootScope.busy = false;
@@ -1358,8 +1415,8 @@ app.filter('is_publicFormat', function() {
 });
 
 app.filter('statusFilter', function() {
-  return function(statusFilter) {
-    return (statusFilter == true) ? 'On' : 'Off';
+  return function(status) {
+    return (status == true) ? 'On' : 'Off';
   };
 });
 

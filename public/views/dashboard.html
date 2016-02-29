@@ -10,13 +10,10 @@
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray">Goals</h1>
-	    	<md-button class="md-raised" href="#/tracking">
-		        List
-		    </md-button>
 		</div>
 
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.dashboard.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
@@ -33,7 +30,7 @@
 	    <!-- Actions -->
         <h1 class="md-display-1 light-gray">Actions</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.dashboard.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
@@ -64,14 +61,14 @@
 
     	<h1 class="md-display-1 light-gray">Upcoming</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.dashboard.outlook}} days. {{data.dashboard.goal.total.open + data.dashboard.goal.total.closed}} goals. {{ data.dashboard.action.total.open + data.dashboard.action.total.closed}} actions.</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} days</div>
         </div>
 
         <div layout="row" >
             <md-content class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
-                    <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.dashboard.outlook)">
+                    <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
                     	<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
                     		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
                     	</md-button>
@@ -84,7 +81,7 @@
                         <md-divider></md-divider>
                     </md-list-item>
                     <!-- Actions -->
-                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.dashboard.outlook) || (a.remainingDays < 0) || a.status[a.status.length-1].on == false">
+                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0) || a.status[a.status.length-1].on == false">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
                     	<md-button class="md-icon-button">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
@@ -105,30 +102,36 @@
   </div>
   <div flex>
 
-  		<!-- data.dashboard.outlook -->
+  		<!-- data.outlook -->
     	<div layout="row" layout-align="start center">
-	    	<h1 class="md-display-1 light-gray"> {{data.dashboard.outlook}} day outlook</h1>
+	    	<h1 class="md-display-1 light-gray"> {{data.outlook}} day outlook</h1>
 		</div>
         <div layout="row" layout-align="center center">
-	        <md-slider flex min="1" max="31" ng-model="data.dashboard.outlook" aria-label="due" id="due-slider" class>
+	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
 	        </md-slider>
 	        <div layout layout-align="center center">
-                <input flex type="number" ng-model="data.dashboard.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
+                <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
 	        </div>
 	    </div>
     
     	<!-- Recent -->
-    	<div layout="row" layout-align="start center">
+        
+        <div layout="row" layout-align="start center">
+            <md-button class="md-raised" href="#/tracking">
+                All goals & actions
+            </md-button>
+        </div>
+
+    	<!-- <div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray">Recent</h1>
 		</div>
 
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.dashboard.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
         </div>
         <div layout="row">
             <md-content class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
-                	<!-- goal -->
                     <md-list-item class="md-2-line" ng-repeat="item in goal.recent" ng-hide="item.date_modified > compareDate">
                     	<ng-md-icon icon="edit" class="md-avatar"></ng-md-icon>
                         <div class="md-list-item-text" layout="column">
@@ -138,23 +141,8 @@
                         </div>
                         <md-divider></md-divider>
                     </md-list-item>
-                    <!-- <md-list-item>
-	                    <div layout="row" layout-align="start center">
-				    	<h1 class="md-display-1 light-gray">Goals</h1>
-				    	<md-button class="md-raised md-primary" href="#/tracking">
-					        See all
-					    </md-button>
-						</div>
-                        <md-divider></md-divider>
-	                </md-list-item>
-	                <md-list-item>
-		                <div layout="row" layout-align="start center">
-					    	<h1 class="md-display-4 data.dashboard.outlook-head light-gray"> {{data.dashboard.outlook}} day data.dashboard.outlook</h1>
-						</div>
-                        <md-divider></md-divider>
-		            </md-list-item> -->
             </md-content>
-        </div>
+        </div> -->
 
   </div>
 </div>

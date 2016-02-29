@@ -225,3 +225,7 @@ body {
 .min-goal{
 	min-width: 300px;
 }
+
+.goal-list {
+	min-width: 250px;
+}
