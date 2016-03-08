@@ -7,7 +7,7 @@ var actionSchema = mongoose.Schema({
     verb_quantity	: Number,
     noun			: String,
     period 			: Number, // TODO: Store period as Number, apply Angular filter clientside to show 'every month' for 30 days, 'every week' for 7 days, 'every 120 days' for 120 day custom period. 0: one time
-    due 			: Date,
+    // due 			: Date, use status On/Off instead of hard due date
     summary			: [], // [{period: 1, progress: 2}, {period: 2, progress: 3}]. Similar to how Angular nvD3 requires data format
     status			: [], // [{date: '2016-01-01', on: true}, {date: '2016-02-01', on: false}]
     date_created    : { type: Date, default: Date.now }, // TODO: use start date instead of created

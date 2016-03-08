@@ -7,6 +7,7 @@
         Progress tracker
     </md-button> -->
 
+        
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray">Goals</h1>
@@ -101,7 +102,6 @@
         </div>
   </div>
   <div flex>
-
   		<!-- data.outlook -->
     	<div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray"> {{data.outlook}} day outlook</h1>
@@ -110,7 +110,7 @@
 	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
 	        </md-slider>
 	        <div layout layout-align="center center">
-                <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
+                <input type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
 	        </div>
 	    </div>
     
@@ -122,29 +122,37 @@
             </md-button>
         </div>
 
-    	<!-- <div layout="row" layout-align="start center">
-	    	<h1 class="md-display-1 light-gray">Recent</h1>
-		</div>
-
-        <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
-        </div>
-        <div layout="row">
-            <md-content class="">
-                <md-list class="dashboard-box dashboardbox-top-margin">
-                    <md-list-item class="md-2-line" ng-repeat="item in goal.recent" ng-hide="item.date_modified > compareDate">
-                    	<ng-md-icon icon="edit" class="md-avatar"></ng-md-icon>
-                        <div class="md-list-item-text" layout="column">
-                            <h3>{{item.description}}</h3>
-					        <h4>{{item.date_modified | date}}</h4>
-					        <p>{{item.update}}</p>
-                        </div>
-                        <md-divider></md-divider>
-                    </md-list-item>
-            </md-content>
-        </div> -->
-
   </div>
 </div>
 
+<!-- Settings -->
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-11dp" md-component-id="settings" scroll>
+    <div ng-cloak>
+        <!-- Toolbar -->
+        <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+            <h2>
+              <span>Settings</span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="toggleMenu('settings')">
+                <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+
+        <md-list ng-cloak>
+          <md-list-item ng-click="logout()" href="#/login">
+            <md-button class="md-raised md-warn"> Logout </md-button>
+          </md-list-item>
+        </md-list>
+
+    </div>
+</md-sidenav>
+
 </div>
+
+<div ng-controller="createCtrl">
+    <create-sidenav f="methods" d="data"></create-sidenav>
+</div>
+

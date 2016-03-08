@@ -21,7 +21,7 @@
 	            <div class="md-display-2">{{data.activeAction.action[0].remainingDays}}</div><div class="md-caption dashboard-box-caption">days remaining</div>
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <md-switch class="md-display-1" ng-model="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on" aria-label="Status">
+	            <md-switch class="md-display-1" ng-model="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on" aria-label="Status" ng-change="actionDataChanged()">
                    {{  data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on  | statusFilter}}
                 </md-switch>
                 <div class="md-caption dashboard-box-caption">status</div>
@@ -36,7 +36,7 @@
                 <div class="md-caption light-gray">created: {{data.activeAction.action[0].date_created | date: 'yyyy-MM-dd'}}</div>
             </div>
             <div flex layout="column" layout-align="center center" class="small-pad-top">
-                <md-checkbox ng-model="data.activeAction.action[0].is_public" ng-change="goalDataChanged()">{{data.activeAction.action[0].is_public | is_publicFormat}}</md-checkbox>
+                <md-checkbox ng-model="data.activeAction.action[0].is_public" ng-change="actionDataChanged()">{{data.activeAction.action[0].is_public | is_publicFormat}}</md-checkbox>
                 <!-- <div class="md-caption dashboard-box-caption">Visibility</div> -->
             </div>
         </div>
@@ -65,10 +65,10 @@
         <div layout="row" layout-align="start center">
         	<h1 class="md-display-1 light-gray">Progress</h1>
 
-            <md-button class="md-icon-button md-raised" ng-disabled="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on == false">
+            <md-button class="md-icon-button md-raised">
         		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(data.activeAction.action[0]);"></ng-md-icon>
         	</md-button>
-        	<md-button class="md-icon-button md-raised" ng-disabled="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on == false">
+        	<md-button class="md-icon-button md-raised">
         		<ng-md-icon icon="exposure_minus_1" style="fill:red" class="md-avatar goal-card-icon" ng-click="decrementProgress(data.activeAction.action[0]);"></ng-md-icon>
         	</md-button>
         </div>

@@ -1,77 +1,53 @@
 <div class="md-padding">
-
-<md-content class="md-padding" layout-xs="column" layout="row">
-    <div flex-xs flex-gt-xs="50" layout="column">
+<md-content class="md-padding" layout="row" layout-wrap>
+<div ng-repeat="g in data.dashboard.goal">
       <md-card>
         <md-card-title>
           <md-card-title-text>
-            <span class="md-headline">Card with image</span>
-            <span class="md-subhead">Large</span>
+            <span class="md-headline"><a class="href-link" ng-click="setActiveGoal(g)" href="#/goal">{{g.description}}</a></span>
+            <span class="md-subhead">
+    			<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
+            		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
+            	</md-button>
+            	{{g.remainingDays}} {{g.remainingDays | daysRemainingDescription}}
+            </span>
           </md-card-title-text>
-          <md-card-title-media>
+          <!-- <md-card-title-media>
             <div class="md-media-lg card-media"></div>
-          </md-card-title-media>
+          </md-card-title-media> -->
         </md-card-title>
+        <md-card-content>
+        <md-content class="">
+                <md-list class="dashboard-box dashboardbox-top-margin">
+                	<!-- Goals -->
+                    <!-- Actions -->
+                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="a._goalid != g._id">
+                    	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
+                    	<md-button class="md-icon-button">
+                    		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
+                    	</md-button>
+                        <div class="md-list-item-text" layout="column">
+                            <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
+                            <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
+					        <h4>{{a.remainingDays}} days remaining </h4>
+					        
+					        <!-- TODO:  -->
+					        <p>action</p>
+					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
+                        </div>
+                        <md-divider></md-divider>
+                    </md-list-item>
+            </md-content>
+   	    </md-card-content>
         <md-card-actions layout="row" layout-align="end center">
-          <md-button>Action 1</md-button>
-          <md-button>Action 2</md-button>
+          <!-- <md-button>Action 1</md-button>
+          <md-button>Action 2</md-button> -->
         </md-card-actions>
       </md-card>
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Card with  image</span>
-            <span class="md-subhead">Extra Large</span>
-          </md-card-title-text>
-        </md-card-title>
-        <md-card-content layout="row" layout-align="space-between">
-          <div class="md-media-xl card-media"></div>
-          <md-card-actions layout="column">
-            <md-button class="md-icon-button" aria-label="Favorite">
-              <md-icon md-svg-icon="img/icons/favorite.svg"></md-icon>
-            </md-button>
-            <md-button class="md-icon-button" aria-label="Settings">
-              <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-            </md-button>
-            <md-button class="md-icon-button" aria-label="Share">
-              <md-icon md-svg-icon="img/icons/share-arrow.svg"></md-icon>
-            </md-button>
-          </md-card-actions>
-        </md-card-content>
-      </md-card>
-    </div>
-    <div flex-xs flex-gt-xs="50" layout="column">
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Card with image</span>
-            <span class="md-subhead">Small</span>
-          </md-card-title-text>
-          <md-card-title-media>
-            <div class="md-media-sm card-media"></div>
-          </md-card-title-media>
-        </md-card-title>
-        <md-card-actions layout="row" layout-align="end center">
-          <md-button>Action 1</md-button>
-          <md-button>Action 2</md-button>
-        </md-card-actions>
-      </md-card>
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Card with image</span>
-            <span class="md-subhead">Medium</span>
-          </md-card-title-text>
-          <md-card-title-media>
-            <div class="md-media-md card-media"></div>
-          </md-card-title-media>
-        </md-card-title>
-        <md-card-actions layout="row" layout-align="end center">
-          <md-button>Action 1</md-button>
-          <md-button>Action 2</md-button>
-        </md-card-actions>
-      </md-card>
-    </div>
+</div>
+
+
+
   </md-content>
-  
+
 </div>

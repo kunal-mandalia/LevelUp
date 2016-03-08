@@ -1,0 +1,109 @@
+<!-- Create -->
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-11dp" md-component-id="create" scroll>
+    <div ng-cloak>
+        <!-- Toolbar -->
+        <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+            <h2>
+              <span>Create new</span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button d.goal-card-icon" aria-label="Close" ng-click="f.toggleMenu('create')">
+                <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom md-selected="d.selectedIndex">
+                <!-- Create Goal -->
+                <md-tab label="Goal">
+                    <md-content class="md-padding">
+                        <md-input-container class="md-block">
+                            <label>Description</label>
+                            <textarea required ng-model="d.goal.description" md-maxlength="150" rows="5" md-select-on-focus></textarea>
+                        </md-input-container>
+
+                        <md-input-container>
+                            <label>Status</label>
+                            <md-select required ng-model="d.goal.status">
+                                <md-option ng-repeat="s in d.goal.statusList" ng-value="s">
+                                    {{s}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-checkbox ng-model="d.goal.is_public" aria-label="Is public">
+                            Public
+                        </md-checkbox>
+
+                        <md-datepicker ng-model="d.goal.due" required md-placeholder="Due date">
+                        </md-datepicker>
+
+
+                        <div class="small-pad-top">
+                            <md-button class="md-raised md-primary" ng-click="f.saveGoal(d.goal.description, d.goal.status, d.goal.is_public, d.goal.due)">Save</md-button>
+                            <md-button ng-click="f.toggleMenu('create')">Cancel</md-button>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <!-- Create Action -->
+                <md-tab label="Action" ng-click="f.initialise()">
+                    <md-content class="md-padding">
+                        <md-input-container>
+                            <label>Goal</label>
+                            <md-select required ng-model="d.action.goalSelected">
+                                <md-option ng-repeat="g in d.goals" value="{{g._id}}">
+                                    {{g.description}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Action</label>
+                            <input md-maxlength="30" required name="actionverb" ng-model="d.action.verb" />
+                            <div class="hint">E.g. Walk, Read, Study, Attend, etc.</div>
+                            <div ng-messages="userForm.name.$error">
+                            </div>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Repetitons</label>
+                            <input type="number" required name="actionverbfrequency" ng-model="d.action.verb_quantity" />
+                            <div class="hint">E.g. 1, 2, 3, etc.</div>
+                            <div ng-messages="userForm.name.$error">
+                            </div>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Acting on</label>
+                            <input md-maxlength="30" required name="actionnoun" ng-model="d.action.noun" />
+                            <div class="hint">E.g. Miles, Books, Gym sessions, etc.</div>
+                            <div ng-messages="userForm.name.$error">
+                            </div>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Per number of days</label>
+                            <input type="number" required name="actionperiod" ng-model="d.action.period" />
+                            <div class="hint">E.g. 1, 7 (1 week), 30 (1 month), etc.</div>
+                            <div ng-messages="userForm.name.$error">
+                            </div>
+                        </md-input-container>
+
+                        <md-checkbox ng-model="d.action.is_public" aria-label="Is public">
+                            Public
+                        </md-checkbox>
+
+                        <md-switch ng-model="d.action.statusOn" aria-label="Status">
+                            Status: {{  d.action.statusOn  | statusFilter}}
+                        </md-switch>
+
+                        <div class="small-pad-top">
+                            <md-button class="md-raised md-primary" ng-click="f.saveAction(d.action.goalSelected, d.action.verb, d.action.verb_quantity, d.action.noun, d.action.period, d.action.is_public, d.action.statusOn)">Save</md-button>
+                            <md-button ng-click="f.toggleMenu('create')">Cancel</md-button>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+    </div>
+    <!--  -->
+    <!-- <md-button ng-click="f.log()">test</md-button> -->
+
+    <!-- <md-button ng-click="customerInfo.log()">test</md-button>
+    {{customerInfo.name}}
+</md-sidenav>

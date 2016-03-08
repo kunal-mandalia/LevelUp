@@ -66,7 +66,7 @@
     <div ng-controller="RootCtrl" layout="column">
     <md-toolbar class="menu-toolbar" scroll>
       <div class="md-toolbar-tools">
-        <md-button class="md-icon-button menu-icon" aria-label="Menu">
+        <md-button class="md-icon-button menu-icon" aria-label="Menu" ng-click="toggleMenu('links')">
             <ng-md-icon icon="menu"></ng-md-icon>
         </md-button>
         <h2>
@@ -75,7 +75,7 @@
         <md-progress-circular class="md-hue-1" md-mode="indeterminate" ng-hide="busy==false"></md-progress-circular>
             
             
-        <span class="small-pad-left" flex></span>{{user.first_name}}
+        <span class="small-pad-left" flex></span>
 
         <div ng-switch="location.path()">
           <div ng-switch-when="/tracking">
@@ -95,25 +95,9 @@
 
           </div>
 
-          <div ng-switch-when="/dashboard">
+
+          <div ng-switch-when="/">
             
-            <div layout="row" layout-align="end center">
-                <md-button class="md-icon-button menu-icon" aria-label='add' href="#/tracking">
-                    <ng-md-icon icon="list"></ng-md-icon>
-                </md-button>
-                
-                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')">
-                    <ng-md-icon icon="settings"></ng-md-icon>
-                </md-button>
-            </div>
-          </div>
-
-          <div ng-switch-default>
-
-            <md-button class="md-icon-button menu-icon" aria-label='visibility' ng-click="" href="#/demo">
-                <ng-md-icon icon="visibility"></ng-md-icon>
-            </md-button>
-
             <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
                 <ng-md-icon icon="person_add"></ng-md-icon>
             </md-button>
@@ -122,13 +106,84 @@
                 <ng-md-icon icon="login"></ng-md-icon>
             </md-button>
 
+          </div>
+
+          <div ng-switch-when="/login">
             
+            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
+                <ng-md-icon icon="person_add"></ng-md-icon>
+            </md-button>
+
+            <md-button class="md-icon-button menu-icon" aria-label='login' ng-click="" href="#/login">
+                <ng-md-icon icon="login"></ng-md-icon>
+            </md-button>
+            
+          </div>
+
+          <div ng-switch-when="/signup">
+            
+            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
+                <ng-md-icon icon="person_add"></ng-md-icon>
+            </md-button>
+
+            <md-button class="md-icon-button menu-icon" aria-label='login' ng-click="" href="#/login">
+                <ng-md-icon icon="login"></ng-md-icon>
+            </md-button>
+          </div>
+
+          <div ng-switch-default>
+
+            <div layout="row" layout-align="end center">
+                
+                <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+                </md-button>
+
+                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')">
+                    <ng-md-icon icon="settings"></ng-md-icon>
+                </md-button>
+
+            </div>
 
           </div>
+
         </div>
       </div>
     </md-toolbar>
     </div>
+
+    <!-- links left sidenav -->
+    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-11dp" md-component-id="links" scroll>
+        <div ng-cloak>
+            <!-- Toolbar -->
+            <md-toolbar class="md-hue-2">
+              <div class="md-toolbar-tools">
+                <md-button class="md-icon-button menu-icon md-hue-1" aria-label="Menu" ng-click="toggleMenu('links')">
+                    <ng-md-icon icon="menu"></ng-md-icon>
+                </md-button>
+                <h2>
+                  <span class="md-headline">LevelUp</span>
+                </h2>
+
+                <span flex></span>
+                <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="toggleMenu('links')">
+                    <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
+                </md-button>
+              </div>
+            </md-toolbar>
+
+            <md-list ng-cloak>
+              <md-list-item href="#/dashboard">
+                <md-button> Dashboard </md-button>
+              </md-list-item>
+              <md-list-item href="#/list">
+                <md-button> All goals and actions </md-button>
+              </md-list-item>
+            </md-list>
+                        
+        </div>
+    </md-sidenav>
+
     <div class="large-pad-top"></div>
     <!-- Angular partials -->
     <ng-view></ng-view>

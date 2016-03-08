@@ -118,7 +118,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
     //================================================
 
   }) // end of config()
-  .run(function($rootScope, $http, $location){
+  .run(function($rootScope, $http, $location, $mdSidenav){
 
     $rootScope.location = $location;
     $rootScope.message = '';
@@ -127,11 +127,12 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
 
     // init DataService data structure
     $rootScope.data = [];
+    $rootScope.data.loaded = false;
     // $rootScope.data.goal = [];
     // $rootScope.data.action = [];
     // $rootScope.data.goal.total = {open: 0, closed: 0, complete: 0};
     // $rootScope.data.action.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-   $rootScope.data.outlook = 7;
+    $rootScope.data.outlook = 7;
 
     $rootScope.data.dashboard = [];
     $rootScope.data.activeGoal = [];
@@ -153,12 +154,22 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           $rootScope.data.dashboard.action = actions;
           $rootScope.data.dashboard.progress = progress;
           $rootScope.data.outlook = outlook;
+
+          $rootScope.data.loaded = true;
           break;
 
         case "goal":
 
+          var currentGoal = Object.assign({}, $rootScope.data.activeGoal.goal);
+
           $rootScope.data.activeGoal = [];
-          $rootScope.data.activeGoal.goal = goals;
+
+          if (options.goal) {
+            $rootScope.data.activeGoal.goal = goals;
+          } else {
+            $rootScope.data.activeGoal.goal = currentGoal;
+          }
+
           $rootScope.data.activeGoal.action = actions;
           $rootScope.data.activeGoal.progress = progress;
           $rootScope.data.activeGoal.preEdit = Object.assign({}, goals);
@@ -168,10 +179,10 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         case "action":
 
           $rootScope.data.activeAction = [];
+          $rootScope.data.activeAction.preEdit = $rootScope.clone(actions[0]);
           $rootScope.data.activeAction.goal = goals;
           $rootScope.data.activeAction.action = actions;
           $rootScope.data.activeAction.progress = progress;
-          $rootScope.data.activeAction.preEdit = Object.assign({}, actions);
 
           break;
 
@@ -187,8 +198,9 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       // $rootScope.data.outlook = outlook;
     }
 
-    $rootScope.setActiveGoal = function(goal){
+    $rootScope.setActiveGoal = function(goal, options){
       var actions = [];
+      var options = options;
 
       for (var i = 0; i < $rootScope.data.dashboard.action.length; i++) {
 
@@ -196,10 +208,12 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           actions.push($rootScope.data.dashboard.action[i]);
         }
       };
+
+      if (!options){
+        options = {goal: true, branch: "goal"};
+      }
       // setdata
-      // is progress required?
-      var options = {branch: "goal"};
-      $rootScope.setData(goal, actions, null, 7, options);
+        $rootScope.setData(goal, actions, null, $rootScope.data.outlook, options);
       // function(goals, actions, progress, outlook, options)
     }
 
@@ -218,7 +232,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       };
 
       var options = {branch: "action"};
-      $rootScope.setData(goals, actions, null, 7, options);
+      $rootScope.setData(goals, actions, null, $rootScope.data.outlook, options);
 
     }
     // Logout function is available in any pages
@@ -228,6 +242,30 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       $http.post('/logout');
     };
 
+    $rootScope.toggleMenu = function(id) {
+      $mdSidenav(id).toggle();
+    };
+
+    // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object
+    $rootScope.clone = function(obj) {
+      if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
+        return obj;
+
+      if (obj instanceof Date)
+        var temp = new obj.constructor(); //or new Date(obj);
+      else
+        var temp = obj.constructor();
+
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj['isActiveClone'] = null;
+          temp[key] = $rootScope.clone(obj[key]);
+          delete obj['isActiveClone'];
+        }
+      }
+
+      return temp;
+    }
   });
 
 
@@ -299,10 +337,6 @@ app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav,
 
   DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
 
-  // $scope.data = Object.assign({}, $rootScope.data);
-
-  // $rootScope.activeGoal.due = new Date($rootScope.activeGoal.due);
-
   $scope.$watch('data.outlook', function() {
     DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
   });
@@ -328,34 +362,49 @@ app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $tim
 // $scope.preEditGoal = Object.assign({}, $rootScope.activeGoal);
 // $scope.editGoal = Object.assign({}, $rootScope.activeGoal);
 
-$scope.showEditButtons = false;
-
-$scope.updateStatus = function(){
-  $rootScope.activeGoal.status = $rootScope.statusList[1];
-}
-
-
-$scope.save = function(){
   $scope.showEditButtons = false;
-}
 
-$scope.cancel = function(){
 
-    $rootScope.data.activeGoal.goal.description = $rootScope.data.activeGoal.preEdit.description;
-    $rootScope.data.activeGoal.goal.due         = new Date($rootScope.data.activeGoal.preEdit.due);
-    $rootScope.data.activeGoal.goal.status      = $rootScope.data.activeGoal.preEdit.status;
-    $rootScope.data.activeGoal.goal.is_public   = $rootScope.data.activeGoal.preEdit.is_public;
-    $rootScope.data.activeGoal.goal.date_created = new Date($rootScope.data.activeGoal.preEdit.date_created);
-    $rootScope.data.activeGoal.goal.date_modified = new Date($rootScope.data.activeGoal.preEdit.date_modified);
+  $scope.updateStatus = function(){
+    $rootScope.activeGoal.status = $rootScope.statusList[1];
+  }
 
-    $scope.showEditButtons = false;
-}
 
-$scope.goalDataChanged = function(){
-  $scope.showEditButtons = true;
-}
+  $scope.save = function(){
+    console.log('save');
+    // put api
+    var goals = [];
+    $rootScope.data.activeGoal.goal.date_modified = new Date(Date.now());
+    goals.push($rootScope.data.activeGoal.goal);
 
-$scope.$watch('data.outlook', function() {
+    DataService.putGoal($rootScope.data.activeGoal.goal)
+      .success(function(res){
+        console.log('putgoal success: ' + res);
+        DataService.prepareGoalData(goals, $rootScope.data.outlook);
+        $scope.showEditButtons = false;
+      })
+      .error(function(err){
+        console.log('putgoal error: ' + err);
+      });
+  }
+
+  $scope.cancel = function(){
+
+      $rootScope.data.activeGoal.goal.description = $rootScope.data.activeGoal.preEdit.description;
+      $rootScope.data.activeGoal.goal.due         = new Date($rootScope.data.activeGoal.preEdit.due);
+      $rootScope.data.activeGoal.goal.status      = $rootScope.data.activeGoal.preEdit.status;
+      $rootScope.data.activeGoal.goal.is_public   = $rootScope.data.activeGoal.preEdit.is_public;
+      $rootScope.data.activeGoal.goal.date_created = new Date($rootScope.data.activeGoal.preEdit.date_created);
+      $rootScope.data.activeGoal.goal.date_modified = new Date($rootScope.data.activeGoal.preEdit.date_modified);
+
+      $scope.showEditButtons = false;
+  }
+
+  $scope.goalDataChanged = function(){
+    $scope.showEditButtons = true;
+  }
+
+  $scope.$watch('data.outlook', function() {
     DataService.updateOutlook($rootScope.data.activeGoal.goal, $rootScope.data.activeGoal.action, $rootScope.data.outlook);
   });
 
@@ -382,6 +431,35 @@ $scope.incrementProgress = function(action){
 $scope.decrementProgress = function(action){
     DataService.postProgress($rootScope.data.activeAction.action, action, -1, $rootScope.data.outlook);
   };
+
+$scope.actionDataChanged = function(){
+  $scope.showEditButtons = true;
+}
+
+$scope.cancel = function(){
+
+      $rootScope.data.activeAction.action[0].is_public = $rootScope.data.activeAction.preEdit.is_public;
+      $rootScope.data.activeAction.action[0].status[$rootScope.data.activeAction.action[0].status.length-1].on = $rootScope.data.activeAction.preEdit.status[$rootScope.data.activeAction.preEdit.status.length-1].on;
+
+      $scope.showEditButtons = false;
+}
+
+  $scope.save = function(){
+    console.log('save');
+    // put api
+    var actions = $rootScope.data.activeAction.action;
+    actions[0].date_modified = new Date(Date.now());
+
+    DataService.putAction(actions[0])
+      .success(function(res){
+        console.log('putAction success: ' + res);
+        DataService.prepareActionData(actions, $rootScope.data.outlook);
+        $scope.showEditButtons = false;
+      })
+      .error(function(err){
+        console.log('putAction error: ' + err);
+      });
+  }
 
 });
 
@@ -878,28 +956,170 @@ app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(
   
 app.controller('listCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
 
-  // console.log('outlook updated...');
-  // $scope.data = $rootScope.data;
-  // console.log();
+  $scope.incrementProgress = function(action){
+    DataService.postProgress($rootScope.data.dashboard.action, action, 1, $rootScope.data.outlook);
+  };
+
+  $scope.completeGoal = function(goal){
+    var body = {status: "Closed - Complete", }
+    // DataService.setOutlook(outlook);
+    DataService.putGoal(goal, body);
+  };
 
 }]);
 
-// SERVICES
- // app.service( 'MenuService', [ '$rootScope', function( $rootScope ) {
- //   return {
- //      menu: [{ type: 'button', icon:'settings', ngClick: '', href: ''}],
- //      add: function( item ) {
- //        this.menu.push( item );
- //      }
- //   };
- // }])
+app.controller('createCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
 
-// FACTORIES
+
+  // var goal = {};
+  // var action = {};
+
+  // // Set goal defaults
+  // goal.is_public = false;
+  // goal.status = "Open";
+
+  var url = $location.url();
+
+  $scope.methods = {
+    // called on action tab click to load goals
+    initialise: function(){
+      console.log('initialising...');
+      $scope.data.goals = $rootScope.data.dashboard.goal;
+      console.log($scope.data.goals);
+    },
+    resetScopeData: function(){
+
+        var goalid = '';
+        var goalSelected = '';
+        var selectedIndex = 0;
+
+        if (url == "/goal") {
+         goalid = $rootScope.data.activeGoal.goal._id;
+         selectedIndex = 1;
+        };
+
+        var dueDate = new Date();
+        $scope.data = {
+          selectedIndex: selectedIndex,
+          goal: {
+            statusList: $rootScope.statusList,
+            description: '',
+            due: dueDate,
+            is_public: false,
+            status: 'Open'
+          },
+          action: {
+            goalSelected: goalid,
+            _goalid     : goalid,
+            is_public   : false,
+            verb        : '',
+            verb_quantity : 1,
+            noun        : '',
+            period      : 7, // TODO: Store period as Number, apply Angular filter clientside to show 'every month' for 30 days, 'every week' for 7 days, 'every 120 days' for 120 day custom period. 0: one time
+            // due         : Date,
+            // summary     : [], // [{period: 1, progress: 2}, {period: 2, progress: 3}]. Similar to how Angular nvD3 requires data format
+            statusOn      : true, // [{date: '2016-01-01', on: true}, {date: '2016-02-01', on: false}]
+          }
+        }
+
+        $scope.data.goals = $rootScope.data.dashboard.goal;
+    },
+    toggleMenu: function(id) {
+      $mdSidenav(id).toggle();
+    },
+    saveGoal: function(description, status, is_public, due){
+      
+      // validate
+      if (!description || description == '' || (!status) || status == '' || (!due)){
+        return null;
+      }
+
+      var dueDate = new Date(due);
+      var goal = {description: description, status: status, is_public: is_public, due: dueDate};
+
+      DataService.saveGoal(goal)
+        .success(function(res){
+          $rootScope.data.dashboard.goal.push(goal);
+          DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
+          $scope.methods.resetScopeData();
+
+        })
+        .error(function(err){
+
+        });
+
+      console.log('save goal');
+    },
+    saveAction: function(goalid, verb, verb_quantity, noun, period, is_public, statusOn){
+      var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, is_public: is_public, statusOn: statusOn};
+
+      // action to push to rootscope
+      var summary = [];
+      var now = new Date(Date.now());
+      var status = [{date: now, on: statusOn}];
+      var adjustedAction = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, is_public: is_public, summary: summary, status: status, date_created: now, date_modified: now};
+
+      // validation
+      if (!goalid || goalid == '' || !verb || verb == '' || !verb_quantity || verb_quantity == '' || !noun || noun == '' || !period || period == '') {
+        console.log('saveAction validation error');
+        return null;
+      };
+
+      // save api
+      DataService.saveAction(action)
+        .success(function(res){
+          $rootScope.data.dashboard.action.push(adjustedAction);
+          $scope.methods.resetScopeData();
+
+          // activeGoal indicates whether the user created the action from its respective goal page
+          if ($rootScope.data.activeGoal.goal._id == goalid) {
+            var goal = {};
+            var options = {goal: false, branch: 'goal'}; // don't update activeGoal.goal, it's just activeGoal.action we want updating
+            goal._id = goalid; 
+            $rootScope.data.activeGoal.action.push(adjustedAction);
+            $rootScope.setActiveGoal(goal, options);
+          };
+
+          DataService.updateOutlook($rootScope.data.dashboard.goal, $rootScope.data.dashboard.action, $rootScope.data.outlook);
+          DataService.updateOutlook($rootScope.data.activeGoal.goal, $rootScope.data.activeGoal.action, $rootScope.data.outlook);
+
+        })
+        .error(function(err){
+          console.log('could not create action:');
+          console.log(err);
+        });
+    }
+  }
+
+  $scope.methods.resetScopeData();
+
+
+}]);
+
+
+app.controller('settingsCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
+}]);
+
+
+
+// FACTORIES AND SERVICES
 app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScope, $http, $filter) {
 
   var dataSet = [];
   //functions defined within a JSON object so they're accessible to eachother
   var functions = {
+    putAction: function(action){
+      return $http.put('/api/v1/action/' + action._id, action);
+    },
+    putGoal: function(goal){
+      return $http.put('/api/v1/goal/' + goal._id, goal);
+    },
+    saveGoal: function(goal){
+      return $http.post('/api/v1/goal', goal);
+    },
+    saveAction: function(action){
+      return $http.post('/api/v1/action', action);
+    },
     prepareActionData: function(actions, outlook){
         var total = 0;
         var on = 0;
@@ -1091,6 +1311,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
       for (var i=0; i < goals.length; i++){
         
         var goal = goals[i];
+        goal.date_created = new Date(goal.date_created);
         goal.date_modified = new Date(goal.date_modified);
         goal.due = new Date(goal.due);
         // calculate days remaining
@@ -1122,6 +1343,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
     },
     actionDurationOn: function(action, dateRange){
 
+      // calculates the duration in days an action has been switched on between a date range
       var durationOn = 0;
 
       var s = dateRange.start;
@@ -1240,10 +1462,19 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
     },
     //TODO: generalise to operate on not just on rootscope.data.action, etc. but rather function (goal, action, outlook)
     updateOutlook: function(goals, actions, outlook){
-      if (!goals || !actions){ return null; } //not loaded
-      functions.setOutlook(outlook); // required?
-      functions.prepareGoalData(goals, outlook);
-      functions.prepareActionData(actions, outlook);
+
+
+      functions.setOutlook(outlook);
+
+      // can use null to not prepareGoalData
+      if (goals && outlook){
+        functions.prepareGoalData(goals, outlook);
+      }
+
+      if (actions && outlook) {
+        functions.prepareActionData(actions, outlook);
+      };
+
       $rootScope.busy = false;
 
       var dataSet = {goals: goals, actions: actions, outlook: outlook};
@@ -1302,25 +1533,28 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         console.log('ProgressFactory error: ' + JSON.stringify(error));
         $rootScope.busy = false;
       });
-  },
-  putGoal: function(goal, body){
-    $rootScope.busy = true;
-    // add current datetime to date_modified
-    body.date_modified = new Date(Date.now());
-
-    $http.put('/api/v1/goal/' + goal._id, body)
-      .success(function(res){
-        console.log('put goal' + JSON.stringify(goal));
-        if (body.status){goal.status = body.status};
-        goal.date_modified = body.date_modified;
-        functions.prepareGoalData();
-        $rootScope.busy = false;
-      })
-      .error(function(err){
-        console.log('error put goal: ' + err);
-        $rootScope.busy = false;
-      });
   }
+  // ,
+  // putGoal: function(goal, body){
+  //   $rootScope.busy = true;
+  //   // add current datetime to date_modified
+  //   body.date_modified = new Date(Date.now());
+
+  //   $http.put('/api/v1/goal/' + goal._id, body)
+  //     .success(function(res){
+  //       console.log('put goal' + JSON.stringify(goal));
+  //       if (body.status){goal.status = body.status};
+  //       goal.date_modified = body.date_modified;
+
+  //       var options = {branch: 'goal', goal: false};
+  //       $rootScope.setActiveGoal(goal, options)
+  //       $rootScope.busy = false;
+  //     })
+  //     .error(function(err){
+  //       console.log('error put goal: ' + err);
+  //       $rootScope.busy = false;
+  //     });
+  // }
 }
 return functions;
 }]);
@@ -1451,4 +1685,24 @@ app.filter('periodInWords', function() {
 });
 
 // DIRECTIVES
+app.directive('createSidenav', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      f: '=f',  // functions or methods
+      d: '=d'   // data
+    },
+    templateUrl: 'views/create-sidenav.html'
+  };
+});
 
+app.directive('settingsSidenav', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      f: '=f',  // functions or methods
+      d: '=d'   // data
+    },
+    templateUrl: 'views/settings-sidenav.html'
+  };
+});

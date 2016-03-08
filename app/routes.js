@@ -156,6 +156,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	});
 
 	app.post('/api/v1/goal', auth, function(req, res){
+		// TODO: Handle goal passed in instead of broken down namespaced req.body...
 		//get currently logged in user id through req.user._id
 		var goal = new Goal({ _userid: req.user._id, description: req.body.description, due: req.body.due, status: req.body.status, is_public: req.body.is_public });
 		goal.save(function (err, createdGoal) {
@@ -163,7 +164,6 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 		  	res.status(400);
 		  	res.send('Server error');
 		  }
-
 		  return res.send(JSON.stringify(createdGoal));
 		});
 	});
@@ -221,9 +221,8 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 			    verb_unit 		: req.body.verb_unit,
 			    noun			: req.body.noun,
 			    period 			: req.body.period,
-			    due 			: req.body.due,
-			    date_created 	: req.body.date_created,
-			    date_modified	: req.body.date_modified,
+			    // date_created 	: req.body.date_created,
+			    // date_modified	: req.body.date_modified,
 			    status			: [{date: now, on: req.body.statusOn}]
 			});
 
