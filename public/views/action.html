@@ -10,7 +10,7 @@
         <div>
             <div layout="row" class="md-subhead light-gray dashboard-subhead">
                 <md-chips>
-                    <md-chip>Action</md-chip>
+                    <md-chip class="chip-action">Action</md-chip>
                 </md-chips>
                 <md-button class="md-raised md-primary" ng-hide="!showEditButtons" ng-click="save()">Save</md-button>
                 <md-button class="md-raised" ng-hide="!showEditButtons" ng-click="cancel()">Cancel</md-button>
@@ -60,8 +60,23 @@
                 <div class="md-display-2">{{data.activeAction.action.total.rep_conversion}}%</div><div class="md-caption dashboard-box-caption">Rep conversion</div>
             </div>
         </div>
+
+        <!-- data.outlook -->
+        <div layout="row" layout-align="start center">
+            <h1 class="md-display-1 light-gray">{{data.outlook}} day outlook</h1>
+            
+        </div>
+            
+        <div layout="row">
+              <md-slider flex min="1" max="30" ng-model="data.outlook" aria-label="due" id="due-slider" class>
+              </md-slider>
+              <div flex="20" layout layout-align="center center">
+                  <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="outlook-slider" class="subtle-control">
+              </div>
+          </div>
+
   </div>
-  <div flex>
+  <div flex="35">
         <div layout="row" layout-align="start center">
         	<h1 class="md-display-1 light-gray">Progress</h1>
 
@@ -74,47 +89,46 @@
         </div>
 
         <div layout="row" >
-            <md-content class="">
+            <md-content flex="100" class="">
                 <div class="">
                     <nvd3 options="data.activeAction.action[0].chart.options" data="data.activeAction.action[0].chart.data"></nvd3>
                 </div>
             </md-content>
         </div>
-  </div>
+<!--   </div>
   <div flex>
-
-  		<!-- data.outlook -->
-        <div layout="row" layout-align="start center">
-            <h1 class="md-display-1 light-gray">{{data.outlook}} day outlook</h1>
-            
-        </div>
-	    	
-        <div layout="row" layout-align="center center">
-	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
-	        </md-slider>
-	        <div layout layout-align="center center">
-                <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
-	        </div>
-	    </div>
+ -->
+  		
 	   
-    	<div layout="row" layout-align="start center">
+    	<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
+            <a class="href-link md-subhead" ng-click="setActiveGoal(data.activeAction.goal[0])" href="#/goal">
+                {{data.activeAction.goal[0].description}}
+            </a>
+             <md-chips>
+               <md-chip class="chip-goal">Goal</md-chip>
+             </md-chips>
+
 	    	 <md-button class="md-raised" href="#/dashboard">
                 Dashboard
              </md-button>
-             <md-button class="md-raised" href="#/tracking">
+             <md-button class="md-raised" href="#/list">
                 All goals & actions
             </md-button>
 		</div>
-			<div layout="row" layout-align="start center">
-	        	<a class="href-link md-caption" ng-click="setActiveGoal(data.activeAction.goal[0])" href="#/goal">
-		        	{{data.activeAction.goal[0].description}}
-		        </a>
-		         <md-chips>
-	               <md-chip>Goal</md-chip>
-	             </md-chips>
+			<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
+	        	
         	</div>
     	
-  </div>
+  <!-- </div> -->
 </div>
 
+</div>
+</div>
+
+<div ng-controller="createCtrl">
+    <create-sidenav f="methods" d="data"></create-sidenav>
+</div>
+
+<div ng-controller="settingsActionCtrl">
+    <settings-goal-action-sidenav f="methods" d="data"></settings-goal-action-sidenav>
 </div>

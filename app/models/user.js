@@ -10,11 +10,17 @@ var userSchema = mongoose.Schema({
     date_modified		: { type: Date, default: Date.now }
 });
 
-userSchema
-.virtual('fullname')
-.get(function () {
+userSchema.virtual('fullname').get(function () {
 	return this.firstname + ' ' + this.lastname;
 });
+
+userSchema.methods.changePassword = function(newPasswordHash, cb){
+	this.password = newPasswordHash;
+	this.save(function (err) {
+	    cb(err, this);
+	  });
+}
+
 
 // create the model for user and expose it to our app
 module.exports = mongoose.model('User', userSchema);

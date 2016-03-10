@@ -131,6 +131,46 @@
             </md-button>
           </div>
 
+          <div ng-switch-when="/goal">
+            <div layout="row" layout-align="end center">
+                <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+                </md-button>
+
+                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settingsGoalAction')">
+                    <ng-md-icon icon="settings"></ng-md-icon>
+                </md-button>
+            </div>
+           </div>
+
+           <div ng-switch-when="/action">
+            <div layout="row" layout-align="end center">
+                <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+                </md-button>
+
+                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settingsGoalAction')">
+                    <ng-md-icon icon="settings"></ng-md-icon>
+                </md-button>
+            </div>
+           </div>
+
+           <div ng-switch-when="/list">
+            <div layout="row" layout-align="end center">
+                <md-button class="md-icon-button menu-icon" aria-label='filter' ng-click="toggleMenu('filter')">
+                    <ng-md-icon icon="filter_list"></ng-md-icon>
+                </md-button>
+
+                <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+                </md-button>
+
+                <md-button class="md-icon-button menu-icon" aria-label='settings' ng-click="toggleMenu('settings')">
+                    <ng-md-icon icon="settings"></ng-md-icon>
+                </md-button>
+            </div>
+           </div>
+
           <div ng-switch-default>
 
             <div layout="row" layout-align="end center">

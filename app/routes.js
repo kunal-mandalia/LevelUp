@@ -368,4 +368,53 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 		  });
 	});
 
+	app.post('/api/v1/resetPassword', function(req, res){
+		var recipient = req.body.recipient;
+		// var username;
+		// var password;
+
+		// 1. check if user exists
+		User.findOne({email: recipient}, function(err, doc){
+			if (err){return res.send('error finding user');}
+			if (!doc){return res.send('No such email found');}
+			else {
+			// 2. create random password, from SO
+
+			    var text = "";
+			    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+			    for( var i=0; i < 5; i++ ){
+			        text += possible.charAt(Math.floor(Math.random() * possible.length));
+			    }
+
+			    bcrypt.hash(text, 8, function(err, hash) {
+					if (err){
+						res.status(400);
+						res.send('Server error');
+					}
+					else {
+
+						doc.changePassword(hash, function(err,doc){
+							if (!err){
+								// 3. send email to user with plain text password
+								var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+								sendgrid.send({
+								  to:       recipient,
+								  from:     'no-reply@levelup.kunalmandalia.com',
+								  fromname: 'LevelUp',
+								  subject:  'Password reset',
+								  text:     'Your new password is: ' + text + '. Go to levelup.kunalmandalia.com to continue'
+								}, function(err, json) {
+								  if (err) { return res.send(err); }
+								  else {return res.send('Reset Okay!');}
+								  console.log(json);
+								});
+							}
+						}); 
+					}
+				});
+			}
+		});
+	});
+
 };

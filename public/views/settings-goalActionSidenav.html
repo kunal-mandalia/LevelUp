@@ -1,0 +1,35 @@
+<!-- Settings -->
+<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-11dp" md-component-id="settingsGoalAction" scroll>
+    <!-- <div ng-cloak> -->
+        <!-- Toolbar -->
+        <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+            <h2>
+              <span>Settings</span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="f.toggleMenu('settingsGoalAction')">
+                <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+
+        <md-list ng-cloak>
+          <md-list-item ng-click="logout()" href="#/login">
+            <md-button class="md-raised md-warn"> Logout </md-button>
+          </md-list-item>
+        </md-list>
+
+        <form id="deleteForm" class="md-padding">
+          <md-input-container class="md-block" flex-gt-sm>
+              <label>{{d.delete.message}}</label>
+              <input required name="delete" ng-model="delete.input" />
+              <div class="hint">Type REMOVE and cick delete</div>
+              <div ng-messages="userForm.name.$error">
+              </div>
+          </md-input-container>
+
+          <md-button class="md-raised md-warn" ng-disabled="delete.input != 'REMOVE'" ng-click="f.delete();">Delete</md-button>
+        </form>
+    <!-- </div> -->
+</md-sidenav>

@@ -66,7 +66,7 @@
         </div>
 
         <div layout="row" >
-            <md-content class="">
+            <md-content flex="90" class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
                     <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
@@ -106,18 +106,17 @@
     	<div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray"> {{data.outlook}} day outlook</h1>
 		</div>
-        <div layout="row" layout-align="center center">
-	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
-	        </md-slider>
-	        <div layout layout-align="center center">
-                <input type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
-	        </div>
-	    </div>
-    
+
+          <div layout="row">
+              <md-slider flex min="1" max="30" ng-model="data.outlook" aria-label="due" id="due-slider" class>
+              </md-slider>
+              <div flex="20" layout layout-align="center center">
+                  <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="outlook-slider" class="subtle-control">
+              </div>
+          </div>
     	<!-- Recent -->
-        
         <div layout="row" layout-align="start center">
-            <md-button class="md-raised" href="#/tracking">
+            <md-button class="md-raised md-warn" href="#/list">
                 All goals & actions
             </md-button>
         </div>
@@ -125,34 +124,12 @@
   </div>
 </div>
 
-<!-- Settings -->
-<md-sidenav layout="column" class="md-sidenav-right md-whiteframe-11dp" md-component-id="settings" scroll>
-    <div ng-cloak>
-        <!-- Toolbar -->
-        <md-toolbar class="md-hue-2">
-          <div class="md-toolbar-tools">
-            <h2>
-              <span>Settings</span>
-            </h2>
-            <span flex></span>
-            <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="toggleMenu('settings')">
-                <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
-            </md-button>
-          </div>
-        </md-toolbar>
-
-        <md-list ng-cloak>
-          <md-list-item ng-click="logout()" href="#/login">
-            <md-button class="md-raised md-warn"> Logout </md-button>
-          </md-list-item>
-        </md-list>
-
-    </div>
-</md-sidenav>
-
 </div>
 
 <div ng-controller="createCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
 </div>
 
+<div ng-controller="settingsCtrl">
+    <settings-sidenav f="methods" d="data"></settings-sidenav>
+</div>

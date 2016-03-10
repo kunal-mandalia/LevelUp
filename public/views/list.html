@@ -1,6 +1,11 @@
-<div class="md-padding">
+
+
+<!-- <section layout="row" flex> -->
+
+
+<!-- Goal/Action card content -->
 <md-content class="md-padding" layout="row" layout-wrap>
-<div ng-repeat="g in data.dashboard.goal">
+<div ng-repeat="g in data.dashboard.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)">
       <md-card>
         <md-card-title>
           <md-card-title-text>
@@ -21,7 +26,7 @@
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
                     <!-- Actions -->
-                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="a._goalid != g._id">
+                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a._goalid != g._id) || (a.status[a.status.length-1].on==true && !filter.action.on) || (a.status[a.status.length-1].on==false && !filter.action.off) || (a.is_public==true && !filter.action.is_public) || (a.is_public==false && !filter.action.is_private) || (a.remainingDays > filter.action.daysRemaining)">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
                     	<md-button class="md-icon-button">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
@@ -44,10 +49,111 @@
           <md-button>Action 2</md-button> -->
         </md-card-actions>
       </md-card>
-</div>
+    </div>
 
-
+    
 
   </md-content>
 
+<div layout="row" layout-align="center center">
+            <md-button class="md-raised" href="#/dashboard">
+                Dashboard
+            </md-button>
+    </div>
+
+
+<!-- </div> -->
+<!-- </section> -->
+
+
+<div ng-controller="settingsCtrl">
+    <settings-sidenav f="methods" d="data"></settings-sidenav>
 </div>
+
+<div ng-controller="createCtrl">
+    <create-sidenav f="methods" d="data"></create-sidenav>
+</div>
+
+<!-- Filter sidenav -->
+  <md-sidenav layout="column" class="md-sidenav-right md-whiteframe-11dp" md-component-id="filter" scroll>
+    <!-- <div ng-cloak> -->
+        <!-- Toolbar -->
+        <md-toolbar class="md-hue-2">
+          <div class="md-toolbar-tools">
+            <h2>
+              <span>Filter</span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="toggleMenu('filter')">
+                <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+
+        <md-content class="md-padding" layout-padding>
+            <div class="filter-controls">
+
+            <h1 class="md-headline">Goals</h1>
+            <!-- <div class="filter-controls md-padding"> -->
+              <md-checkbox ng-model="filter.goal.open" aria-label="Goal Open">
+                  Open
+              </md-checkbox><br/>
+
+              <md-checkbox ng-model="filter.goal.closedComplete" aria-label="Goal Complete">
+                  Closed (Complete)
+              </md-checkbox><br/>
+
+              <md-checkbox ng-model="filter.goal.closedIncomplete" aria-label="Goal Incomplete">
+                  Closed (Incomplete)
+              </md-checkbox>
+            <!-- </div> -->
+
+              <h1 class="md-subhead">Due within {{filter.goal.daysRemaining}} days</h1>
+              <div layout="row">
+                  <md-slider flex min="0" max="100" ng-model="filter.goal.daysRemaining" aria-label="due" id="due-slider" class>
+                  </md-slider>
+                  <div flex="20" layout layout-align="center center">
+                      <input flex type="number" ng-model="filter.goal.daysRemaining" aria-label="due" aria-controls="due-slider">
+                  </div>
+              </div>
+
+            <!-- <div class="filter-controls md-padding"> -->
+              <md-checkbox ng-model="filter.goal.is_public" aria-label="Goal Public">
+                  Public
+              </md-checkbox>
+              <br/>
+              <md-checkbox ng-model="filter.goal.is_private" aria-label="Goal Private">
+                  Private
+              </md-checkbox>
+
+            <h1 class="md-headline">Actions</h1>
+
+            <md-checkbox ng-model="filter.action.on" aria-label="Action On">
+                On
+            </md-checkbox>
+            <br/>
+            <md-checkbox ng-model="filter.action.off" aria-label="Action Off">
+                Off
+            </md-checkbox>
+
+            <h1 class="md-subhead">Due within {{filter.action.daysRemaining}} days</h1>
+            <div layout="row">
+                <md-slider flex min="0" max="30" ng-model="filter.action.daysRemaining" aria-label="due" id="due-slider" class>
+                </md-slider>
+                <div flex="20" layout layout-align="center center">
+                    <input flex type="number" ng-model="filter.action.daysRemaining" aria-label="due" aria-controls="due-slider">
+                </div>
+            </div>
+
+            <md-checkbox ng-model="filter.action.is_public" aria-label="Action Public">
+                Public
+            </md-checkbox>
+            <br/>
+            <md-checkbox ng-model="filter.action.is_private" aria-label="Action Private">
+                Private
+            </md-checkbox>
+          </div>
+        </md-content>
+
+    </md-sidenav>
+<!-- End of Filter sidenav -->

@@ -68,6 +68,9 @@ body {
 	padding-left: 20px;
 }
 
+.filter-controls{
+	/*background-color: #FBFBFB;*/
+}
 .small-pad-right{
 	padding-right: 1em;
 }
@@ -92,7 +95,7 @@ body {
 
 .graph-placeholder{
 	/*background-color: #FFFCE4;*/
-	min-height: 80px;
+	min-height: 400px;
 	min-width: 50%;
 	margin-left: 1em;
 }
@@ -228,4 +231,18 @@ body {
 
 .goal-list {
 	min-width: 250px;
+}
+
+.list-filter {
+	/*z-index: 1;*/
+	margin-top: -3px;
+	height: 100%;
+}
+
+.chip-goal{
+	/*background-color: #D6FFD6 !important;*/
+}
+
+.chip-action{
+	/*background-color: #FFD0C1 !important;*/
 }

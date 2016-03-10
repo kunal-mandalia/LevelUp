@@ -11,7 +11,7 @@
         <div>
             <div layout="row" class="md-subhead light-gray dashboard-subhead">
                 <md-chips>
-                    <md-chip>Goal</md-chip>
+                    <md-chip class="chip-goal">Goal</md-chip>
                 </md-chips>
                 <md-button class="md-raised md-primary" ng-hide="!showEditButtons" ng-click="save()">Save</md-button>
                 <md-button class="md-raised" ng-hide="!showEditButtons" ng-click="cancel()">Cancel</md-button>
@@ -88,7 +88,7 @@
   </div>
   <div flex>
         <div layout="row" layout-align="start center">
-        	<h1 class="md-display-1 light-gray">Related actions</h1>
+        	<h1 class="md-display-1 light-gray">Upcoming actions</h1>
             <md-button class="md-icon-button md-raised" ng-click="toggleMenu('create')">
                 <ng-md-icon icon="add" class="md-avatar greenFill" size="25"></ng-md-icon>
             </md-button>
@@ -97,7 +97,7 @@
             <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} days</div>
         </div>
         <div layout="row" >
-            <md-content class="">
+            <md-content flex="90" class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
                     <!-- <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
@@ -145,13 +145,13 @@
             
         </div>
 	    	
-        <div layout="row" layout-align="center center">
-	        <md-slider flex min="1" max="31" ng-model="data.outlook" aria-label="due" id="due-slider" class>
-	        </md-slider>
-	        <div layout layout-align="center center">
-                <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="due-slider" class="subtle-control">
-	        </div>
-	    </div>
+        <div layout="row">
+              <md-slider flex min="1" max="30" ng-model="data.outlook" aria-label="due" id="due-slider" class>
+              </md-slider>
+              <div flex="20" layout layout-align="center center">
+                  <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="outlook-slider" class="subtle-control">
+              </div>
+          </div>
     
     	<!-- Recent -->
     	<div layout="row" layout-align="start center">
@@ -160,29 +160,6 @@
             </md-button>
 		</div>
 
-<!--         <div layout="row" layout-align="start center">                    
-            <h1 class="md-display-1 light-gray">Recent</h1>
-        </div>
-
-        <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
-        </div>
-        <div layout="row">
-            <md-content class="">
-                <md-list class="dashboard-box dashboardbox-top-margin">
-                	
-                    <md-list-item class="md-2-line" ng-repeat="item in goal.recent" ng-hide="item.date_modified > compareDate">
-                    	<ng-md-icon icon="edit" class="md-avatar"></ng-md-icon>
-                        <div class="md-list-item-text" layout="column">
-                            <h3>{{item.description}}</h3>
-					        <h4>{{item.date_modified | date}}</h4>
-					        <p>{{item.update}}</p>
-                        </div>
-                        <md-divider></md-divider>
-                    </md-list-item>
-            </md-content>
-        </div> -->
-
   </div>
 </div>
 
@@ -190,4 +167,8 @@
 
 <div ng-controller="createCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
+</div>
+
+<div ng-controller="settingsGoalCtrl">
+    <settings-goal-action-sidenav f="methods" d="data"></create-sidenav>
 </div>

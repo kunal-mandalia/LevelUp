@@ -100,10 +100,6 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         templateUrl: 'views/goal.html',
         controller: 'GoalCtrl'
       })
-      // .when('/goal2', {
-      //   templateUrl: 'views/goal2.html',
-      //   controller: 'GoalCtrl'
-      // })
       .when('/action', {
         templateUrl: 'views/action.html',
         controller: 'ActionCtrl'
@@ -272,7 +268,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
 /**********************************************************************
  * Login controller
  **********************************************************************/
-app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
+app.controller('LoginCtrl', function($scope, $rootScope, $http, $location, DataService) {
   // This object will be filled by the form
   $scope.user = {};
   $scope.loginStatus = "";
@@ -321,6 +317,17 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location) {
 
     $scope.loginGithub = function(){
       $rootScope.busy = true;
+    }
+
+    $scope.resetPassword = function(){
+      var body = {recipient: $scope.user.username};
+      DataService.resetPassword(body)
+        .success(function(res){
+          console.log('resetPassword success:' + res);
+        })
+        .error(function(err){
+          console.log('resetPassword failed: ' + err);
+        });
     }
 });
 
@@ -460,7 +467,6 @@ $scope.cancel = function(){
         console.log('putAction error: ' + err);
       });
   }
-
 });
 
 /**********************************************************************
@@ -956,6 +962,22 @@ app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(
   
 app.controller('listCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
 
+  $scope.filter = {};
+  $scope.filter.goal = {
+    open: true,
+    closedComplete: true,
+    closedIncomplete: true,
+    is_public: true,
+    is_private: true
+  };
+
+  $scope.filter.action = {
+    on: true,
+    off: true,
+    is_public: true,
+    is_private: true
+  };
+
   $scope.incrementProgress = function(action){
     DataService.postProgress($rootScope.data.dashboard.action, action, 1, $rootScope.data.outlook);
   };
@@ -1093,14 +1115,83 @@ app.controller('createCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
 
   $scope.methods.resetScopeData();
 
-
 }]);
 
 
 app.controller('settingsCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
+
+  $scope.methods = {
+      // ToDo this is duplicated multiple times, is there a way of accessing rootscope function from selfcontained directive?
+      toggleMenu: function(id) {
+        $mdSidenav(id).toggle();
+      }
+    }
+
 }]);
 
+app.controller('settingsGoalCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
+  
+  $scope.data = {
+    delete: {
+      message: "Delete goal"
+    }
+  }
 
+  $scope.methods = {
+    // TODO: house all actions belonging to deleted goals in 'Deleted goals' goal so they can be
+    //  picked up in All goals and actions view
+    delete: function(){
+      console.log('delete goal');
+      DataService.deleteGoal($rootScope.data.activeGoal.goal)
+        .success(function(res){
+          console.log('deleted goal: ' + res);
+          $location.url('/dashboard');
+
+          //TODO flash success message
+        })
+        .error(function(err){
+          console.log('could not delete goal: ' + err);
+        })
+    },
+    toggleMenu: function(id) {
+      $mdSidenav(id).toggle();
+    }
+  }
+
+}]);
+
+app.controller('settingsActionCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
+
+  $scope.data = {
+    delete: {
+      message: "Delete action"
+    }
+  }
+
+  $scope.methods = {
+    delete: function(){
+      console.log('delete action');
+      DataService.deleteAction($rootScope.data.activeAction.action[0])
+        .success(function(res){
+          console.log('deleted action: ' + res);
+          $location.url('/dashboard');
+          // DataService.updateOutlook($rootScope.data.activeAction.goal,$rootScope.data.activeAction.action,$rootScope.data.outlook);
+          // DataService.updateOutlook($rootScope.data.activeGoal.goal,$rootScope.data.activeGoal.action,$rootScope.data.outlook);
+
+          // Todo: history.back(); but with updated data
+
+          //TODO flash success message
+        })
+        .error(function(err){
+          console.log('could not delete action: ' + err);
+        })
+    },
+    toggleMenu: function(id) {
+      $mdSidenav(id).toggle();
+    }
+  }
+
+}]);
 
 // FACTORIES AND SERVICES
 app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScope, $http, $filter) {
@@ -1108,6 +1199,15 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
   var dataSet = [];
   //functions defined within a JSON object so they're accessible to eachother
   var functions = {
+    resetPassword: function(email){
+      return $http.post('/api/v1/resetPassword', email);
+    },
+    deleteAction: function(action){
+      return $http.delete('/api/v1/action/' + action._id);
+    },
+    deleteGoal: function(goal){
+      return $http.delete('/api/v1/goal/' + goal._id);
+    },
     putAction: function(action){
       return $http.put('/api/v1/action/' + action._id, action);
     },
@@ -1218,7 +1318,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
                           type: 'multiBarChart',
                           showControls: false,
                           showLegend: false,
-                          height: 130,
+                          height: 250,
                           margin : {
                               top: 20,
                               right: 20,
@@ -1704,5 +1804,16 @@ app.directive('settingsSidenav', function() {
       d: '=d'   // data
     },
     templateUrl: 'views/settings-sidenav.html'
+  };
+});
+
+app.directive('settingsGoalActionSidenav', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      f: '=f',  // functions or methods
+      d: '=d'   // data
+    },
+    templateUrl: 'views/settings-goalActionSidenav.html'
   };
 });
