@@ -37,7 +37,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/tracking');
+	      return res.redirect('/#/dashboard');
 	    });
 	  })(req, res, next);
 	});
@@ -52,7 +52,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/tracking');
+	      return res.redirect('/#/dashboard');
 	    });
 	  })(req, res, next);
 	});

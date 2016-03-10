@@ -77,11 +77,12 @@ passport.use(new GoogleStrategy({
   }
 ));
 
+
 // Github strategy
 passport.use(new GithubStrategy({
-    clientID: passportConfig["Github"].clientID,
-    clientSecret: passportConfig["Github"].clientSecret,
-    callbackURL: passportConfig["Github"].callbackURL,
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: process.env.GITHUB_CALLBACK,
     profileFields: ['email']
   },
   function(accessToken, refreshToken, profile, done) {
