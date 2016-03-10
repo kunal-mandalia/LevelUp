@@ -51,6 +51,7 @@ passport.use(new GoogleStrategy({
     // done has been extended, the function takes three parameters; err, user, info
     // if no user exists in db, then redirect user to signup page with prefilled fields using profile
     // we'll put this redirecturl in 'info'
+
     process.nextTick(function () {
 
       User.findOne({email:profile.emails[0].value}, function(err,user){
@@ -71,7 +72,27 @@ passport.use(new GoogleStrategy({
         }
         // if (!user.verifyPassword(password)) { return done(null, false); }
         console.log('google user found : ' + profile.emails[0].value);
+
+          // // revoke tokens
+          // var options = {
+          //   host: 'https://accounts.google.com',
+          //   path: '/o/oauth2/revoke?token=' + accessToken
+          // };
+
+          // http.request(options, null).end();
+
+          // // revoke tokens
+          // var options = {
+          //   host: 'https://accounts.google.com',
+          //   path: '/o/oauth2/revoke?token=' + refreshToken
+          // };
+
+          // http.request(options, null).end();
+
+        // https://accounts.google.com/o/oauth2/revoke?token=accessToken
+        // https://accounts.google.com/o/oauth2/revoke?token=refreshToken
         return done(null, user, null);
+
       });
     });
   }

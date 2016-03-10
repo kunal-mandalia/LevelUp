@@ -26,7 +26,7 @@ module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
 	//==================================================================
 
 	app.get('/auth/google',
-	  passport.authenticate('google', { scope: 'https://www.googleapis.com/auth/userinfo.email'}));
+	  passport.authenticate('google', { scope: 'email profile'}));
 
 	// auth function extended to allow another parameter, signup, to be accessed
 	// so unregistered users can be redirected and signup and be prefilled with profile info
