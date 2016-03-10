@@ -36,9 +36,6 @@
                 <div layout="row" layout-align="center center">
                 <div class="light-gray">due</div> 
                 <md-datepicker ng-model="data.activeGoal.goal.due" required md-placeholder="Until" ng-disabled="data.activeGoal.goal.status !='Open'" ng-change="goalDataChanged()"></md-datepicker>
-                <!-- <div class="validation-messages" ng-messages="myForm.dateField.$error">
-                    <div ng-message="valid" class="md-caption dashboard-box-caption">Due date</div>
-                </div> -->
                 </div>
             </div>
             <div flex layout="column" layout-align="center center" class="small-pad-top">
@@ -84,9 +81,10 @@
                 <div class="md-display-2">{{data.activeGoal.action.total.rep_conversion}}%</div><div class="md-caption dashboard-box-caption">Rep conversion</div>
             </div>
         </div>
-
   </div>
-  <div flex>
+
+  <!-- Upcoming actions -->
+  <!-- <div flex>
         <div layout="row" layout-align="start center">
         	<h1 class="md-display-1 light-gray">Upcoming actions</h1>
             <md-button class="md-icon-button md-raised" ng-click="toggleMenu('create')">
@@ -99,46 +97,23 @@
         <div layout="row" >
             <md-content flex="90" class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
-                	<!-- Goals -->
-                    <!-- <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
-                    	<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
-                    		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
-                    	</md-button>
-                        <div class="md-list-item-text" layout="column">
-                            <h3><a ng-click="setActiveGoal(g)" href="#/goal" class="href-link">{{g.description}}</a></h3>
-					        <h4>{{g.remainingDays}} days remaining</h4>
-					        <p>goal</p>
-                        </div>
-                        <md-divider></md-divider>
-                    </md-list-item> -->
-                    <!-- Actions -->
                     <md-list-item class="md-2-line goal-list" ng-repeat="a in data.activeGoal.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0)">
-                    	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
                     	<md-button class="md-icon-button">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
-                            <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
                             <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
 					        <h4>{{a.remainingDays}} days remaining </h4> 
-					        <!-- TODO:  -->
 					        <p>action</p>
 					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
-					        <!-- {{ a.currentProgress }}/{{a.verb_quantity}} -->
                         </div>
                         <md-divider></md-divider>
-                    <!-- </md-list-item>
-                        <div class="md-list-item-text">
-                            <div style="width: 100%; min-width: 400px"></div>
-                        </div>
-                    <md-list-item> -->
-
                     </md-list-item>
             </md-content>
         </div>
-  </div>
-  <div flex>
+  </div> -->
 
+  <div flex>
   		<!-- data.outlook -->
         <div layout="row" layout-align="start center">
             <h1 class="md-display-1 light-gray">{{data.outlook}} day outlook</h1>
@@ -159,8 +134,8 @@
                 Dashboard
             </md-button>
 		</div>
-
   </div>
+
 </div>
 
 </div>
