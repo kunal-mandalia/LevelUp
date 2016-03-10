@@ -246,3 +246,19 @@ body {
 .chip-action{
 	/*background-color: #FFD0C1 !important;*/
 }
+
+.banner{
+	/*margin-top: 10%;*/
+	padding-top: 12%;
+}
+
+.banner-strip{
+	background-color: rgba(255, 255, 255, 0.24);
+}
+
+.background-picture{
+	width: 100%;
+	height:100%;
+	background-image: url("/images/VizTV-Background-Gradient4.png");
+	background-size:cover;
+}
