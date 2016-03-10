@@ -42,9 +42,9 @@ passport.use(new LocalStrategy(
 
 // Google strategy
 passport.use(new GoogleStrategy({
-    clientID: passportConfig["Google"].clientID,
-    clientSecret: passportConfig["Google"].clientSecret,
-    callbackURL: passportConfig["Google"].callbackURL
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK,
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
