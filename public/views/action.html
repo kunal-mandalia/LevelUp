@@ -76,8 +76,8 @@
           </div>
   </div>
 
-  <div flex="65">
-        <!-- <div layout="row" layout-align="start center">
+  <div flex>
+        <div layout="row" layout-align="start center">
         	<h2 class="md-display-1 light-gray">Progress</h2>
 
             <md-button class="md-icon-button md-raised">
@@ -86,15 +86,15 @@
         	<md-button class="md-icon-button md-raised">
         		<ng-md-icon icon="exposure_minus_1" style="fill:red" class="md-avatar goal-card-icon" ng-click="decrementProgress(data.activeAction.action[0]);"></ng-md-icon>
         	</md-button>
-        </div> -->
+        </div>
 
-        <!-- <div layout="row" >
+        <div layout="row" >
             <md-content flex class="">
                 <div class="">
                     <nvd3 options="data.activeAction.action[0].chart.options" data="data.activeAction.action[0].chart.data"></nvd3>
                 </div>
             </md-content>
-        </div> -->
+        </div>
 	   
     	<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
             <a class="href-link md-subhead" ng-click="setActiveGoal(data.activeAction.goal[0])" href="#/goal">
