@@ -1,8 +1,8 @@
 <div class="md-padding">
 
 <div layout="column" layout-gt-md="row" class="dashboard-pane-1">
-  <div flex="35">
 
+  <div flex="35">
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
 	    	<h1 class="md-headline light-gray">{{data.activeAction.action[0].verb}} {{data.activeAction.action[0].verb_quantity}} {{data.activeAction.action[0].noun}} {{data.activeAction.action[0].period | periodInWords:0}}</h1>
@@ -74,9 +74,9 @@
                   <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="outlook-slider" class="subtle-control">
               </div>
           </div>
-
   </div>
-  <div flex="35">
+
+  <div flex="65">
         <div layout="row" layout-align="start center">
         	<h1 class="md-display-1 light-gray">Progress</h1>
 
@@ -89,16 +89,12 @@
         </div>
 
         <div layout="row" >
-            <md-content flex="100" class="">
+            <md-content flex class="">
                 <div class="">
                     <nvd3 options="data.activeAction.action[0].chart.options" data="data.activeAction.action[0].chart.data"></nvd3>
                 </div>
             </md-content>
         </div>
-<!--   </div>
-  <div flex>
- -->
-  		
 	   
     	<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
             <a class="href-link md-subhead" ng-click="setActiveGoal(data.activeAction.goal[0])" href="#/goal">
@@ -116,12 +112,8 @@
                 All goals & actions
             </md-button>
 		</div>
-			<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
-	        	
-        	</div>
     	
-  <!-- </div> -->
-</div>
+    </div>
 
 </div>
 </div>
