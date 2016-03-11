@@ -48,7 +48,10 @@
                 <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.rep_conversion}}%
+                <div layout="row" layout-align="center center">
+                    <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.rep_conversion}}
+                    </div>
+                    <h2 class="md-subhead">%</h2>
                 </div>
                 <div class="md-caption dashboard-box-caption">Rep conversion</div>
             </div>
