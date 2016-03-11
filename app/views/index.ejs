@@ -69,9 +69,9 @@
         <md-button class="md-icon-button menu-icon" aria-label="Menu" ng-click="toggleMenu('links')">
             <ng-md-icon icon="menu"></ng-md-icon>
         </md-button>
-        <h2>
+        <a href="#/dashboard">
           <span class="md-headline">LevelUp</span>
-        </h2>
+        </a>
         <md-progress-circular class="md-hue-1" md-mode="indeterminate" ng-hide="busy==false"></md-progress-circular>
             
             
@@ -98,7 +98,7 @@
 
           <div ng-switch-when="/">
             
-            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
+            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup" show-gt-sm hide>
                 <ng-md-icon icon="person_add"></ng-md-icon>
             </md-button>
 
@@ -110,7 +110,7 @@
 
           <div ng-switch-when="/login">
             
-            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
+            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup" show-gt-sm hide>
                 <ng-md-icon icon="person_add"></ng-md-icon>
             </md-button>
 
@@ -122,7 +122,7 @@
 
           <div ng-switch-when="/signup">
             
-            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup">
+            <md-button class="md-icon-button menu-icon" aria-label='person_add' ng-click="" href="#/signup" show-gt-sm hide>
                 <ng-md-icon icon="person_add"></ng-md-icon>
             </md-button>
 
