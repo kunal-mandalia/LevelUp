@@ -147,6 +147,10 @@ body {
  	margin-bottom:4px;
  }
 
+ .dashboard-stat-action{
+ 	margin-bottom: 10px;
+ }
+
  .light-blue{
  	background-color: #4777C3;
  }

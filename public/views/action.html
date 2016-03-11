@@ -5,7 +5,7 @@
   <div flex>
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
-	    	<h1 class="md-headline light-gray">{{data.activeAction.action[0].verb}} {{data.activeAction.action[0].verb_quantity}} {{data.activeAction.action[0].noun}} {{data.activeAction.action[0].period | periodInWords:0}}</h1>
+	    	<h1 class="md-headline">{{data.activeAction.action[0].verb}} {{data.activeAction.action[0].verb_quantity}} {{data.activeAction.action[0].noun}} {{data.activeAction.action[0].period | periodInWords:0}}</h1>
 		</div>
         <div>
             <div layout="row" class="md-subhead light-gray dashboard-subhead">
@@ -51,13 +51,13 @@
         <!-- Action repetitions -->
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{data.activeAction.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Repetitions</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Repetitions</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
-                <div class="md-display-2">{{data.activeAction.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{data.activeAction.action.total.rep_conversion}}%</div><div class="md-caption dashboard-box-caption">Rep conversion</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.rep_conversion}}%</div><div class="md-caption dashboard-box-caption">Rep conversion</div>
             </div>
         </div>
 
