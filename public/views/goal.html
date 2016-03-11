@@ -19,7 +19,7 @@
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.activeGoal.goal.remainingDays}}</div><div class="md-caption dashboard-box-caption">days remaining</div>
+	            <div class="md-display-2">{{data.activeGoal.goal.remainingDays}}</div><div class="md-caption dashboard-box-caption">day{{data.activeGoal.goal.remainingDays | plural }} remaining</div>
 
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
@@ -56,7 +56,7 @@
         <!-- TODO: ng-sum? actions-->
         <h1 class="md-display-1 light-gray">Actions</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} day{{data.outlook | plural }}</div>
         </div>
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
@@ -97,7 +97,7 @@
             </md-button>
         </div>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} day{{data.outlook | plural }}</div>
         </div>
         <div layout="row" >
             <md-content flex="90" class="">
@@ -108,7 +108,7 @@
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
                             <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
-					        <h4>{{a.remainingDays}} days remaining </h4> 
+					        <h4>{{a.remainingDays}} day{{a.remainingDays | plural }} remaining </h4> 
 					        <p>action</p>
 					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
                         </div>

@@ -18,7 +18,7 @@
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.activeAction.action[0].remainingDays}}</div><div class="md-caption dashboard-box-caption">days remaining</div>
+	            <div class="md-display-2">{{data.activeAction.action[0].remainingDays}}</div><div class="md-caption dashboard-box-caption">day{{data.activeAction.action[0].remainingDays | plural}} remaining</div>
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
 	            <md-switch class="md-display-1" ng-model="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on" aria-label="Status" ng-change="actionDataChanged()">
@@ -45,7 +45,7 @@
         <!-- TODO: ng-sum? actions-->
         <h1 class="md-display-1 light-gray">Consistency</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} day{{data.outlook | plural}}</div>
         </div>
 
         <!-- Action repetitions -->

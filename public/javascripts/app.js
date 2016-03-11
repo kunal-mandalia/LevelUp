@@ -1742,6 +1742,13 @@ app.filter('daysRemainingDescription', function() {
   };
 });
 
+app.filter('plural', function(){
+  return function(number){
+    return (number == 1) ? '' : 's';
+  }
+
+});
+
 app.filter('is_publicFormat', function() {
   return function(is_public) {
     return (is_public == 0) ? 'Private' : 'Public';

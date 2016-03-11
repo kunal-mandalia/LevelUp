@@ -9,7 +9,7 @@
 		</div>
 
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} day{{data.outlook | plural }}</div>
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
@@ -26,7 +26,7 @@
 	    <!-- Actions -->
         <h1 class="md-display-1 light-gray">Actions</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} day{{data.outlook | plural }}</div>
         </div>
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
@@ -62,7 +62,7 @@
   <div flex>
     	<h1 class="md-display-1 light-gray">Upcoming</h1>
         <div layout="row">
-            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} days</div>
+            <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} day{{data.outlook | plural }}</div>
         </div>
 
         <div layout="row" >
@@ -75,7 +75,7 @@
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
                             <h3><a ng-click="setActiveGoal(g)" href="#/goal" class="href-link">{{g.description}}</a></h3>
-					        <h4>{{g.remainingDays}} days remaining</h4>
+					        <h4>{{g.remainingDays}} day{{g.remainingDays | plural }} remaining</h4>
 					        <p>goal</p>
 					        <!-- <ng-md-icon icon="mood" style="fill:green" class="md-avatar goal-card-icon" ng-hide="g.status != 'closed - complete'"></ng-md-icon> -->
                         </div>
@@ -90,7 +90,7 @@
                         <div class="md-list-item-text" layout="column">
                             <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
                             <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
-					        <h4>{{a.remainingDays}} days remaining </h4> 
+					        <h4>{{a.remainingDays}} day{{a.remainingDays | plural }} remaining </h4> 
 					        <!-- TODO:  -->
 					        <p>action</p>
 					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
