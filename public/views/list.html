@@ -5,8 +5,8 @@
 
 <!-- Goal/Action card content -->
 <md-content class="md-padding" layout="row" layout-wrap>
-<div ng-repeat="g in data.dashboard.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)">
-      <md-card>
+<div ng-repeat="g in data.dashboard.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)" class="list-card">
+      <md-card class="">
         <md-card-title>
           <md-card-title-text>
             <span class="md-headline"><a class="href-link" ng-click="setActiveGoal(g)" href="#/goal">{{g.description}}</a></span>
@@ -21,9 +21,9 @@
             <div class="md-media-lg card-media"></div>
           </md-card-title-media> -->
         </md-card-title>
-        <md-card-content>
+        <md-card-content class="">
         <md-content class="">
-                <md-list class="dashboard-box dashboardbox-top-margin">
+                <md-list class="list-card-actions">
                 	<!-- Goals -->
                     <!-- Actions -->
                     <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a._goalid != g._id) || (a.status[a.status.length-1].on==true && !filter.action.on) || (a.status[a.status.length-1].on==false && !filter.action.off) || (a.is_public==true && !filter.action.is_public) || (a.is_public==false && !filter.action.is_private) || (a.remainingDays > filter.action.daysRemaining)">
@@ -42,6 +42,7 @@
                         </div>
                         <md-divider></md-divider>
                     </md-list-item>
+                  </md-list>
             </md-content>
    	    </md-card-content>
         <md-card-actions layout="row" layout-align="end center">

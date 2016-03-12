@@ -1746,8 +1746,14 @@ app.filter('plural', function(){
   return function(number){
     return (number == 1) ? '' : 's';
   }
-
 });
+
+app.filter('firstNChars', function(){
+  // returns first n chars of string, appends ... to strings surpassing length limit
+  return function(string, length){
+    // TODO: google string function for returning/slicing first n chars of string
+  }
+})
 
 app.filter('is_publicFormat', function() {
   return function(is_public) {

@@ -266,3 +266,19 @@ body {
 	background-image: url("/images/VizTV-Background-Gradient4.png");
 	background-size:cover;
 }
+
+.list-card{
+	width: 282px;
+	height: 400px;
+}
+
+.list-card-actions{
+	height: 210px !important;
+}
+
+@media screen and (max-width: 480px) {
+    .list-card {
+    	width: 98%; 
+        width: calc(100% - 10px);
+    }
+}
