@@ -18,7 +18,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var GithubStrategy = require('passport-github').Strategy;
-var passportConfig = require('./config/passportConfig.js');
+// var passportConfig = require('./config/passportConfig.js');
 
 mongoose.connect(process.env.MONGOLAB_URI);
 //==================================================================
