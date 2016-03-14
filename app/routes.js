@@ -1,7 +1,7 @@
 var auth = require('./models/auth.js');
-var passport = require('passport');
+// var passport = require('passport');
 
-module.exports = function(app, User, Goal, Action, Progress, bcrypt) {
+module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 
 	app.get('/', function(req, res){
 	  res.render(__dirname + '/views/index.ejs', { title: 'Express' });

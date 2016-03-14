@@ -211,7 +211,7 @@ if ('development' == app.get('env')) {
 }
 
 //load routes
-routes(app, User, Goal, Action, Progress, bcrypt);
+routes(passport, app, User, Goal, Action, Progress, bcrypt);
 
 app.listen(process.env.PORT);
 console.log('LevelUp running on port ' + process.env.PORT);

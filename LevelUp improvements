@@ -21,5 +21,4 @@ Steps to recreate issue of progress chart not updating:
 3. Click an action
 4. Increment progress on that action
 
-Progress chart updates in the following flow:
-1.
+Not reproducible on newer goals/actions - closing
