@@ -6,16 +6,16 @@
 <!-- Goal/Action card content -->
 <md-content class="md-padding" layout="row" layout-wrap>
 <div ng-repeat="g in data.dashboard.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)" class="list-card">
-      <md-card class="">
+      <md-card>
         <md-card-title>
           <md-card-title-text>
-            <span class="md-headline"><a class="href-link" ng-click="setActiveGoal(g)" href="#/goal">{{g.description}}</a></span>
-            <span class="md-subhead">
+            <span class="md-body-2"><a class="href-link" ng-click="setActiveGoal(g)" href="#/goal">{{g.description | firstNChars : 40}}</a></span>
+            <div layout="row" layout-align="start center">
     			<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
             		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
             	</md-button>
-            	{{g.remainingDays}} {{g.remainingDays | daysRemainingDescription}}
-            </span>
+            	<p class="md-body-1 light-gray">{{g.remainingDays}} {{g.remainingDays | daysRemainingDescription}}</p>
+            </div>
           </md-card-title-text>
           <!-- <md-card-title-media>
             <div class="md-media-lg card-media"></div>
@@ -33,11 +33,12 @@
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
                             <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
-                            <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
-					        <h4>{{a.remainingDays}} days remaining </h4>
+                            <a ng-click="setActiveAction(a)" href="#/action" class="href-link md-body-1">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a>
+					                  <div class="md-body-1 light-gray">{{a.remainingDays}} days remaining </div>
 					        
 					        <!-- TODO:  -->
-					        <p>action</p>
+                  <!-- <md-chips><md-chip>action</md-chip></md-chips> -->
+					        <div class="md-body-1 light-gray">action</div>
 					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
                         </div>
                         <md-divider></md-divider>

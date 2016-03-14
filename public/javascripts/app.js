@@ -341,7 +341,6 @@ app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav,
   // $rootScope.data.outlook = 7;
 
   var options = {branch: 'dashboard'};
-
   DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
 
   $scope.$watch('data.outlook', function() {
@@ -1750,7 +1749,12 @@ app.filter('plural', function(){
 
 app.filter('firstNChars', function(){
   // returns first n chars of string, appends ... to strings surpassing length limit
-  return function(string, length){
+  return function(string, limit){
+    var output = string;
+    if (string.length > limit){
+      output = string.substring(0, limit - 3) + '...';
+    }
+    return output;
     // TODO: google string function for returning/slicing first n chars of string
   }
 })
