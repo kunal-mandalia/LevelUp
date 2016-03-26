@@ -5,7 +5,8 @@ var userSchema = mongoose.Schema({
 	password			: String,
 	first_name 			: String, 
 	last_name		 	: String,
-	is_public			: Boolean,
+	is_public			: { type: Boolean, default: false },
+	picture_url			: String, 
 	date_created		: { type: Date, default: Date.now },
     date_modified		: { type: Date, default: Date.now }
 });
@@ -20,7 +21,6 @@ userSchema.methods.changePassword = function(newPasswordHash, cb){
 	    cb(err, this);
 	  });
 }
-
 
 // create the model for user and expose it to our app
 module.exports = mongoose.model('User', userSchema);

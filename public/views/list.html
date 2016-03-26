@@ -1,19 +1,26 @@
 
 
 <!-- <section layout="row" flex> -->
-
+<div layout="row" layout-align="center center">
+  <div class="md-padding">
+<md-button md-no-ink class="md-primary" ng-click="toggleMenu('filter')">
+    <ng-md-icon icon="filter_list" ng-class="" class="blue-fill"></ng-md-icon>
+    Filter
+</md-button>
+</div>
+</div>
 
 <!-- Goal/Action card content -->
 <md-content class="md-padding" layout="row" layout-wrap>
-<div ng-repeat="g in data.dashboard.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)" class="list-card">
+<div ng-repeat="g in data.goal" ng-hide="(g.status=='Open' && !filter.goal.open) || (g.status=='Closed - Complete' && !filter.goal.closedComplete) || (g.status=='Closed - Incomplete' && !filter.goal.closedIncomplete) || (g.is_public==true && !filter.goal.is_public) || (g.is_public==false && !filter.goal.is_private) || (g.remainingDays > filter.goal.daysRemaining)" class="list-card">
       <md-card>
         <md-card-title>
           <md-card-title-text>
-            <span class="md-body-2"><a class="href-link" ng-click="setActiveGoal(g)" href="#/goal">{{g.description | firstNChars : 40}}</a></span>
+            <span class="md-headline"><a class="href-link" ng-click="setActiveGoal(g)" href="#/{{data.user._id}}/goal/{{g._id}}">{{g.description | firstNChars : 40}}</a></span>
             <div layout="row" layout-align="start center">
-    			<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
-            		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
-            	</md-button>
+    			     <!-- <md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'" aria-label=""> -->
+            		  <ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="medium-margin-right"></ng-md-icon>
+            	<!-- </md-button> -->
             	<p class="md-body-1 light-gray">{{g.remainingDays}} {{g.remainingDays | daysRemainingDescription}}</p>
             </div>
           </md-card-title-text>
@@ -26,14 +33,14 @@
                 <md-list class="list-card-actions">
                 	<!-- Goals -->
                     <!-- Actions -->
-                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a._goalid != g._id) || (a.status[a.status.length-1].on==true && !filter.action.on) || (a.status[a.status.length-1].on==false && !filter.action.off) || (a.is_public==true && !filter.action.is_public) || (a.is_public==false && !filter.action.is_private) || (a.remainingDays > filter.action.daysRemaining)">
+                    <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a._goalid != g._id) || (a.status[a.status.length-1].on==true && !filter.action.on) || (a.status[a.status.length-1].on==false && !filter.action.off) || (a.is_public==true && !filter.action.is_public) || (a.is_public==false && !filter.action.is_private) || (a.remainingDays > filter.action.daysRemaining)">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-                    	<md-button class="md-icon-button">
+                    	<md-button class="md-icon-button" aria-label="Increment Progress on action by 1">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
                             <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
-                            <a ng-click="setActiveAction(a)" href="#/action" class="href-link md-body-1">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a>
+                            <a ng-click="setActiveAction(a)" href="#/{{data.user._id}}/action/{{a._id}}" class="href-link md-body-1">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a>
 					                  <div class="md-body-1 light-gray">{{a.remainingDays}} days remaining </div>
 					        
 					        <!-- TODO:  -->
@@ -57,12 +64,13 @@
 
   </md-content>
 
-<div layout="row" layout-align="center center">
-            <md-button class="md-raised" href="#/dashboard">
-                Dashboard
-            </md-button>
-    </div>
-
+  <div layout="row" layout-align="center center">
+        <div class="md-padding">
+          <md-button class="md-raised" href="#/{{data.user._id}}/dashboard" aria-label="Back to dashboard">
+              Dashboard
+          </md-button>
+        </div>
+  </div>
 
 <!-- </div> -->
 <!-- </section> -->
@@ -72,7 +80,7 @@
     <settings-sidenav f="methods" d="data"></settings-sidenav>
 </div>
 
-<div ng-controller="createCtrl">
+<div ng-controller="CreateCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
 </div>
 
@@ -86,7 +94,7 @@
               <span>Filter</span>
             </h2>
             <span flex></span>
-            <md-button class="md-icon-button goal-card-icon" aria-label="Close" ng-click="toggleMenu('filter')">
+            <md-button class="md-icon-button goal-card-icon" aria-label="Close filter" ng-click="toggleMenu('filter')">
                 <ng-md-icon icon="close" class="white-fill"></ng-md-icon>
             </md-button>
           </div>

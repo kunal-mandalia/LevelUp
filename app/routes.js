@@ -37,7 +37,7 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/dashboard');
+	      return res.redirect('/#/' + user._id + '/dashboard?loginSource=google&first_name=' + user.first_name + '&picture_url=' + encodeURI(user.picture_url));
 	    });
 	  })(req, res, next);
 	});
@@ -52,7 +52,7 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	    if (!user) { return res.redirect(signup); }
 	    req.logIn(user, function(err) {
 	      if (err) { return next(err); }
-	      return res.redirect('/#/dashboard');
+	      return res.redirect('/#/' + user._id + '/dashboard?loginSource=github&first_name=' + user.first_name + '&picture_url=' + encodeURI(user.picture_url));
 	    });
 	  })(req, res, next);
 	});
@@ -127,6 +127,24 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		});
 	});
 
+	// update user
+	app.put('/api/v1/me', auth, function(req, res){
+
+		console.log(req.body);
+
+		// sanitise attempted password change
+		var safeBody = req.body;
+		if ((typeof(safeBody)==="object") && (!safeBody['password'])){
+			delete safeBody['password'];
+		}
+
+		User.update({email: req.user.email}, { $set: safeBody }, function(err, user){
+			if(err){res.send(400);};
+			return res.send('Updated user');
+		});
+
+	});
+
 	// GOALS API
 	app.get('/api/v1/goal', auth, function(req, res){
 		// Goal.find({ _userid: req.user._id }, function(err, goal){
@@ -177,11 +195,31 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		});
 	});
 
+	/**
+	* Deletes a goal and depending on the options, its associated actions or rehouses associated actions (giving them a particular id)
+	* @param {String} req.params.id - goalid
+	* @param {String} req.body.actionDestination - the destination of associated actions; either 'move' to another goal or 'delete'
+	*/
 	app.delete('/api/v1/goal/:id', auth, function(req, res){
-		//only authorized user may delete goal
+
+		var actionDestination = req.body.actionDestination;
+		var actionMoveTo 	  = req.body.actionMoveTo;
+		//1. delete goal. only authorized user may delete goal
 		Goal.findOneAndRemove({ _userid: req.user._id, _id: req.params.id}, function(err){
 			if (err){ return res.send(err);}
 
+			//2. Remove or rehouse associated actions
+			Action.find({_goalid: req.params.id}, function(err, docs){
+				if (err){ return res.send(err);}
+
+				if  (actionDestination === 'move'){
+
+				}
+				else if (actionDestination === 'delete'){
+
+				}
+
+			})
 			return res.send('Removed goal');
 		});
 	});
@@ -240,6 +278,7 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 
 	app.put('/api/v1/action/:id', auth, function(req, res){
 		// Todo: check if Action belongs to current user
+		// Todo: handle status update
 		Action.update({ _id: req.params.id}, { $set: req.body }, function(err, rawResponse){
 			if (err){ return res.send(err);}
 
@@ -310,63 +349,7 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		});
 	});
 
-	// TODO: app.put('/api/v1/activities')
-	app.get('/api/v1/goalsActionsProgress', auth, function(req, res){
-
-		var goals = [];
-		var actions = [];
-		var progress = [];
-
-		var goalIds = [];
-		var actionIds = [];
-
-		var goalsActionsProgress = [];
-
-		// 1. find all goals for current user
-		Goal.find()
-		  .where('_userid').equals(req.user._id)
-		  .exec(function (err, goalDocs) {
-		    //make magic happen
-	    	if (err){return res.send(err);}
-
-			goals = goalDocs;
-			// 2. get actions for all goals
-			for (var i = 0; i < goals.length; i++) {
-				goalIds[i] = goals[i].id;
-			};
-
-			Action.find()
-				.where('_goalid')
-				.in(goalIds)
-				.exec(function (err, actionDocs){
-
-					if (err){return res.send(err);}
-
-					actions = actionDocs;
-					// goalsActions = [goals, actions];
-					// return res.send(goalsActions);
-
-					// 3. get actions for all goals
-					for (var i = 0; i < actions.length; i++) {
-						actionIds[i] = actions[i].id;
-					};
-
-					Progress.find()
-					.where('_actionid')
-					.in(actionIds)
-					.sort({date_created: 'descending'})
-					.exec(function (err, progressDocs){
-
-						if (err){return res.send(err);}
-
-						progress = progressDocs;
-						goalsActionsProgress = [goals, actions, progress];
-						return res.send(goalsActionsProgress);
-					});
-
-				});
-		  });
-	});
+	
 
 	app.post('/api/v1/resetPassword', function(req, res){
 		var recipient = req.body.recipient;
@@ -417,4 +400,165 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		});
 	});
 
+
+
+	/**
+	 * Gets logged in user's data
+	 * @return [Array] [goals, actions, progress, user]
+	 */
+	app.get('/api/v1/privateData', auth, function(req, res){
+
+		var user = {};
+		var goals = [];
+		var actions = [];
+		var progress = [];
+
+		var goalIds = [];
+		var actionIds = [];
+
+		var goalsActionsProgress = [];
+
+		user.first_name 	= req.user.first_name;
+		user.last_name  	= req.user.last_name;
+		user.date_created  	= req.user.date_created;
+		user.date_modified  = req.user.date_modified;
+		user.is_public  	= req.user.is_public;
+		user.email  		= req.user.email;
+		user.picture_url    = req.user.picture_url;
+		user._id 			= req.user._id;
+		// 1. find all goals for current user
+		Goal.find()
+		  .where('_userid').equals(req.user._id)
+		  .exec(function (err, goalDocs) {
+		    //make magic happen
+	    	if (err){return res.send(err);}
+
+			goals = goalDocs;
+			// 2. get actions for all goals
+			for (var i = 0; i < goals.length; i++) {
+				goalIds[i] = goals[i].id;
+			};
+
+			Action.find()
+				.where('_goalid')
+				.in(goalIds)
+				.exec(function (err, actionDocs){
+
+					if (err){return res.send(err);}
+
+					actions = actionDocs;
+					// goalsActions = [goals, actions];
+					// return res.send(goalsActions);
+
+					// 3. get actions for all goals
+					for (var i = 0; i < actions.length; i++) {
+						actionIds[i] = actions[i].id;
+					};
+
+					Progress.find()
+					.where('_actionid')
+					.in(actionIds)
+					.sort({date_created: 'descending'})
+					.exec(function (err, progressDocs){
+
+						if (err){return res.send(err);}
+
+						progress = progressDocs;
+						goalsActionsProgress = [goals, actions, progress, user];
+						return res.send(goalsActionsProgress);
+					});
+
+				});
+		  });
+	});
+
+// 
+// 	Public API
+// 
+	app.get('/api/v1/publicData/:userId', function(req, res){
+		// res.send('public data returned ' + req.params.userId);
+
+		var user = {};
+		var goals = [];
+		var actions = [];
+		var progress = [];
+
+		var goalIds = [];
+		var actionIds = [];
+
+		var data = [];
+
+		// 0. check if public profile exists
+
+		User.find({_id: req.params.userId, is_public: true})
+		  .exec(function (err, userDoc){
+
+
+		  	console.log('userDoc');
+		  	console.log(userDoc);
+
+
+		  	if (err) {return res.send(err);}
+		  	else if (!userDoc || userDoc.length===0) {
+		  		res.status(404);
+	      		return res.send('not found');
+		  	}
+		  	else {
+		  		user.first_name 	= userDoc[0].first_name;
+				user.last_name  	= userDoc[0].last_name;
+				user.date_created  	= userDoc[0].date_created;
+				user.date_modified  = userDoc[0].date_modified;
+				user.is_public  	= userDoc[0].is_public;
+				user._id  			= req.params.userId;
+				user.picture_url    = userDoc[0].picture_url;
+		  	
+				// 1. find all public goals for current user
+				Goal.find({_userid: req.params.userId, is_public: true})
+				  .exec(function (err, goalDocs) {
+				    //make magic happen
+			    	if (err){return res.send(err);}
+
+					goals = goalDocs;
+					// 2. get actions for all goals
+					for (var i = 0; i < goals.length; i++) {
+						goalIds[i] = goals[i].id;
+					};
+
+					Action.find({is_public: true})
+						.where('_goalid')
+						.in(goalIds)
+						.exec(function (err, actionDocs){
+
+							if (err){return res.send(err);}
+
+							actions = actionDocs;
+							// goalsActions = [goals, actions];
+							// return res.send(goalsActions);
+
+							// 3. get actions for all goals
+							for (var i = 0; i < actions.length; i++) {
+								actionIds[i] = actions[i].id;
+							};
+
+							// TODO: decide if progress logs are worth querying - currently not used
+							Progress.find()
+							.where('_actionid')
+							.in(actionIds)
+							.sort({date_created: 'descending'})
+							.exec(function (err, progressDocs){
+
+								if (err){return res.send(err);}
+
+								progress = progressDocs;
+								data = [goals, actions, progress, user];
+								return res.send(data);
+							});
+						});
+				  });
+			}
+		});
+	});
+
+
+	
 };

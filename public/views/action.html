@@ -3,46 +3,50 @@
 <div layout="column" layout-gt-md="row" class="dashboard-pane-1">
 
   <div flex>
-	    <!-- Goals -->
-        <div layout="row" layout-align="start center">
-	    	<h1 class="md-headline">{{data.activeAction.action[0].verb}} {{data.activeAction.action[0].verb_quantity}} {{data.activeAction.action[0].noun}} {{data.activeAction.action[0].period | periodInWords:0}}</h1>
-		</div>
-        <div>
-            <div layout="row" class="md-subhead light-gray dashboard-subhead">
-                <md-chips>
-                    <md-chip class="chip-action">Action</md-chip>
-                </md-chips>
-                <md-button class="md-raised md-primary" ng-hide="!showEditButtons" ng-click="save()">Save</md-button>
-                <md-button class="md-raised" ng-hide="!showEditButtons" ng-click="cancel()">Cancel</md-button>
+
+        <!-- Profile -->
+        <div layout="row" layout-align="start center" class="goal-card small-margin-bottom large-margin-top">
+            <div layout="column">
+                <div class="circle-image-cropper profile-user-image user-card-picture">
+                    <img src="{{ data.user.picture_url }}" height="80" width="80" alt="{{ data.user.first_name }}" class="circle-image " ng-cloak>
+                </div>
+            </div>
+            <div layout="row" layout-align="start center" class="medium-pad-left">
+                <h1 class="md-headline md-padding">{{data.action['active'].verb}} {{data.action['active'].verb_quantity}} {{data.action['active'].noun}} {{data.action['active'].period | periodInWords:0}}</h1>
+                <md-chips class="large-margin-right"><md-chip>Action</md-chip></md-chips>
             </div>
         </div>
+	    <!-- Goals -->
+<!--         <div layout="row" layout-align="start center">
+	    	<h1 class="md-headline">{{data.action['active'].verb}} {{data.action['active'].verb_quantity}} {{data.action['active'].noun}} {{data.action['active'].period | periodInWords:0}}</h1>
+            <md-chip class="chip-action">Action</md-chip>
+		</div> -->
+
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.activeAction.action[0].remainingDays}}</div><div class="md-caption dashboard-box-caption">day{{data.activeAction.action[0].remainingDays | plural}} remaining</div>
+	            <div class="md-display-2">{{data.action['active'].remainingDays}}</div><div class="md-caption dashboard-box-caption">day{{data.action['active'].remainingDays | plural}} remaining</div>
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <md-switch class="md-display-1" ng-model="data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on" aria-label="Status" ng-change="actionDataChanged()">
-                   {{  data.activeAction.action[0].status[data.activeAction.action[0].status.length-1].on  | statusFilter}}
+	            <md-switch class="md-display-1" ng-model="data.action['active'].status[data.action['active'].status.length-1].on" aria-label="Status" ng-change="actionDataChanged()">
+                   {{  data.action['active'].status[data.action['active'].status.length-1].on  | statusFilter}}
                 </md-switch>
                 <div class="md-caption dashboard-box-caption">status</div>
 	        </div>
 	    </div>
 
-        <div layout="row" layout-align="center center" class="dashboard-stat-container">
+        <!-- <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="">
-                <div class="md-caption light-gray">updated: {{data.activeAction.action[0].date_modified | date: 'yyyy-MM-dd'}}</div>
+                <div class="md-caption light-gray">updated: {{data.action['active'].date_modified | date: 'yyyy-MM-dd'}}</div>
             </div>
             <div flex layout="column" layout-align="center center" class="">
-                <div class="md-caption light-gray">created: {{data.activeAction.action[0].date_created | date: 'yyyy-MM-dd'}}</div>
+                <div class="md-caption light-gray">created: {{data.action['active'].date_created | date: 'yyyy-MM-dd'}}</div>
             </div>
             <div flex layout="column" layout-align="center center" class="small-pad-top">
-                <md-checkbox ng-model="data.activeAction.action[0].is_public" ng-change="actionDataChanged()">{{data.activeAction.action[0].is_public | is_publicFormat}}</md-checkbox>
-                <!-- <div class="md-caption dashboard-box-caption">Visibility</div> -->
+                <md-checkbox ng-model="data.action['active'].is_public" ng-change="actionDataChanged()">{{data.action['active'].is_public | is_publicFormat}}</md-checkbox>
             </div>
-        </div>
+        </div> -->
 
 	    <!-- Action -->
-        <!-- TODO: ng-sum? actions-->
         <h1 class="md-display-1 light-gray">Consistency</h1>
         <div layout="row">
             <div class="md-subhead light-gray dashboard-subhead"> Last {{data.outlook}} day{{data.outlook | plural}}</div>
@@ -51,25 +55,24 @@
         <!-- Action repetitions -->
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Repetitions</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.action['active'].total.repetition}}</div><div class="md-caption dashboard-box-caption">Planned reps</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
-                <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.action['active'].total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Reps complete</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
                 <div layout="row" layout-align="center center">
-                    <div class="md-display-1 dashboard-stat-action">{{data.activeAction.action.total.rep_conversion}}
+                    <div class="md-display-1 dashboard-stat-action">{{data.action['active'].total.rep_conversion}}
                     </div>
                     <h2 class="md-subhead">%</h2>
                 </div>
-                <div class="md-caption dashboard-box-caption">Rep conversion</div>
+                <div class="md-caption dashboard-box-caption">Conversion</div>
             </div>
         </div>
 
         <!-- data.outlook -->
         <div layout="row" layout-align="start center">
             <h1 class="md-display-1 light-gray">{{data.outlook}} day outlook</h1>
-            
         </div>
             
         <div layout="row">
@@ -78,55 +81,80 @@
               <div flex="20" layout layout-align="center center">
                   <input flex type="number" ng-model="data.outlook" aria-label="due" aria-controls="outlook-slider" class="subtle-control">
               </div>
-          </div>
+        </div>
   </div>
 
-  <div flex>
+  <div flex class="large-margin-left">
         <div layout="row" layout-align="start center">
         	<h2 class="md-display-1 light-gray">Progress</h2>
 
-            <md-button class="md-icon-button md-raised">
-        		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(data.activeAction.action[0]);"></ng-md-icon>
+            <md-button class="md-icon-button md-raised" aria-label="Increment progress for action">
+        		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress()"></ng-md-icon>
         	</md-button>
-        	<md-button class="md-icon-button md-raised">
-        		<ng-md-icon icon="exposure_minus_1" style="fill:red" class="md-avatar goal-card-icon" ng-click="decrementProgress(data.activeAction.action[0]);"></ng-md-icon>
+        	<md-button class="md-icon-button md-raised" aria-label="Decrement progress for action">
+        		<ng-md-icon icon="exposure_minus_1" style="fill:red" class="md-avatar goal-card-icon" ng-click="decrementProgress(data.action['active']);"></ng-md-icon>
         	</md-button>
         </div>
 
+        <!-- Chart -->
         <div layout="row" >
-            <md-content flex class="">
+            <md-content flex>
                 <div class="">
-                    <nvd3 options="data.activeAction.action[0].chart.options" data="data.activeAction.action[0].chart.data"></nvd3>
+                    <nvd3 options="data.action['active'].chart.options" data="data.action['active'].chart.data"></nvd3>
                 </div>
             </md-content>
         </div>
 	   
     	<div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
-            <a class="href-link md-subhead" ng-click="setActiveGoal(data.activeAction.goal[0])" href="#/goal">
-                {{data.activeAction.goal[0].description}}
-            </a>
-             <md-chips>
-               <md-chip class="chip-goal">Goal</md-chip>
-             </md-chips>
+            
+
+            <md-input-container>
+                <label>Goal</label>
+                <md-select required ng-model="data.action['active']._goalid" ng-change="actionDataChanged()">
+                    <md-option ng-repeat="g in data.goal" ng-value="g._id">
+                        {{g.description}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+
+            <md-button md-no-ink class="md-primary" ng-click="setActiveGoal(data.action['active'].goal)" ng-href="#/{{data.user._id}}/goal/{{data.action['active']._goalid}}" href="#/{{data.user._id}}/goal/{{data.action['active']._goalid}}">
+                Parent goal
+            </md-button>
+
          </div>
         <div layout="row" layout-align="end center" class="small-pad-top small-pad-right">
-	    	 <md-button class="md-raised" href="#/dashboard">
+	    	 <md-button class="md-raised" href="#/{{data.user._id}}/dashboard">
                 Dashboard
              </md-button>
-             <md-button class="md-raised" href="#/list">
+             <md-button class="md-raised" href="#/{{data.user._id}}/list">
                 All goals & actions
             </md-button>
 		</div>
+
+        <!-- Action details -->
+        <div layout="column" class="md-padding" layout-align="end end" class="dashboard-stat-container">
+                <div layout="row" layout-align="start center">
+                    <div class="small-pad-top">
+                    <md-checkbox ng-model="data.action['active'].is_public" ng-change="actionDataChanged()">{{data.action['active'].is_public | is_publicFormat}}</md-checkbox>
+                    </div>
+                </div>
+                
+                <div class="md-caption light-gray small-pad-top">updated: {{data.action['active'].date_modified | date: 'yyyy-MM-dd'}}</div>
+                <div class="md-caption light-gray small-pad-top">created: {{data.action['active'].date_created | date: 'yyyy-MM-dd'}}</div>
+                
+                <div layout="row" class="small-pad-top">
+                    <md-button class="md-raised md-primary" ng-hide="!showEditButtons" ng-click="save()" aria-label="Save action changes">Save</md-button>
+                    <md-button class="md-raised" ng-hide="!showEditButtons" ng-click="cancel()" aria-label="Cancel action changes">Cancel</md-button>
+                </div>
+            </div>
+        </div>
     	
     </div>
 
 </div>
 </div>
 
-<div ng-controller="createCtrl">
+<div ng-controller="CreateCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
 </div>
 
-<div ng-controller="settingsActionCtrl">
-    <settings-goal-action-sidenav f="methods" d="data"></settings-goal-action-sidenav>
-</div>

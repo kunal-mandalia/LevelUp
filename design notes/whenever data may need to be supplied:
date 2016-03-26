@@ -1,0 +1,58 @@
+whenever data may need to be supplied:
+
+loggedInAs === ''
+
+-> loadPublic
+
+
+loggedInAs === userUri
+
+-> loadPrivate
+
+loggedInAs !== userUri
+
+-> loadPublic
+
+----
+
+loaded = userId, as opposed to Boolean
+Don't want to keep asking for data when it's available
+
+
+
+(userUri!='abc', userUri='abc')
+----             	  	loaded=''           				loaded = 'abc'			loaded = 'def'
+
+
+loggedInAs = '' 		loadPublic, loadPublic 				loadPublic, nothing		loadPublic, loadPublic
+
+
+loggedInAs = 'abc'		loadPublic, loadPrivate				loadPublic, nothing		loadPublic, loadPrivate
+
+if (loaded===''){
+
+	if (loggedInAs===''){
+		loadPublic(userUri)
+	} else {
+		(userUri===loggedInAs) ? loadPrivate : loadPublic
+	}
+} else if (loaded!=='') {
+
+	if (loggedInAs===''){
+		(userUri===loaded) ? resolvePromise() : loadPublic
+	} else {
+		if (userUri===loaded){
+			resolvePromise();
+		} else {
+			(userUrl===loggedInAs) ? loadPrivate : loadPublic
+		}
+	}
+
+}
+
+Tomorrow:
+
+/:userId/goal/:goalId
+/:userId/action/:actionId
+
+restrict/hide visitor controls

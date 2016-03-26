@@ -269,7 +269,7 @@ body {
 
 .list-card{
 	width: 282px;
-	height: 400px;
+	height: 100%;
 }
 
 .list-card-actions{
@@ -281,4 +281,105 @@ body {
     	width: 98%; 
         width: calc(100% - 10px);
     }
+}
+
+/* http://jsfiddle.net/13u5z2mg/3/ */
+
+.circle-image-cropper {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.circle-image {
+    display: inline;
+    margin: 0 auto;
+    height: 100%;
+    width: auto;
+}
+
+.profile-user-image {
+	margin-top: 20px;
+}
+
+.caption-green {
+	color: #008000;
+}
+
+.detective {
+	max-height: 250px;
+	opacity: 0.75;
+}
+
+.menu-profile {
+	height: 200%;
+	margin-top: -40%;
+	margin-left: -45%;
+}
+
+.user-card {
+	margin-top: 20px;
+	margin-right: 20px;
+	margin-bottom: 5px;
+	padding-bottom: 10px;
+	padding-top: 5px;
+	background-color: rgb(228, 228, 228);
+}
+
+.user-card-picture {
+	margin-left: 20px;
+	margin-bottom: -20px;
+	margin-top: -20px;
+}
+
+.goal-card {
+	margin-right: 14px;
+	background-color: rgba(173, 173, 173, 0.22);
+	margin-bottom: 5px;
+}
+
+.small-margin-bottom {
+	margin-bottom: 5px;
+}
+
+.medium-margin-left {
+	margin-left:	10px;
+}
+
+.small-margin-right {
+	margin-right:	5px;
+}
+
+.medium-margin-right {
+	margin-right:	10px;
+}
+
+.large-margin-right {
+	margin-right:	15px;
+}
+
+.large-margin-left {
+	margin-left:	15px;
+}
+
+.medium-margin-top {
+	margin-top:	10px;
+}
+
+.large-margin-top {
+	margin-top:	15px;
+}
+
+.green-fill {
+	fill: rgb(52, 112, 206);
+}
+
+.blue-fill {
+	fill: rgb(52,112,206);
 }

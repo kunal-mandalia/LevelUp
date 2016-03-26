@@ -3,6 +3,24 @@
 <div layout="column" layout-gt-md="row" class="dashboard-pane-1">
 
   <div flex>
+        <!-- Profile -->
+        <div layout="row" layout-align="start center" class="user-card">
+            <div layout="column">
+                <div class="circle-image-cropper profile-user-image user-card-picture">
+                    <img src="{{ data.user.picture_url }}" height="80" width="80" alt="{{ data.user.first_name }}" class="circle-image " ng-cloak>
+                </div>
+            </div>
+            <div layout="column" class="medium-pad-left">
+                <a class="md-subhead href-link" href="/#/{{data.user._id}}/profile">{{data.user.first_name}} {{data.user.last_name}}</a>
+                <div ng-if="(data.user._id===data.loaded) && (data.loaded===data.loggedInAs)">
+                    <div class="md-caption caption-green">Signed in</div>
+                </div>
+                <div ng-if="!((data.user._id===data.loaded) && (data.loaded===data.loggedInAs))">
+                    <div class="md-caption">Viewing public profile</div>
+                </div>
+            </div>
+        </div>
+
 	    <!-- Goals -->
         <div layout="row" layout-align="start center">
 	    	<h1 class="md-display-1 light-gray">Goals</h1>
@@ -13,13 +31,13 @@
         </div>
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.dashboard.goal.total.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
+	            <div class="md-display-2">{{data.goal.total.open}}</div><div class="md-caption dashboard-box-caption">Open</div>
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.dashboard.goal.total.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
+	            <div class="md-display-2">{{data.goal.total.closed}}</div><div class="md-caption dashboard-box-caption">Closed</div>
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <div class="md-display-2">{{data.dashboard.goal.total.complete}}</div><div class="md-caption dashboard-box-caption">Completed</div>
+	            <div class="md-display-2">{{data.goal.total.complete}}</div><div class="md-caption dashboard-box-caption">Completed</div>
 	        </div>
 	    </div>
 
@@ -30,36 +48,36 @@
         </div>
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{data.dashboard.action.total.total}}</div><div class="md-caption dashboard-box-caption">Total</div>
+                <div class="md-display-2">{{data.action.total.total}}</div><div class="md-caption dashboard-box-caption">Total</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
-                <div class="md-display-2">{{data.dashboard.action.total.on}}</div><div class="md-caption dashboard-box-caption">On</div>
+                <div class="md-display-2">{{data.action.total.on}}</div><div class="md-caption dashboard-box-caption">On</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-2">{{data.dashboard.action.total.off}}</div><div class="md-caption dashboard-box-caption">Off</div>
+                <div class="md-display-2">{{data.action.total.off}}</div><div class="md-caption dashboard-box-caption">Off</div>
             </div>
         </div>
         <!-- Action repetitions -->
         <div layout="row" layout-align="center center" class="dashboard-stat-container">
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
-                <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Repetitions</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.action.total.repetition}}</div><div class="md-caption dashboard-box-caption">Planned reps</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange ">
-                <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Rep completed</div>
+                <div class="md-display-1 dashboard-stat-action">{{data.action.total.rep_complete}}</div><div class="md-caption dashboard-box-caption">Reps complete</div>
             </div>
             <div flex layout="column" layout-align="center center" class="dashboard-stat light-orange">
                 <div layout="row" layout-align="center center">
-                    <div class="md-display-1 dashboard-stat-action">{{data.dashboard.action.total.rep_conversion}}
+                    <div class="md-display-1 dashboard-stat-action">{{data.action.total.rep_conversion}}
                     </div>
                     <h2 class="md-subhead">%</h2>
                 </div>
-                <div class="md-caption dashboard-box-caption">Rep conversion</div>
+                <div class="md-caption dashboard-box-caption">Conversion</div>
             </div>
         </div>
   </div>
 
   <!-- Upcoming -->
-  <div flex>
+  <div flex class="medium-margin-left">
     	<h1 class="md-display-1 light-gray">Upcoming</h1>
         <div layout="row">
             <div class="md-subhead light-gray dashboard-subhead"> Next {{data.outlook}} day{{data.outlook | plural }}</div>
@@ -69,12 +87,12 @@
             <md-content flex="90" class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                 	<!-- Goals -->
-                    <md-list-item class="md-2-line" ng-repeat="g in data.dashboard.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
-                    	<md-button class="md-icon-button" ng-disabled="g.status == 'Closed - Complete'">
-                    		<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-avatar" ng-click="completeGoal(g)"></ng-md-icon>
-                    	</md-button>
+                    <md-list-item class="md-2-line" ng-repeat="g in data.goal | orderBy:'remainingDays'" ng-hide="(g.remainingDays > data.outlook)">
+
+                    	<ng-md-icon icon="beenhere" ng-class="(g.status == 'Closed - Complete') ? 'greenFill' : 'orangeFill'" class="md-padding"></ng-md-icon>
+
                         <div class="md-list-item-text" layout="column">
-                            <h3><a ng-click="setActiveGoal(g)" href="#/goal" class="href-link">{{g.description}}</a></h3>
+                            <h3><a ng-click="setActiveGoal(g)" href="#/{{data.user._id}}/goal/{{g._id}}" class="href-link" aria-label="Open goal">{{g.description}}</a></h3>
 					        <h4>{{g.remainingDays}} day{{g.remainingDays | plural }} remaining</h4>
 					        <p>goal</p>
 					        <!-- <ng-md-icon icon="mood" style="fill:green" class="md-avatar goal-card-icon" ng-hide="g.status != 'closed - complete'"></ng-md-icon> -->
@@ -82,14 +100,16 @@
                         <md-divider></md-divider>
                     </md-list-item>
                     <!-- Actions -->
-                    <md-list-item class="md-2-line" ng-repeat="a in data.dashboard.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0) || a.status[a.status.length-1].on == false">
+                    <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0) || a.status[a.status.length-1].on == false">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-                    	<md-button class="md-icon-button">
-                    		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
-                    	</md-button>
+                        <div class="medium-margin-right medium-margin-left">
+                        	<md-button class="md-icon-button md-padding" aria-label="Increment progress">
+                        		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
+                        	</md-button>
+                        </div>
                         <div class="md-list-item-text" layout="column">
                             <!-- <h3>{{a.verb}} {{a.verb_quantity}} {{a.noun}}</h3> -->
-                            <h3><a ng-click="setActiveAction(a)" href="#/action" class="href-link">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
+                            <h3><a ng-click="setActiveAction(a, null, null)" href="#/{{data.user._id}}/action/{{a._id}}" class="href-link" aria-label="Open action">{{a.verb}} {{a.verb_quantity}} {{a.noun}}</a></h3>
 					        <h4>{{a.remainingDays}} day{{a.remainingDays | plural }} remaining </h4> 
 					        <!-- TODO:  -->
 					        <p>action</p>
@@ -116,7 +136,7 @@
           </div>
     	<!-- Recent -->
         <div layout="row" layout-align="start center">
-            <md-button class="md-raised md-warn" href="#/list">
+            <md-button class="md-raised" href="#/{{data.user._id}}/list">
                 All goals & actions
             </md-button>
         </div>
@@ -126,10 +146,11 @@
 
 </div>
 
-<div ng-controller="createCtrl">
+<div ng-controller="CreateCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
 </div>
 
 <div ng-controller="settingsCtrl">
     <settings-sidenav f="methods" d="data"></settings-sidenav>
 </div>
+

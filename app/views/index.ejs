@@ -69,7 +69,7 @@
         <md-button class="md-icon-button menu-icon" aria-label="Menu" ng-click="toggleMenu('links')">
             <ng-md-icon icon="menu"></ng-md-icon>
         </md-button>
-        <a href="#/dashboard">
+        <a href="#/{{data.user._id}}/dashboard">
           <span class="md-headline">LevelUp</span>
         </a>
         <md-progress-circular class="md-hue-1" md-mode="indeterminate" ng-hide="busy==false"></md-progress-circular>
@@ -77,7 +77,7 @@
             
         <span class="small-pad-left" flex></span>
 
-        <div ng-switch="location.path()">
+        <!-- <div ng-switch="location.path()">
           <div ng-switch-when="/tracking">
             
 
@@ -184,11 +184,84 @@
                 </md-button>
 
             </div>
+          </div> -->
 
+          <!-- Dynamic controller specific menu -->
+          <!-- <div ng-repeat="m in activeMenu">
+                <md-button class="md-icon-button menu-icon" ng-click="runMenuFunction('showCreateMenu')" ng-href="{{m.ngHref}}" href="{{m.href}}" aria-label="{{m.areaLabel}}">
+                    <ng-md-icon icon="{{m.icon}}"></ng-md-icon>
+                </md-button>
+          </div> -->
+
+          <!-- User signed in, on own profile-->
+          <div ng-if="data.loggedInAs._id !=='' && data.user._id === data.loggedInAs._id" ng-cloak>
+            <div layout="row" layout-align="end center">
+              <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+              </md-button>
+              <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
+                <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+              </md-button>
+            </div>
           </div>
 
-        </div>
-      </div>
+          <!-- User signed in, on different profile-->
+          <div ng-if="data.loggedInAs._id !=='' && data.user._id !== data.loggedInAs._id" ng-cloak>
+            <div layout="row" layout-align="end center">
+
+              <md-button class="md-icon-button menu-icon" aria-label='dashboard' ng-href='#/{{data.loggedInAs._id}}/dashboard'>
+                <ng-md-icon icon="home"></ng-md-icon>
+              </md-button>
+              <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
+                <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+              </md-button>
+            </div>
+          </div>
+
+          <!-- User not signed in-->
+          <div ng-if="data.loggedInAs._id ===''" ng-cloak>
+            <div layout="row" layout-align="end center">
+
+              <md-button class="md-icon-button menu-icon" aria-label='login' ng-click="" href="#/login">
+                    <ng-md-icon icon="login"></ng-md-icon>
+              </md-button>
+            </div>
+          </div>
+
+          
+
+          <!-- If user is not signed in -->
+          <!-- <div ng-if="data.loggedInAs._id===''" ng-cloak>
+                <md-button class="md-icon-button menu-icon" aria-label='login' ng-click="" href="#/login">
+                    <ng-md-icon icon="login"></ng-md-icon>
+                </md-button>
+          </div>   -->
+
+          <!-- If user is signed in AND are on their own page-->
+          <!-- <div ng-if="data.loggedInAs._id!=='' && data.loggedInAs.first_name!=='' && data.loggedInAs.picture_url!=='' && (data.loggedInAs._id === data.user._id)" ng-cloak>
+                <md-button class="md-icon-button menu-icon" aria-label='add' ng-click="toggleMenu('create')">
+                    <ng-md-icon icon="create"></ng-md-icon>
+                </md-button>
+                <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
+                    <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                </md-button>
+          </div> -->
+
+          <!-- If user is signed in AND on a different oerson's page-->
+          <!-- <div ng-if="data.loggedInAs._id!=='' && data.loggedInAs.first_name!=='' && data.loggedInAs.picture_url!=='' && (data.loggedInAs._id !== data.user._id)" ng-cloak>
+
+                <md-button class="md-icon-button menu-icon" aria-label='login' ng-click="" href="#/{{data.loggedInAs._id}}/dashboard">
+                    <ng-md-icon icon="dashboard"></ng-md-icon>
+                </md-button>
+                <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
+                    <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                </md-button>
+          </div>   -->
+
+
+          
+    </div>
+  </div>
     </md-toolbar>
     </div>
 
@@ -213,11 +286,11 @@
             </md-toolbar>
 
             <md-list ng-cloak>
-              <md-list-item href="#/dashboard">
-                <md-button> Dashboard </md-button>
+              <md-list-item href="#/{{data.user._id}}/dashboard">
+                <md-button md-no-ink class="md-primary"> Dashboard </md-button>
               </md-list-item>
-              <md-list-item href="#/list">
-                <md-button> All goals and actions </md-button>
+              <md-list-item href="#/{{data.user._id}}/list">
+                <md-button md-no-ink class="md-primary"> All goals and actions </md-button>
               </md-list-item>
             </md-list>
                         

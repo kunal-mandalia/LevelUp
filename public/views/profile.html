@@ -1,0 +1,59 @@
+<div class="md-padding">
+
+<div layout="column" layout-align="center center">
+	<div class="circle-image-cropper profile-user-image">
+		<img src="{{ data.user.picture_url }}" height="180" width="180" alt="{{ data.user.first_name }}" class="circle-image" ng-cloak>
+	</div>
+	<h1 class="md-display-1">{{data.user.first_name}} {{data.user.last_name}}</h1>
+	<h1 class="md-subhead">Joined on {{data.user.date_created | date}}</h1>
+  <div layout="row" layout-align="center center">
+    <md-button md-no-ink class="md-primary" ng-href="#/{{data.user._id}}/dashboard">Dashboard</md-button> | 
+    <md-button md-no-ink class="md-primary" ng-href="#/{{data.user._id}}/list">All goals & actions</md-button>
+  </div>
+</div>
+
+<!-- 
+
+Settings
+Public/Private
+change password
+
+
+ -->
+<div layout="row" layout-align="center center">
+ <md-list flex-gt-sm="30" flex ng-cloak>
+  <md-subheader class="md-no-sticky">Settings</md-subheader>
+  <md-list-item>
+    <h1 class="md-subhead"> {{ data.user.is_public | is_publicFormat }} </h1>
+    <md-checkbox class="md-secondary" ng-model="data.user.is_public" ng-change="updateIsPublic()"></md-checkbox>
+  </md-list-item>
+  <md-divider></md-divider>
+  <md-list-item>
+    <md-input-container flex>
+     <label>Picture url</label>
+     <input ng-model="data.user.picture_url" ng-change="updatePictureUrl()">
+    </md-input-container>
+  </md-list-item>
+  <md-divider></md-divider>
+  <md-list-item flex ng-click="logout()" ng-href="#/login">
+     <md-button class="md-primary">Sign out</md-button>
+  </md-list-item>
+  <md-divider></md-divider>
+</md-list>
+</div>
+
+</div>
+
+
+<!-- {{data.user.first_name}} {{data.user.last_name}}
+
+Joined: {{data.user.created | date }}
+Public? {{data.user.is_public}}
+
+Password:
+Old: <input></input>
+New: <input></input>
+
+<button>Change</button>
+
+ -->

@@ -5,7 +5,7 @@
         <md-toolbar class="md-hue-2">
           <div class="md-toolbar-tools">
             <h2>
-              <span>Create new</span>
+              <span>{{d.view.title}}</span>
             </h2>
             <span flex></span>
             <md-button class="md-icon-button d.goal-card-icon" aria-label="Close" ng-click="f.toggleMenu('create')">
@@ -14,7 +14,7 @@
           </div>
         </md-toolbar>
         <md-content>
-            <md-tabs md-dynamic-height md-border-bottom md-selected="d.selectedIndex">
+            <md-tabs md-dynamic-height md-border-bottom md-selected="d.view.selectedIndex">
                 <!-- Create Goal -->
                 <md-tab label="Goal">
                     <md-content class="md-padding">
@@ -99,11 +99,74 @@
                         </div>
                     </md-content>
                 </md-tab>
-            </md-tabs>
-    </div>
-    <!--  -->
-    <!-- <md-button ng-click="f.log()">test</md-button> -->
 
-    <!-- <md-button ng-click="customerInfo.log()">test</md-button>
-    {{customerInfo.name}}
+                <!-- goal delete -->
+                <div ng-if="d.view.page === 'goal'">
+                    <md-tab label="Delete">
+                    <md-content class="md-padding">
+
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Goal</label>
+                            <input required name="goalDescription" ng-model="d.goal.deleteView.description" value="d.goal.deleteView.goalId" disabled/>
+                        </md-input-container>
+
+                        <md-radio-group ng-model="d.goal.deleteView.actionDestination">
+                            <label class="md-body-1">What should be done with the goals' associated actions?</label>
+
+                          <md-radio-button value="move" class="md-primary">Move to 
+                          </md-radio-button>
+
+                            <md-input-container class="medium-margin-left">
+                                <label>Goal</label>
+                                <md-select ng-model="d.goal.deleteView.actionMoveTo" ng-disabled="d.goal.deleteView.actionDestination!=='move'">
+                                  <md-optgroup label="Empty bucket">
+                                    <md-option ng-value="untitled._id" ng-repeat="untitled in d.goal.deleteView.untitled">{{untitled.description}}</md-option>
+                                  </md-optgroup>
+                                  <md-optgroup label="Existing goal">
+                                  <!-- TODO: remove current goal -->
+                                    <md-option ng-value="g._id" ng-repeat="g in d.goals">{{g.description}}</md-option>
+                                  </md-optgroup>
+                                </md-select>
+                              </md-input-container>
+
+                          <md-radio-button value="delete"> Delete all</md-radio-button>
+                        </md-radio-group>
+
+                        <md-input-container class="">
+                            <label>Confirm delete</label>
+                            <textarea ng-model="d.goal.deleteView.confirm" rows="5" placeholder="Type REMOVE to delete"></textarea>
+                        </md-input-container>
+
+                        <md-button class="md-raised md-warn" ng-click="f.deleteGoal()" ng-disabled="d.goal.deleteView.confirm!=='REMOVE'">Delete</md-button>
+
+                        </md-content>
+                    </md-tab>
+                </div>
+                <!-- End of goal delete -->
+
+                <!-- action delete -->
+                <div ng-if="d.view.page === 'action'">
+                    <md-tab label="Delete">
+                    <md-content class="md-padding">
+                        
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Action</label>
+                            <input required name="actionDescription" ng-model="d.action.deleteView.description" value="d.action.deleteView.actionId" disabled/>
+                        </md-input-container>
+
+                        <md-input-container class="">
+                            <label>Confirm delete</label>
+                            <textarea ng-model="d.action.deleteView.confirm" rows="5" placeholder="Type REMOVE to delete"></textarea>
+                        </md-input-container>
+
+                        <md-button class="md-raised md-warn" ng-click="f.deleteAction()" ng-disabled="d.action.deleteView.confirm!=='REMOVE'">Delete</md-button>
+
+                    </md-content>
+                </md-tab>
+                </div>
+                <!-- End of action delete -->
+
+            </md-tabs>
+        </md-content>
+    </div>
 </md-sidenav>
