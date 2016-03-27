@@ -1842,25 +1842,3 @@ app.directive('createAction', function() {
     templateUrl: 'views/create-action.html'
   };
 });
-
-app.directive('settingsSidenav', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      f: '=f',  // functions or methods
-      d: '=d'   // data
-    },
-    templateUrl: 'views/settings-sidenav.html'
-  };
-});
-
-app.directive('settingsGoalActionSidenav', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      f: '=f',  // functions or methods
-      d: '=d'   // data
-    },
-    templateUrl: 'views/settings-goalActionSidenav.html'
-  };
-});
