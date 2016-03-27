@@ -12,10 +12,10 @@
             </div>
             <div layout="column" class="medium-pad-left">
                 <a class="md-subhead href-link" href="/#/{{data.user._id}}/profile">{{data.user.first_name}} {{data.user.last_name}}</a>
-                <div ng-if="(data.user._id===data.loaded) && (data.loaded===data.loggedInAs)">
+                <div ng-if="(data.user._id!=='') && (data.user._id===data.loggedInAs._id)">
                     <div class="md-caption caption-green">Signed in</div>
                 </div>
-                <div ng-if="!((data.user._id===data.loaded) && (data.loaded===data.loggedInAs))">
+                <div ng-if="(data.user._id!=='') && (data.user._id!==data.loggedInAs._id)">
                     <div class="md-caption">Viewing public profile</div>
                 </div>
             </div>
@@ -148,9 +148,5 @@
 
 <div ng-controller="CreateCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
-</div>
-
-<div ng-controller="settingsCtrl">
-    <settings-sidenav f="methods" d="data"></settings-sidenav>
 </div>
 

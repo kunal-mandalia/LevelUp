@@ -11,7 +11,8 @@ var actionSchema = mongoose.Schema({
     summary			: [], // [{period: 1, progress: 2}, {period: 2, progress: 3}]. Similar to how Angular nvD3 requires data format
     status			: [], // [{date: '2016-01-01', on: true}, {date: '2016-02-01', on: false}]
     date_created    : { type: Date, default: Date.now }, // TODO: use start date instead of created
-    date_modified   : { type: Date, default: Date.now }
+    date_modified   : { type: Date, default: Date.now },
+    orphan			: { type: Boolean, default: false } //
 });
 
 actionSchema.methods.updateSummary = function(compareDate, progress, cb){

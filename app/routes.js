@@ -197,10 +197,11 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 
 	/**
 	* Deletes a goal and depending on the options, its associated actions or rehouses associated actions (giving them a particular id)
+	* Since Angular doesn't support sending req.body with delete requests, the endpoint was changed to a put request
 	* @param {String} req.params.id - goalid
 	* @param {String} req.body.actionDestination - the destination of associated actions; either 'move' to another goal or 'delete'
 	*/
-	app.delete('/api/v1/goal/:id', auth, function(req, res){
+	app.put('/api/v1/deleteGoal/:id', auth, function(req, res){
 
 		var actionDestination = req.body.actionDestination;
 		var actionMoveTo 	  = req.body.actionMoveTo;
@@ -209,19 +210,31 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 			if (err){ return res.send(err);}
 
 			//2. Remove or rehouse associated actions
-			Action.find({_goalid: req.params.id}, function(err, docs){
-				if (err){ return res.send(err);}
-
-				if  (actionDestination === 'move'){
-
-				}
-				else if (actionDestination === 'delete'){
-
+			if  (actionDestination === 'move'){
+				var update = {_goalid: actionMoveTo};
+				// no parent goal (mongoose will provide a new random _goalid), mark goal as orphan
+				if (actionMoveTo === ''){
+					update = {_goalid: actionMoveTo, orphan: true};
 				}
 
-			})
-			return res.send('Removed goal');
-		});
+				Action.update({_goalid: req.params.id}, {$set: update}, {multi: true}, function (err, numAffected){
+					if (err){ return res.send(err);}
+
+					console.log(numAffected);
+					return res.send('Deleted goal and rehoused ' + numAffected.n + ' actions');
+				});
+			}
+			else if (actionDestination === 'delete'){
+				Action.remove({ _goalid: req.params.id }, function (err) {
+					if (!err){
+						return res.send('Deleted goal and associated actions');
+					} else {
+						return res.send(err);
+					}
+				});
+			}
+
+		})
 	});
 
 	// ACTIONS API
@@ -279,7 +292,17 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	app.put('/api/v1/action/:id', auth, function(req, res){
 		// Todo: check if Action belongs to current user
 		// Todo: handle status update
-		Action.update({ _id: req.params.id}, { $set: req.body }, function(err, rawResponse){
+
+
+		var update = req.body;
+		// check if action has been reassigned to another goal, if so, it's not an orphan
+		if (update._goalid){
+			if (update._goalid !== ''){
+			update.orphan = false;
+			}
+		}
+
+		Action.update({ _id: req.params.id}, { $set: update }, function(err, rawResponse){
 			if (err){ return res.send(err);}
 
 			return res.send('Updated action : ' + JSON.stringify(rawResponse) + JSON.stringify(req.body));

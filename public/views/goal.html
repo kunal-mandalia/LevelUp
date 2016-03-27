@@ -124,7 +124,7 @@
         <div layout="column" class="md-padding" layout-align="start start" class="dashboard-stat-container">
                 <div layout="row" layout-align="start center">
                     <div class="small-pad-top">
-                    <md-checkbox ng-model="data.goal['active'].is_public" ng-disabled="data.goal['active'].status !='Open'" ng-change="goalDataChanged()">{{data.goal['active'].is_public | is_publicFormat}}</md-checkbox>
+                    <md-checkbox ng-model="data.goal['active'].is_public" ng-change="goalDataChanged()">{{data.goal['active'].is_public | is_publicFormat}}</md-checkbox>
                 </div>
                     <md-datepicker ng-model="data.goal['active'].due" required md-placeholder="Until" ng-disabled="data.goal['active'].status !='Open'" ng-change="goalDataChanged()"></md-datepicker>
                     <div class="light-gray">(due)</div> 

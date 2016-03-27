@@ -24,9 +24,7 @@
             	<p class="md-body-1 light-gray">{{g.remainingDays}} {{g.remainingDays | daysRemainingDescription}}</p>
             </div>
           </md-card-title-text>
-          <!-- <md-card-title-media>
-            <div class="md-media-lg card-media"></div>
-          </md-card-title-media> -->
+
         </md-card-title>
         <md-card-content class="">
         <md-content class="">
@@ -44,7 +42,6 @@
 					                  <div class="md-body-1 light-gray">{{a.remainingDays}} days remaining </div>
 					        
 					        <!-- TODO:  -->
-                  <!-- <md-chips><md-chip>action</md-chip></md-chips> -->
 					        <div class="md-body-1 light-gray">action</div>
 					        <md-progress-linear md-mode="determinate" value="{{100*(a.currentProgress/a.verb_quantity)}}"></md-progress-linear>
                         </div>
@@ -54,14 +51,9 @@
             </md-content>
    	    </md-card-content>
         <md-card-actions layout="row" layout-align="end center">
-          <!-- <md-button>Action 1</md-button>
-          <md-button>Action 2</md-button> -->
         </md-card-actions>
       </md-card>
     </div>
-
-    
-
   </md-content>
 
   <div layout="row" layout-align="center center">
@@ -72,14 +64,7 @@
         </div>
   </div>
 
-<!-- </div> -->
-<!-- </section> -->
-
-
-<div ng-controller="settingsCtrl">
-    <settings-sidenav f="methods" d="data"></settings-sidenav>
-</div>
-
+<!-- Sidenav -->
 <div ng-controller="CreateCtrl">
     <create-sidenav f="methods" d="data"></create-sidenav>
 </div>

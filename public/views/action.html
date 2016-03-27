@@ -16,12 +16,8 @@
                 <md-chips class="large-margin-right"><md-chip>Action</md-chip></md-chips>
             </div>
         </div>
-	    <!-- Goals -->
-<!--         <div layout="row" layout-align="start center">
-	    	<h1 class="md-headline">{{data.action['active'].verb}} {{data.action['active'].verb_quantity}} {{data.action['active'].noun}} {{data.action['active'].period | periodInWords:0}}</h1>
-            <md-chip class="chip-action">Action</md-chip>
-		</div> -->
 
+	    <!-- Goals -->
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
 	            <div class="md-display-2">{{data.action['active'].remainingDays}}</div><div class="md-caption dashboard-box-caption">day{{data.action['active'].remainingDays | plural}} remaining</div>
@@ -33,19 +29,7 @@
                 <div class="md-caption dashboard-box-caption">status</div>
 	        </div>
 	    </div>
-
-        <!-- <div layout="row" layout-align="center center" class="dashboard-stat-container">
-            <div flex layout="column" layout-align="center center" class="">
-                <div class="md-caption light-gray">updated: {{data.action['active'].date_modified | date: 'yyyy-MM-dd'}}</div>
-            </div>
-            <div flex layout="column" layout-align="center center" class="">
-                <div class="md-caption light-gray">created: {{data.action['active'].date_created | date: 'yyyy-MM-dd'}}</div>
-            </div>
-            <div flex layout="column" layout-align="center center" class="small-pad-top">
-                <md-checkbox ng-model="data.action['active'].is_public" ng-change="actionDataChanged()">{{data.action['active'].is_public | is_publicFormat}}</md-checkbox>
-            </div>
-        </div> -->
-
+        
 	    <!-- Action -->
         <h1 class="md-display-1 light-gray">Consistency</h1>
         <div layout="row">

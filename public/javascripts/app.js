@@ -1,28 +1,29 @@
 'use strict';
 
-/**********************************************************************
- * Angular Application
- **********************************************************************/
+ /**
+ * ANGULAR APP
+ * @constructor
+ */
 var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria', 'ngMaterial', 'ngMdIcons', 'nvd3'])
   .config(function($routeProvider, $locationProvider, $httpProvider, $mdThemingProvider) {
 
     var darkBlueMap = $mdThemingProvider.extendPalette('blue', {
       '500': '3470ce'
     });
-    // Register the new color palette map with the name <code>neonRed</code>
+    // Register the new color palette map with the name 'darkBlue'
     $mdThemingProvider.definePalette('darkBlue', darkBlueMap);
     // Use that theme for the primary intentions
     $mdThemingProvider.theme('default')
       .primaryPalette('darkBlue')
       
-    //================================================
-    // Check if the user is connected
-    //================================================
+    /**
+    * Supply required data depending on whether the use is logged in and looking at their own page
+    * @param {Promise} $q - resolve once data is provided
+    */
     var supplyRequiredData = function($q, $rootScope, $location, DataService){
+
       console.log('SUPPLY REQUIRED DATA');
       $rootScope.busy = true;
-      // var loaded = $rootScope.data.loaded;
-      // var loggedInAsId = $rootScope.data.loggedInAs._id;
       var userUri = $location.url().split('/')[1];
       var deferred = $q.defer();
 
@@ -48,8 +49,6 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         $rootScope.data.loggedInAs = {_id: lsUser._id, first_name: lsUser.first_name, picture_url: lsUser.picture_url};
       }
 
-
-
       if ($rootScope.data.loaded===''){
 
         if ($rootScope.data.loggedInAs._id===''){
@@ -71,8 +70,6 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
           }
         }
       }
-
-
     }
 
     var resolvePromise = function(deferred){
@@ -100,7 +97,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         deferred.reject();
 
         // redirect to 404
-        $location.url('/404');
+        $location.path('/404');
 
         return deferred.promise;
       });
@@ -126,72 +123,6 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         return deferred.promise;
       });
     };
-
-    // // Check if data is loaded
-    // var loadData = function($rootScope, DataService, deferred, $location, usersMatch){
-
-    //   console.log('loadData...');
-    //   $rootScope.busy = true;
-
-    //   // if (!$rootScope.data.loaded){
-
-    //     // Private request
-    //     if ($rootScope.data.publicMode === false && usersMatch){
-
-    //         DataService.loadPrivateData()
-    //           .success(function(res){
-
-    //           // res returns [goals, actions, progress, user]
-    //           $rootScope.setData(res[0], res[1], res[2], res[3], null);
-    //           DataService.updateOutlook(res[0], res[1], $rootScope.data.outlook);
-    //           $rootScope.busy = false;
-
-    //           deferred.resolve();
-    //           return deferred.promise;
-    //         })
-    //         .error(function(err){
-    //           $rootScope.data.message = err;
-    //           $rootScope.busy = false;
-
-    //           deferred.reject();
-    //           return deferred.promise;
-    //         });
-
-    //     } else {
-    //       // Public request. /:userId/profile
-    //       var userId = $location.url().split('/')[1];
-    //       DataService.loadPublicData(userId)
-    //         .success(function(res){
-
-    //           // res returns [goals, actions, progress, user]
-    //           $rootScope.setData(res[0], res[1], res[2], res[3], null);
-    //           DataService.updateOutlook(res[0], res[1], $rootScope.data.outlook);
-    //           $rootScope.busy = false;
-
-    //           deferred.resolve();
-    //           return deferred.promise;
-    //         })
-    //         .error(function(err){
-
-    //           $rootScope.data.message = err;
-    //           $rootScope.busy = false;
-
-    //           deferred.reject();
-
-    //           // redirect to 404
-    //           $location.url('/404');
-
-    //           return deferred.promise;
-    //         });
-    //     }
-    //   // }
-    //   //   else {
-    //   //     // data loaded
-    //   //     $rootScope.busy = false;
-    //   //     deferred.resolve();
-    //   //     return deferred.promise;
-    //   //   }
-    // }
 
     var checkLoggedin = function($http){
       // Initialize a new promise
@@ -219,62 +150,9 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         });
     };
 
-   //  // Check if data is loaded
-   //  var checkDataLoaded = function($rootScope, DataService, deferred){
-   //    console.log('checkDataLoaded');
-   //    $rootScope.busy = true;
-
-   //    if (!$rootScope.data.loaded){
-
-   //      if ($rootScope.data.publicMode===false){
-   //        var options = {branch: 'dashboard'};
-   //          // if publicMode...load only publically accessible data
-   //          DataService.loadData2($rootScope.data.outlook, function(){
-   //            // completed
-   //            $rootScope.data.loaded    = true;
-
-   //            $rootScope.busy=false;
-   //            deferred.resolve();
-   //            return deferred.promise;
-   //          }, options);
-   //      } else {
-   //        // public profile
-   //        // TODO: get userid from url
-   //        DataService.loadPublicData('56adf77a12493f2e694857fe')
-   //          .success(function(res){
-
-   //            $rootScope.data.goal      = res[0];
-   //            $rootScope.data.action    = res[1];
-   //            $rootScope.data.progress  = res[2];
-   //            $rootScope.data.user      = res[3];
-
-   //            $rootScope.data.loaded    = true;
-   //            $rootScope.busy = false;
-
-   //            deferred.resolve();
-   //            return deferred.promise;
-   //          })
-   //          .error(function(err){
-   //            $rootScope.data.message = err;
-   //            $rootScope.busy = false;
-
-   //            deferred.reject();
-   //            return deferred.promise;
-   //          });
-   //      }
-   //    }
-   //      else {
-   //        // data loaded
-   //        $rootScope.busy=false;
-   //        deferred.resolve();
-   //        return deferred.promise;
-   //      }
-   // }
-    //================================================
-    
-    //================================================
-    // Add an interceptor for AJAX errors
-    //================================================
+    /**
+    * Intercept AJAX calls and handle errors (send to login page)
+    */
     $httpProvider.interceptors.push(function($q, $location, $rootScope) {
       return {
         response: function(response) {
@@ -290,11 +168,10 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         }
       };
     });
-    //================================================
 
-    //================================================
-    // Define all the routes
-    //================================================
+    /**
+    * ROUTES - Define all routes and associated views and controllers
+    */
     $routeProvider
       .when('/', {
         templateUrl: '/views/main.html'
@@ -356,84 +233,21 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
   .run(function($rootScope, $http, $location, $mdSidenav, DataService){
 
     // triggered when page refreshed too
-
     $rootScope.location = $location;
     $rootScope.message = '';
     $rootScope.millisecondsInDay = 86400000;
     $rootScope.busy = false;
     $rootScope.runLoaded = false;
+    $rootScope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
 
     // init data structure if not already done so
     if (!$rootScope.data){
       $rootScope.data = [];
       $rootScope.data.loaded = '';
       $rootScope.data.outlook = 7;
-
       $rootScope.data.loggedInAs = {_id: '', first_name: '', picture_url: ''};
-
       $rootScope.data.user = {_id: ''};
     }
-
-    // $rootScope.loadPrivateData = function($rootScope){
-    //   $http.get('/api/v1/privateData')
-    //     .success(function(res){
-
-    //     // res returns [goals, actions, progress, user]
-    //     $rootScope.setData(res[0], res[1], res[2], res[3], null);
-    //     DataService.updateOutlook(res[0], res[1], $rootScope.data.outlook);
-    //     $rootScope.busy = false;
-    //   })
-    //   .error(function(err){
-    //     $rootScope.busy = false;
-    //   });
-    // };
-    /**
-     * Checks if user loggedin and their details matchup with details about user in localStorage and rootScope.
-     * Helps experience persist after user refreshes page (rootScope is cleared when this happens, hence localStorage used)
-     * @param {Object} user - the user object returned from a $http request by DataService
-     * Function signature - DataService.loggedIn(callbackIfLoggedIn(user), callbackIfNotLoggedIn, callbackOnError)
-     */
-    // DataService.loggedIn(function(user, $rootScope){
-    //   // user exists
-    //   var lsUser = JSON.parse(localStorage.getItem('loggedInAs'));
-
-    //   // create data structure if it doesn't exist
-    //   if (!$rootScope.data){
-    //     $rootScope.data = [];
-    //     $rootScope.data.loggedInAs = {};
-    //   }
-
-    //   if (lsUser){
-
-    //     if (lsUser._id===user._id){
-
-    //       $rootScope.data.loggedInAs._id = lsUser._id;
-    //       $rootScope.data.loggedInAs.first_name = lsUser.first_name;
-    //       $rootScope.data.loggedInAs.picture_url = lsUser.picture_url;
-    //     }
-
-    //   } else {
-    //     $rootScope.data.loggedInAs._id = user._id;
-    //     $rootScope.data.loggedInAs.first_name = user.first_name;
-    //     $rootScope.data.loggedInAs.picture_url = user.picture_url;
-
-    //     var currentUser = {_id: user._id, first_name: user.first_name, picture_url: user.picture_url};
-    //     localStorage.setItem('loggedInAs', currentUser);
-    //   }
-
-    //     // loadprivatedata
-    //     $rootScope.loadPrivateData($rootScope);
-
-    // }, function(){
-    //     // user doesn't exist. Clear their localStorage
-    //     var lsUser = localStorage.getItem('loggedInAs');
-    //     if (lsUser){
-    //       localStorage.removeItem('loggedInAs');
-    //     }
-    //     $rootScope.data.loggedInAs = {_id:'', first_name: '', picture_url: ''};
-    // }, null);
-
-    $rootScope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
 
     $rootScope.setData = function(goals, actions, progress, user, options){
 
@@ -441,12 +255,14 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       $rootScope.data.action    = actions;
       $rootScope.data.progress  = progress;
       $rootScope.data.user      = user;
-
       $rootScope.data.loaded    = user._id;
-
     }
 
-    // Based on existing goal already...what if goal is left null and options.goalId=... is provided?
+    /**
+    * Sets active goal i.e. sets the property goal['active']
+    * @param {Object | null} goal - optional goal which should be set as active
+    * @param {Object | null} options - optional information e.g. if goal not provided, options.goalId can tell us goal to set as active
+    */
     $rootScope.setActiveGoal = function(goal, options){
 
       if (!goal){
@@ -464,6 +280,12 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
         $rootScope.data.goal['active'] = goal;
       }
 
+      // if still no active goal is set then the either the goal doesn't exist or its private
+      if (!('active' in $rootScope.data.goal)){
+        $location.path('/404');
+        return null;
+      }
+
       // clear active actions
       $rootScope.data.goal['active'].action = []; 
       // one goal has subsets of actions
@@ -475,9 +297,14 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       };
     }
 
+    /**
+    * Sets active action i.e. sets the property action['active']
+    * @param {Object | null} action - optional action which should be set as active
+    * @param {Object | null} goal - optional goal to be appended to active action
+    * @param {Object | null} options - optional information e.g. if goal not provided, options.goalId can tell us goal to set as active
+    */
     $rootScope.setActiveAction = function(action, goal, options){
       // find action if not provided
-
       if (!action){
         if (options.actionId){
 
@@ -491,6 +318,12 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       } else {
 
         $rootScope.data.action['active'] = action;
+      }
+
+      // if still no active action is set then the either the goal doesn't exist or its private
+      if (!('active' in $rootScope.data.action)){
+        $location.path('/404');
+        return null;
       }
 
       $rootScope.data.action['active'].goal = [];
@@ -508,8 +341,9 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       
     }
 
-
-    // Logout function is available in any pages
+    /**
+    * Logs user out, resets memory data to defaults ($rootScope variables), and redirects user to login page
+    */
     $rootScope.logout = function(){
       $rootScope.user = {};
       $rootScope.message = 'Logged out.';
@@ -525,31 +359,13 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       $http.post('/logout');
     };
 
+    /**
+    * Toggles the state of menu between visible and hidden
+    * @param {String} id - the id of the menu to toggle
+    */
     $rootScope.toggleMenu = function(id) {
       $mdSidenav(id).toggle();
     };
-
-  //   // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object
-  //   $rootScope.clone = function(obj) {
-  //     if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
-  //       return obj;
-
-  //     if (obj instanceof Date)
-  //       var temp = new obj.constructor(); //or new Date(obj);
-  //     else
-  //       var temp = obj.constructor();
-
-  //     for (var key in obj) {
-  //       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-  //         obj['isActiveClone'] = null;
-  //         temp[key] = $rootScope.clone(obj[key]);
-  //         delete obj['isActiveClone'];
-  //       }
-  //     }
-
-  //     return temp;
-  //   }
-
 
   /**
    * Persistant check if user logged in
@@ -577,7 +393,7 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       }
     }
 
-    /*
+    /**
     * Removes action from data.action and data.action['active']
     * Required after deleting an action
     * @param {String} actionId - Id of action to be removed
@@ -599,14 +415,37 @@ var app = angular.module('app', ['ngResource', 'ngRoute', 'ngAnimate', 'ngAria',
       };
     }
 
-    $rootScope.runLoaded = true;
+    /**
+    * Removes goal from data.goal and data.goal['active']
+    * Required after deleting a goal
+    * @param {String} goalId - Id of goal to be removed
+    */
+    $rootScope.removeGoal = function (goalId){
 
+      if ($rootScope.data.goal['active']){
+        if ($rootScope.data.goal['active']._id === goalId){
+          delete $rootScope.data.goal['active'];
+        }
+      }
+
+      for (var i = 0; i < $rootScope.data.goal.length; i++) {
+        if ($rootScope.data.goal[i]._id === goalId){
+          // remove 1 action at ith position
+          $rootScope.data.goal.splice(i,1);
+          break;
+        }
+      };
+    }
+
+    $rootScope.runLoaded = true;
   });
 
+ /** CONTROLLERS */
 
-/**********************************************************************
- * Login controller
- **********************************************************************/
+ /**
+ * Login Controller
+ * @constructor
+ */
 app.controller('LoginCtrl', function($scope, $rootScope, $http, $location, DataService) {
   // This object will be filled by the form
   $scope.user = {};
@@ -651,137 +490,57 @@ app.controller('LoginCtrl', function($scope, $rootScope, $http, $location, DataS
     });
   };
 
-    $scope.loginGoogle = function(){
-      $rootScope.busy = true;
-      $http.get('/auth/google', {
+  $scope.loginGoogle = function(){
+    $rootScope.busy = true;
+    $http.get('/auth/google', {
+    })
+    .success(function(user){
+      // No error: authentication OK
+      console.log('logged in as : ' + user);
+    })
+    .error(function(){
+      // Error: authentication failed
+      $rootScope.message = 'Authentication failed.';
+      $location.url('/login');
+      $rootScope.busy = false;
+    });
+  };
+
+  $scope.loginGithub = function(){
+    $rootScope.busy = true;
+    $http.get('/auth/google', {
+    })
+    .success(function(user){
+      // No error: authentication OK
+    })
+    .error(function(){
+      // Error: authentication failed
+      $rootScope.message = 'Authentication failed.';
+      $location.url('/login');
+      $rootScope.busy = false;
+    });
+  };
+
+  $scope.resetPassword = function(){
+    var body = {recipient: $scope.user.username};
+    DataService.resetPassword(body)
+      .success(function(res){
+        console.log('resetPassword success:' + res);
+        // Todo: provide confirmation to user of successful password reset
       })
-      .success(function(user){
-        // No error: authentication OK
-        console.log('logged in as : ' + user);
-        // var url = '/' + user._id + '/dashboard';
-        // $rootScope.data.loggedInAs = user._id;
-        // code doesn't run here...callback
-        // $location.url(url);
-        // $rootScope.busy = false;
-        // $scope.loadData();
-      })
-      .error(function(){
-        // Error: authentication failed
-        $rootScope.message = 'Authentication failed.';
-        $location.url('/login');
-        $rootScope.busy = false;
+      .error(function(err){
+        console.log('resetPassword failed: ' + err);
       });
-    };
-
-    $scope.loginGithub = function(){
-      $rootScope.busy = true;
-      $http.get('/auth/google', {
-      })
-      .success(function(user){
-        // No error: authentication OK
-        // console.log('logged in as : ' + user);
-        // var url = '/' + user._id + '/dashboard';
-        // $rootScope.data.loggedInAs = user._id;
-        // $location.url(url);
-        // $rootScope.busy = false;
-      })
-      .error(function(){
-        // Error: authentication failed
-        $rootScope.message = 'Authentication failed.';
-        $location.url('/login');
-        $rootScope.busy = false;
-      });
-    };
-
-    $scope.resetPassword = function(){
-      var body = {recipient: $scope.user.username};
-      DataService.resetPassword(body)
-        .success(function(res){
-          console.log('resetPassword success:' + res);
-        })
-        .error(function(err){
-          console.log('resetPassword failed: ' + err);
-        });
-    }
-
-    // // load data
-    // $scope.loadData = function(){
-    //   var options = {branch: 'dashboard'};
-    //   DataService.loadData($rootScope.data.outlook, $rootScope.setData, options);
-    // }
+  }
 });
 
-
-/**********************************************************************
- * dashboard controller
- **********************************************************************/
+/**
+ * Dashboard Controller
+ * @constructor
+ */
 app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
 
   console.log('DASHBOARDCTRL');
-
-  
-
-  // $scope.toolbarMenuLoaded = false;
-
-  //   /**
-  //  * Persistant check if user logged in
-  //  */
-  //   $scope.isLoggedIn = function (){
-  //     if ($rootScope.data.loggedInAs._id !== ''){
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   };
-
-  /**
-   * Check if the same user who is logged in is looking at their own profile or someone else's
-   */
-    // $scope.sameUser = function (){
-    //   var isLoggedIn = $scope.isLoggedIn();
-
-    //   if ($rootScope.isLoggedIn = false){ return false;}
-
-    //   if ($rootScope.data.user._id === $rootScope.data.loggedInAs._id){
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-
-  // $scope.runMenuFunction = function (functionName){
-  //   if (functionName in $scope.menuFunctions){
-  //     $scope.menuFunctions[functionName]();
-  //   }
-  // }
-
-  // $scope.menuFunctions = {
-  //   showCreateMenu: function(){
-  //     $rootScope.toggleMenu('create');
-  //   }
-  // }
-
-  // $scope.toolbarMenu = function toolbarMenu(){
-
-  // var loggedIn = $scope.isLoggedIn();
-  // var sameUser = $scope.sameUser();
-  // var menu     = [];
-
-  //   if (loggedIn){
-  //     if (sameUser){
-        
-  //       menu.push({icon: 'create', f: 'showCreateMenu', href: 'javascript:void(0);', areaLabel: 'Create goal or action'})
-  //     } else {
-
-  //       var dashboardHref = '#/' + $rootScope.data.loggedInAs._id + '/dashboard';
-  //       menu.push({icon: 'dashboard', ngClick: 'toggleMenu("create")', areaLabel: 'Back to my dashboard', ngHref: dashboardHref, href: dashboardHref})
-  //     }
-  //   } else {
-
-  //       menu.push({icon: 'login', ngClick: '', areaLabel: 'Login', ngHref: '#/login'})
-  //   }
-  //   $rootScope.activeMenu = menu;
-  // }
 
   $scope.$watch('data.outlook', function() {
     if ($rootScope.data.goal){
@@ -803,7 +562,6 @@ app.controller('DashboardCtrl', function(DataService, $scope, $http, $mdSidenav,
     console.log('update')
     DataService.updateOutlook($rootScope.data.goal, $rootScope.data.action, $rootScope.data.outlook);
   }
-
 });
 
 app.controller('CreateActionCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope, $routeParams) {
@@ -889,14 +647,6 @@ app.controller('CreateActionCtrl', function(DataService, $scope, $http, $mdSiden
     } 
     // end of saveAction
   }
-
-
-
-});
-
-app.controller('UserDashboardCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
-
-  console.log('user dashboard');
 });
 
 app.controller('ProfileCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope) {
@@ -932,9 +682,12 @@ app.controller('ProfileCtrl', function(DataService, $scope, $http, $mdSidenav, $
   $rootScope.busy = false;
 
 });
-/**********************************************************************
- * goal controller
- **********************************************************************/
+
+
+/**
+* Goal Controller
+* @constructor
+*/
 app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $timeout, $rootScope, $routeParams) {
 
   console.log('GOALCTRL');
@@ -979,7 +732,7 @@ app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $tim
       };
       // if no goal found, redirect
       if (!$rootScope.data.goal){
-        $location.url('/404');
+        $location.path('/404');
       }
     }
     $rootScope.data.goal['active'].action = [];
@@ -1006,7 +759,6 @@ app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $tim
       DataService.updateOutlook($rootScope.data.goal['active'], $rootScope.data.goal['active'].action, $rootScope.data.outlook);
     }
   });
-
 
   $scope.save = function(){
     console.log('save');
@@ -1083,7 +835,7 @@ app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $r
       };
       // if no action found, redirect
       if (!$rootScope.data.action){
-        $location.url('/404');
+        $location.path('/404');
       }
     }
     // append parent goal to active action
@@ -1149,7 +901,7 @@ app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $r
       });
   }
 
-    /**
+  /**
    * Watch outlook for any changes. If all necessary data has been loaded then recalculate totals upon outlook change
    * @param {integer} data.outlook - global outlook
    */
@@ -1177,397 +929,12 @@ app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $r
   });
 
   $rootScope.busy = false;
-
 });
 
-/**********************************************************************
- * tracking controller
- **********************************************************************/
-app.controller('TrackingCtrl', function(UserFactory, GoalFactory, ActionFactory, GoalActionProgressFactory, ProgressFactory, $scope, $http, periodInWordsFilter, $filter, $mdSidenav, $timeout, $rootScope) {
-  // List of users got from the server
-  //$scope.users = [];
-  $scope.me = [];
-  $scope.goal = [];
-  $scope.action = [];
-  $scope.progress = [];
-  $scope.chart = [];
-
-  $scope.statusList = ['Open', 'Closed - Complete', 'Closed - Incomplete'];
-
-  $scope.editGoal = [];
-  $scope.editAction = [];
-
-  $scope.preEditGoal = [];
-  $scope.preEditAction = [];
-
-  $scope.filter = [];
-  $scope.filter.goal = [];
-  $scope.filter.action = [];
-
-  // initialise default filters
-  // TODO: allow user to save filters and preload last viewed
-  $scope.filter.goal.open = true;
-  $scope.filter.goal.closedComplete = false;
-  $scope.filter.goal.closedIncomplete = false;
-  $scope.filter.action.statusOn = true
-  $scope.filter.action.closedComplete = false;
-  $scope.filter.action.closedIncomplete = false;
-
-  $scope.getGoalAndActionFilter = function(){
-    console.log('Filter');
-    console.log($scope.filter);
-  }
-
-  $scope.showEditGoalMenu = function(goal){
-    // http://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-clone-an-object
-    $scope.preEditGoal = Object.assign({}, goal);
-    $scope.editGoal = goal;
-    $scope.editGoal.due = new Date(goal.due);
-    console.log('goal:');
-    console.log(goal);
-
-    $mdSidenav('editGoal').toggle();
-  }
-
-  $scope.showEditActionMenu = function(goal, action){
-    $scope.preEditAction = Object.assign({}, action);
-    $scope.preEditAction.due = new Date(action.due);
-    $scope.preEditAction._goalid = goal._goalid;
-    $scope.preEditAction._id = action._id;
-
-    $scope.editAction = action;
-    $scope.editAction.due = new Date(action.due);
-    $scope.editAction._goalid = goal._id;
-    $scope.editAction._id = action._id;
-    console.log($scope.editAction.pre);
-    
-    $mdSidenav('editAction').toggle();
-  }
-// http://stackoverflow.com/questions/16261348/descending-order-by-date-filter-in-angularjs
-  $scope.getDateCreated = function(item) {
-    var date = new Date(item.date_created);
-    return date;
-  };
-
-  $scope.createGoal = function(description, due, status, is_public){
-    var dueDate = new Date(due);
-    if (status){status=status.trim();}
-
-    console.log('Create goal: ' + description + ' due: ' + dueDate);
-    GoalFactory.post(description, dueDate, status, is_public)
-      .success(function(res){
-        console.log('Successfully created goal');
-        // recalculate goals, etc. so they're rendered
-        console.log(res);
-        $scope.goal.push(res);
-        // $scope.goal.splice(0, 0, res);
-
-        console.log($scope.goal);
-      })
-      .error(function(error){
-        console.log('Could not create goal');
-      });
-  }
-
-  $scope.deleteGoal = function(goal){
-    GoalFactory.delete(goal._id)
-      .success(function(res){
-        console.log('successfully deleting goal');
-        var index = $scope.goal.indexOf(goal);
-        console.log('index:');
-        console.log(index);
-        $scope.goal.splice(index, 1);
-        $mdSidenav('editGoal').toggle();
-
-      })
-      .error(function(error){
-        console.log('error deleting goal');
-      });
-  }
-
-  $scope.deleteAction = function(action){
-    ActionFactory.delete(action._id)
-      .success(function(res){
-        console.log('successfully deleting goal');
-        var index = $scope.action.indexOf(action);
-        console.log('index:');
-        console.log(index);
-        $scope.action.splice(index, 1);
-        $mdSidenav('editAction').toggle();
-        
-      })
-      .error(function(error){
-        console.log('error deleting goal');
-      });
-  }
-
-  $scope.updateGoal = function(_goalid, description, due, status, publicallyViewable){
-    var dueDate = new Date(due);
-    if (status){status=status.trim();}
-    GoalFactory.put(_goalid, description, dueDate, status, publicallyViewable)
-      .success(function(res){
-        console.log('Successfully updated goal');
-        $mdSidenav('editGoal').toggle();
-      })
-      .error(function(error){
-        console.log('Could not update goal');
-
-      });
-  }
-
-  $scope.updateAction = function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id, action){
-    // $scope.goal to find goal, splice(0,0, action)
-    // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
-    //var now = new Date(Date.now());
-    status = status.trim();
-
-    console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
-    ActionFactory.put(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id)
-      .success(function(res){
-       console.log('Successfully created action');
-       //$scope.action.push(res);
-       // $scope.prepareData(res); Necessary?
-       //$scope.prepareData(action);
-       console.log(res);
-      $mdSidenav('editAction').toggle();
-
-      })
-      .error(function(error){
-       console.log('Unsuccessful at creating action');
-      });
-  }
-  // console.log(periodInWordsFilter(7,1));
-  $scope.toggleMenu = function(id) {
-    $mdSidenav(id).toggle();
-  };
-
-  $scope.cancelUpdateGoal = function(){
-    console.log('preEditGoal');
-    console.log($scope.preEditGoal);
-    $scope.editGoal.description = $scope.preEditGoal.description;
-    $scope.editGoal.due         = new Date($scope.preEditGoal.due);
-    $scope.editGoal.status      = $scope.preEditGoal.status;
-    $scope.editGoal.is_public   = $scope.preEditGoal.is_public;
-    $mdSidenav('editGoal').toggle();
-  }
-
-  // goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due, action.status, action.is_public
-
-  $scope.cancelUpdateAction = function(){
-    console.log('preEditGoal');
-    console.log($scope.preEditAction);
-    $scope.editAction.verb           = $scope.preEditAction.verb;
-    $scope.editAction.verb_quantity  = $scope.preEditAction.verb_quantity;
-    $scope.editAction.noun           = $scope.preEditAction.noun;
-    $scope.editAction.period         = $scope.preEditAction.period;
-    $scope.editAction.due            = new Date($scope.preEditAction.due);
-    $scope.editAction.status         = $scope.preEditAction.status;
-    $scope.editAction.is_public      = $scope.preEditAction.is_public;
-    $mdSidenav('editAction').toggle();
-  }
-
-//goalSelected, action.verb, action.verb_quantity, action.noun, action.period, action.due
-  $scope.createAction = function(_goalid, verb, verb_quantity, noun, period, due, statusOn, is_public){
-    // $scope.goal to find goal, splice(0,0, action)
-    // var action = {_goalid: goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due};
-    var now = new Date(Date.now());
-    status = status.trim();
-
-    console.log('input: _goalid: ' + _goalid + ' verb_quantity: ' + verb_quantity);
-    ActionFactory.post(_goalid, verb, verb_quantity, noun, period, due, now, statusOn, is_public)
-      .success(function(res){
-       console.log('Successfully created action');
-       $scope.action.push(res);
-       $scope.prepareData(res);
-      })
-      .error(function(error){
-       console.log('Unsuccessful at creating action');
-      });
-  }
-  // console.log(periodInWordsFilter(7,1));
-  $scope.toggleMenu = function(id) {
-    $mdSidenav(id).toggle();
-  };
-
-  $scope.updateProgress = function(action, progress){
-    $rootScope.busy = true;
-    ProgressFactory.post(action._id, progress)
-      .success(function (res){
-        console.log('ProgressFactory success: ' + JSON.stringify(res));
-        console.log($scope.action);
-        action.currentProgress += progress;
-        action.chart.data[0].values[action.currentPeriod-1].y += progress;
-        $rootScope.busy = false;
-      })
-      .error(function(error){
-        console.log('ProgressFactory error: ' + JSON.stringify(error));
-        $rootScope.busy = false;
-      });
-  }
-
-$scope.prepareData = function(action){
-
-  var periodLengthMilliseconds = action.period * $rootScope.millisecondsInDay;
-  var startDate = new Date(action.date_created);
-  var startDateMilliseconds = startDate.getTime();
-  var compareDateMilliseconds = Date.now();
-  var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
-  var daysRemaining = Math.ceil((startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent) - compareDateMilliseconds)/$rootScope.millisecondsInDay);
-  action.daysRemaining = daysRemaining;
-  
-  var deadline = new Date(startDateMilliseconds + (totalPeriodsIncludingCurrent * periodLengthMilliseconds));
-  action.deadline = deadline;
-  action.currentPeriod = totalPeriodsIncludingCurrent;
-
-  var totalPeriodsExcludingCurrent = totalPeriodsIncludingCurrent - 1; // if totalPeriodsIncludingCurrent = 0?
-
-  var startCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsExcludingCurrent));
-  var endCurrentPeriod = new Date(startDateMilliseconds + (periodLengthMilliseconds * totalPeriodsIncludingCurrent));
-  var currentProgress = 0;
-
-  // handle case where no current period progress
-  for (var j = action.summary.length - 1; j >= 0; j--) {
-    if (action.summary[j].period == action.currentPeriod) {
-      currentProgress = action.summary[j].progress;
-      break;
-    };
-  };
-
-  // create values array for nvd3 graph
-  action.chart = [];
-  action.chart.xAxisLabel = periodInWordsFilter(action.period, 1) + ' since ' + $filter('date')(action.date_created, "dd MMM, yyyy");
-  action.chart.data = [{key: 'progress', values: []}];
-
-  for (var i = 0; i < totalPeriodsIncludingCurrent; i++) {
-    var value = {x: i+1, y: 0};
-    action.chart.data[0].values.push(value);
-  };
-
-  for (var i = 0; i < action.summary.length; i++) {
-    var period = action.summary[i].period;
-    action.chart.data[0].values[period-1].y = action.summary[i].progress;
-  };
-
-  action.currentProgress = currentProgress;
-
-  action.chart.options = {
-              chart: {
-                  type: 'multiBarChart',
-                  showControls: false,
-                  showLegend: false,
-                  height: 130,
-                  margin : {
-                      top: 20,
-                      right: 20,
-                      bottom: 50,
-                      left: 50
-                  },
-                  clipEdge: true,
-                  duration: 500,
-                  stacked: true,
-                  forceY: [0, action.verb_quantity],
-                  xAxis: {
-                      axisLabel: action.chart.xAxisLabel,
-                      showMaxMin: false,
-                      tickFormat: function(d){
-                          return d3.format(',f')(d);
-                      }
-                  },
-                  yAxis: {
-                      axisLabel: 'Progress',
-                      axisLabelDistance: -20,
-                      showMaxMin: true,
-                      tickFormat: function(d){
-                          return d3.format(',f')(d);
-                      }
-                  }
-              }
-          };
-
-  return null;
-
-  // action.daysRemaining = daysRemaining;
-  // action.deadline = deadline;
-  // action.currentPeriod = totalPeriodsIncludingCurrent;
-  // action.currentProgress = 0;
-}
-
-
-$scope.getGoalsActionsProgress = function(){
-      $rootScope.busy = true;
-      GoalActionProgressFactory.get()
-        .success(function(goalActionProgress){
-          $scope.goal = goalActionProgress[0];
-          $scope.action = goalActionProgress[1];
-          $scope.progress = goalActionProgress[2];
-
-        /*
-          Do the heavy lifting clientside - categorising progress into period buckets
-          what info do we need from Progress?
-
-          Component: Current period progress
-            Output: Sum of progress filtered for current period over target progress for current period
-            Input: Target progress per period (source: action.verb_quantity)
-
-          Component: Days remaining
-            Output: Days remaining
-            Input: start_date, period_length, today.
-
-          Component: Progress chart
-            Output: progress per period and target. Progress coded to green or red if target met or missed respectively
-            Input: 
-        */
-
-        // correctly format dates from string
-        for (var i = $scope.goal.length - 1; i >= 0; i--) {
-          $scope.goal[i].date_created = new Date($scope.goal[i].date_created);
-          $scope.goal[i].date_modified = new Date($scope.goal[i].date_modified);
-          $scope.goal[i].due = new Date($scope.goal[i].due);
-        };
-
-        // prepare data clientside - e.g. progress in current period, days remaining
-        for (var i = $scope.action.length - 1; i >= 0; i--) {
-          $scope.action[i].date_created = new Date($scope.action[i].date_created);
-          $scope.action[i].date_modified = new Date($scope.action[i].date_modified);
-          $scope.action[i].due = new Date($scope.action[i].due);
-          $scope.prepareData($scope.action[i]);
-        };
-
-          console.log(goalActionProgress);
-          $rootScope.busy = false;
-          return null;
-        })
-        .error(function(error){
-          $scope.status = 'Unable to load goals/actions: ' + error.message;
-          $rootScope.busy = false;
-          return null;
-        })
-    }
-
-    $scope.getGoalsActionsProgress();
-
-    $scope.getUser = function(){
-      $rootScope.busy = true;
-      UserFactory.get()
-        .success(function(user){
-          console.log(user);
-          $rootScope.user = {};
-          $rootScope.user = user;
-          console.log($rootScope.user);
-          $rootScope.busy = false
-        })
-        .error(function(error){
-          console.log('Error getting user');
-          $rootScope.busy = false
-        });
-    }
-
-    $scope.getUser();
-});
-
-/**********************************************************************
- * Signup controller
- **********************************************************************/
+/**
+* Signup Controller
+* @constructor
+*/
 app.controller('SignupCtrl', function($scope, $http, $location) {
   // List of users got from the server
   $scope.newUser = $location.search();
@@ -1584,7 +951,7 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
         .then(function successCallback(response) {
           // this callback will be called asynchronously
           // when the response is available
-          $location.path('/tracking');
+          $location.path('/login');
           console.log('angular: registered user successfully');
         }, function errorCallback(response) {
           // called asynchronously if an error occurs
@@ -1595,82 +962,23 @@ app.controller('SignupCtrl', function($scope, $http, $location) {
   }
 });
 
-
-/**********************************************************************
- * Root page controller
- **********************************************************************/
+/**
+* Root Controller
+* @constructor
+*/  
 app.controller('RootCtrl', ['$scope', '$rootScope', '$location', '$mdSidenav', function($scope, $rootScope, $location, $mdSidenav) {
-  // $scope.menu = MenuService.menu;
-  // $scope.newItem = $scope.menu.length;
 
   $scope.toggleMenu = function(id) {
     $mdSidenav(id).toggle();
   };
 
   $scope.pagename = function() { return $location.path(); };
-
-  // $scope.addItem = function() {
-  //   MenuService.add( $scope.newItem );  
-  //  };
-
-   $scope.hello = function(){
-    console.log('hello world');
-   }
-
-   $scope.functionRunner = function(f){
-    switch(f){
-      case 'hello':
-        console.log('hey there..location: ' + $location.path());
-        return $location.path();
-        break;
-      case 'world':
-        console.log('worldy');
-        break;
-      case 'logout':
-        $rootScope.logout();
-        break;
-      default:
-        console.log('Come again?');
-        break;
-    }
-   }
-
 }]);
 
-app.controller('AnalyticsCtrl2',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
-
-  // console.log('outlook updated...');
-  $scope.data = $rootScope.data;
-  // console.log();
-
-}]);
-
-app.controller('AnalyticsCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
-  $scope.data = $rootScope.data;
-  $scope.outlook = 7;
-  DataService.setOutlook($scope.outlook);
-  DataService.goalTotals();
-  $scope.data = DataService.getData();
-  console.log($scope.data);
-
-  $scope.$watch('outlook', function() {
-    // console.log('outlook updated...');
-    DataService.updateOutlook($scope.outlook);
-    // console.log($rootScope.data);
-  });
-
-  $scope.loadDataToRootScope = function(){
-    DataService.loadData($scope.outlook); // TODO: use promise instead?
-    // console.log($rootScope.data);
-  }
-
-  // $scope.updateOutlook = function(){
-  //   DataService.setOutlook($scope.outlook);
-  // }
-
-
-}]);
-  
+/**
+* List Controller
+* @constructor
+*/  
 app.controller('ListCtrl',['DataService', '$scope', '$rootScope', function(DataService, $scope, $rootScope) {
 
   console.log('LIST CTRL');
@@ -1708,9 +1016,11 @@ app.controller('ListCtrl',['DataService', '$scope', '$rootScope', function(DataS
   $rootScope.busy = false;
 }]);
 
-// Controllers for Directives
+/**
+* Create Controller - used for directive
+* @constructor
+*/  
 app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
-
 
   $scope.methods = {
     // called on action tab click to load goals
@@ -1727,11 +1037,10 @@ app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
         var selectedIndex = 0;
         var goalDescription = '';
         var deleteView = {};
-        /**
-         * Setup variables to be able to distinguish between different pages
-         */
+        
+        // Setup variables to be able to distinguish between different pages
         var url = $location.url();
-        var page = url.split('/')[2]; //  /:userid/goal
+        var page = url.split('/')[2]; // assuming a url route of /:userid/goal
         var title = '';
 
         if (page==='goal' || page === 'action'){
@@ -1860,7 +1169,6 @@ app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
           };
 
           DataService.updateOutlook(null, $rootScope.data.action, $rootScope.data.outlook);
-
         })
         .error(function(err){
           console.log('could not create action:');
@@ -1874,9 +1182,32 @@ app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
       DataService.deleteGoal($rootScope.data.goal['active'], options)
         .success(function(res){
 
+          var goalId = $rootScope.data.goal['active']._id;
+          $rootScope.removeGoal(goalId);
+
+          // remove actions
+          if (options.actionDestination === 'delete'){
+
+            for (var i = $rootScope.data.action.length - 1; i >= 0; i--) {
+              if ($rootScope.data.action[i]._goalid === goalId){
+                  $rootScope.data.action.splice(i,1);
+              }
+            };
+          }
+          // update existing actions
+          else if (options.actionDestination === 'move'){
+            for (var i = $rootScope.data.action.length - 1; i >= 0; i--) {
+              if ($rootScope.data.action[i]._goalid === goalId){
+                  $rootScope.data.action._goalid = options.actionMoveTo;
+              }
+            };
+          }
+          // redirect to dashboard
+          DataService.updateOutlook($rootScope.data.goal, $rootScope.data.action, $rootScope.data.outlook);
+          $location.path('/' + $rootScope.data.loggedInAs._id + '/dashboard');
         })
         .error(function(err){
-
+          console.log('error deleting goal');
         })
     },
     deleteAction: function deleteAction(){
@@ -1905,93 +1236,15 @@ app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
       }
     }
   });
-
 }]);
 
 
-app.controller('settingsCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
+/** FACTORIES AND SERVICES */
 
-  $scope.methods = {
-      // ToDo this is duplicated multiple times, is there a way of accessing rootscope function from selfcontained directive?
-      toggleMenu: function(id) {
-        $mdSidenav(id).toggle();
-      },
-      logout: function(){
-        $rootScope.logout();
-      }
-    }
-
-}]);
-
-app.controller('settingsGoalCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
-  
-  $scope.data = {
-    delete: {
-      message: "Delete goal"
-    }
-  }
-
-  $scope.methods = {
-    // TODO: house all actions belonging to deleted goals in 'Deleted goals' goal so they can be
-    //  picked up in All goals and actions view
-    delete: function(){
-      console.log('delete goal');
-      DataService.deleteGoal($rootScope.data.activeGoal.goal)
-        .success(function(res){
-          console.log('deleted goal: ' + res);
-          $location.url('/dashboard');
-
-          //TODO flash success message
-        })
-        .error(function(err){
-          console.log('could not delete goal: ' + err);
-        })
-    },
-    toggleMenu: function(id) {
-      $mdSidenav(id).toggle();
-    }
-  }
-
-}]);
-
-app.controller('settingsActionCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope', '$location', function($scope, DataService, $mdSidenav, $rootScope, $location){
-
-  $scope.data = {
-    delete: {
-      message: "Delete action"
-    }
-  }
-
-  $scope.methods = {
-    delete: function(){
-      console.log('delete action');
-      DataService.deleteAction($rootScope.data.activeAction.action[0])
-        .success(function(res){
-          console.log('deleted action: ' + res);
-          $location.url('/dashboard');
-          // DataService.updateOutlook($rootScope.data.activeAction.goal,$rootScope.data.activeAction.action,$rootScope.data.outlook);
-          // DataService.updateOutlook($rootScope.data.activeGoal.goal,$rootScope.data.activeGoal.action,$rootScope.data.outlook);
-
-          // Todo: history.back(); but with updated data
-
-          //TODO flash success message
-        })
-        .error(function(err){
-          console.log('could not delete action: ' + err);
-        })
-    },
-    toggleMenu: function(id) {
-      $mdSidenav(id).toggle();
-    }
-  }
-
-}]);
-
-app.controller('404Ctrl', ['$scope', function($scope){
-
-}]);
-
-// FACTORIES AND SERVICES
+/**
+* DataService Factory - responsible for exposing API endpoints and modelling data
+* @constructor
+*/
 app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScope, $http, $filter) {
 
   var dataSet = [];
@@ -1999,20 +1252,20 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
   var functions = {
     loggedIn: function(callbackTrue, callbackFalse, callbackError){
       $http.get('/loggedin')
-              .success(function(user){
-                console.log('LOGGEDIN NO ERROR');
-                // Authenticated
-                if (user !== '0'){
-                  callbackTrue(user, $rootScope);
-                }
-                // Not Authenticated
-                else {
-                  callbackFalse();
-                }
-              })
-              .error(function(err){
-                callbackError();
-              });
+        .success(function(user){
+          console.log('LOGGEDIN NO ERROR');
+          // Authenticated
+          if (user !== '0'){
+            callbackTrue(user, $rootScope);
+          }
+          // Not Authenticated
+          else {
+            callbackFalse();
+          }
+        })
+        .error(function(err){
+          callbackError();
+        });
     },
     updateProfile: function(body){
       return $http.put('/api/v1/me', body);
@@ -2031,11 +1284,12 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
     },
     /**
     * Requests node deletes given goal and optionally its associated actions
+    * Since Angular doesn't support sending req.body in delete requests, I've used a put request instead
     * @param {Object} goal - Goal object to extract id from
     * @param {Object} options - Indicates whether associated actions should also be deleted or rehomed
     */
     deleteGoal: function(goal, options){
-      return $http.delete('/api/v1/goal/' + goal._id, options);
+      return $http.put('/api/v1/deleteGoal/' + goal._id, options);
     },
     putAction: function(action){
       return $http.put('/api/v1/action/' + action._id, action);
@@ -2048,6 +1302,65 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
     },
     saveAction: function(action){
       return $http.post('/api/v1/action', action);
+    },
+    /*
+    * Sends xhr request to post a new progress item. Used when incrementing/decrementing progress
+    * @param {Array} actions
+    * @param {Object} action
+    * @param {Number} progress - the quantity by which to add to progress
+    * @param {Number} outlook
+    */
+    postProgress: function(actions, action, progress, outlook){
+    $rootScope.busy = true;
+
+    var body = {_actionid: action._id, counter: progress}
+    body.date_modified = new Date(Date.now());
+
+    $http.post('/api/v1/progress', body)
+      .success(function (res){
+        console.log('Updated progress successfully: ' + JSON.stringify(res));
+        console.log(action);
+        action.currentProgress += progress;
+        action.chart.data[0].values[action.currentPeriod-1].y += progress;
+        action.date_modified = body.date_modified; // necessary?
+
+        // attempt at bug fix: progress not updating after creating/updating new action
+        if (action.summary.length === 0){
+          action.summary = [{progress: 0, period: 1}];
+        }
+
+        var currentPeriodFound = false;
+        //increment action scope
+        for (var j = action.summary.length - 1; j >= 0; j--) {
+          if (action.summary[j].period == action.currentPeriod) {
+            action.summary[j].progress += progress;
+            console.log('INCREMENTED ACTION PROGRESS : ' + action.verb);
+            currentPeriodFound = true;
+            break;
+          };
+        };
+
+        // Push current slice of summary if period doesn't exist
+        if (!currentPeriodFound){
+          var period = action.currentPeriod;
+          var newSummary = {period: period, progress: progress}
+          action.summary.push(newSummary);
+        }
+
+        functions.prepareActionData(actions, outlook);
+
+        // User may have only changed subset of actions e.g. by incrementing an action in goal view
+        // Check to see if we also need to recalculate action totals for entire dataset 
+        if (actions.length !== $rootScope.data.action.length){
+          functions.prepareActionData($rootScope.data.action, outlook);
+        }
+
+        $rootScope.busy = false;
+      })
+      .error(function(error){
+        console.log('ProgressFactory error: ' + JSON.stringify(error));
+        $rootScope.busy = false;
+      });
     },
     prepareActionData: function(actions, outlook){
         var total = 0;
@@ -2121,8 +1434,6 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
             off += 1;
             total += 1;  
           }
-          // Total, On, Off
-
 
           // handle case where no current period progress
           // only calculate currentProgress if it's not already been calculated
@@ -2190,7 +1501,6 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
 
           // calculate repetition, rep_complete, both at the individual action level and running total
           // having these stats at the individual action level means they're available for when user drills down into the action detail view.
-
           for (var j=0; j < actions[i].summary.length; j++){
             // compare outlook date to period. Todo.
             // action_date_created = new Date(data.action[i].date_created + )
@@ -2288,12 +1598,13 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
       goals.total.closed = closed;
       goals.total.complete = complete;
     },
-    setOutlook: function(outlook){
-      $rootScope.data.outlook = outlook;
-    },
-    getData: function(){
-      return dataSet;
-    },
+
+    /*
+    * Calculates the amount of days the given action has had a status of 'on' within a date range
+    * @param {Object} action - action object
+    * @param {Object} dateRange - Object containing date items {start, end}
+    * @returns {Number} - number of days action had 'on' status
+    */
     actionDurationOn: function(action, dateRange){
 
       // calculates the duration in days an action has been switched on between a date range
@@ -2381,66 +1692,16 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
       };
 
       return durationOn/msd; // return days instead of milliseconds
-
     },
-    loadData: function(outlook, callback, options){
-      $http.get('/api/v1/goalsActionsProgress')
-        .success(function(doc){
-            console.log('before loaded goal:');
-            console.log(goals);
 
-            var goals = doc[0];
-            var actions = doc[1];
-            var progress = doc[2];
-
-             console.log('Loaded Goals, Actions, Progress data');
-             console.log(goals);
-
-             // initialise default values
-            // goals.total = {open: 0, closed: 0, complete: 0};
-            // actions.total = {open: 0, closed: 0, complete: 0, repetition: 0, rep_complete: 0, rep_conversion: 0};
-            // $rootScope.data.outlook = 7;
-            
-            // set date format
-
-            // update totals/stats
-            dataSet = functions.updateOutlook(goals, actions, outlook);
-            console.log(dataSet);
-            callback(goals, actions, progress, outlook, options);
-            // return dataSet;
-        })
-        .error(function(error){
-          console.log('Error loading Goals, Actions, Progress data');
-        })
-    },
-    loadData2: function(outlook, callback, options){
-      $http.get('/api/v1/goalsActionsProgress')
-        .success(function(doc){
-
-            var goals = doc[0];
-            var actions = doc[1];
-            var progress = doc[2];
-
-            $rootScope.data.goal = goals;
-            $rootScope.data.action = actions;
-            $rootScope.data.progress = progress;
-
-            $rootScope.data.loaded = true;
-            // update totals/stats
-            dataSet = functions.updateOutlook(goals, actions, outlook);
-            console.log('loaded data2');
-            callback(goals, actions, progress, outlook, options);
-            // return dataSet;
-        })
-        .error(function(error){
-          console.log('Error loading Goals, Actions, Progress data');
-        })
-    },
-    //TODO: generalise to operate on not just on rootscope.data.action, etc. but rather function (goal, action, outlook)
+    /*
+    * Recalculates totals for goals and actions given an outlook period
+    * @param {Array | null} goals - the set of goals to be recalculated
+    * @param {Array | null} actions - the set of actions to be recalculated
+    * @param {Number} outlook - the period to recalculate goals and actions
+    * @returns {Object} dataSet - the set of updated goals and actions. Not used as goal/action data prepared by ref.
+    */
     updateOutlook: function(goals, actions, outlook){
-
-
-      // functions.setOutlook(outlook);
 
       // can use null to not prepareGoalData
       if (goals && outlook){
@@ -2458,6 +1719,13 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
       // console.log(dataSet);
       return dataSet;
     },
+
+    /*
+    * Calculates the number of days between two dates
+    * @param {String | Date | null} startDate 
+    * @param {String | Date | null} endDate 
+    * @return {Number} daysDiff
+    */
     daysRemaining: function(startDate, endDate){
       var start = new Date(startDate);
       var end = new Date();
@@ -2471,133 +1739,13 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
 
       daysDiff = Math.ceil((end.getTime() - start.getTime())/$rootScope.millisecondsInDay); // TODO: use const global
       return daysDiff;
-    },
-    // CRUD goals and actions
-    postProgress: function(actions, action, progress, outlook){
-    $rootScope.busy = true;
-
-    var body = {_actionid: action._id, counter: progress}
-    body.date_modified = new Date(Date.now());
-
-    $http.post('/api/v1/progress', body)
-      .success(function (res){
-        console.log('ProgressFactory success: ' + JSON.stringify(res));
-        console.log(action);
-        action.currentProgress += progress;
-        action.chart.data[0].values[action.currentPeriod-1].y += progress;
-        action.date_modified = body.date_modified; // necessary?
-
-        // attempt at bug fix: progress not updating after creating/updating new action
-        if (action.summary.length === 0){
-          action.summary = [{progress: 0, period: 1}];
-        }
-
-        var currentPeriodFound = false;
-        //increment action scope
-        for (var j = action.summary.length - 1; j >= 0; j--) {
-          if (action.summary[j].period == action.currentPeriod) {
-            action.summary[j].progress += progress;
-            console.log('INCREMENTED ACTION PROGRESS : ' + action.verb);
-            currentPeriodFound = true;
-            break;
-          };
-        };
-
-        // Push current slice of summary if period doesn't exist
-        if (!currentPeriodFound){
-          var period = action.currentPeriod;
-          var newSummary = {period: period, progress: progress}
-          action.summary.push(newSummary);
-        }
-
-        functions.prepareActionData(actions, outlook);
-
-        // User may have only changed subset of actions e.g. by incrementing an action in goal view
-        // Check to see if we also need to recalculate action totals for entire dataset 
-        if (actions.length !== $rootScope.data.action.length){
-          functions.prepareActionData($rootScope.data.action, outlook);
-        }
-
-        $rootScope.busy = false;
-      })
-      .error(function(error){
-        console.log('ProgressFactory error: ' + JSON.stringify(error));
-        $rootScope.busy = false;
-      });
-  }
+    }
 }
 return functions;
 }]);
 
-app.factory('UserFactory', function($http) {
-     
-    var factory = {};
-    return {
-        get: function() {
-            return $http.get('/api/v1/me');
-        }
-    };
-});
 
-app.factory('GoalFactory', function($http) {
-     
-    var factory = {};
-    return {
-        get: function() {
-            return $http.get('/api/v1/goal');
-        },
-        post: function(description, dueDate, status, is_public){
-            var body = {description: description, due: dueDate, status: status, is_public: is_public};
-            return $http.post('/api/v1/goal', body);
-        },
-        put: function(_goalid, description, dueDate, status, is_public){
-            var body = {description: description, due: dueDate, status: status, is_public: is_public};
-            return $http.put('/api/v1/goal/' + _goalid, body);
-        },
-        delete: function(_goalid){
-          return $http.delete('/api/v1/goal/' + _goalid);
-        }
-    };
-});
-
-app.factory('ActionFactory', function($http){
-  var factory = {};
-  return {
-    post: function(_goalid, verb, verb_quantity, noun, period, due, date_created, statusOn, is_public){
-      var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, date_created: date_created, statusOn: statusOn, is_public: is_public};
-      return $http.post('/api/v1/action', body);
-    },
-    put: function(_goalid, verb, verb_quantity, noun, period, due, status, is_public, _id){
-    var body = {_goalid: _goalid, verb: verb, verb_quantity: verb_quantity, noun: noun, period: period, due: due, status: status, is_public: is_public};
-      return $http.put('/api/v1/action/' + _id, body);
-    },
-    delete: function(_id){
-      return $http.delete('/api/v1/action/' + _id);
-    }
-  };
-});
-
-app.factory('GoalActionProgressFactory', function($http) {
-     
-    var factory = {};
-    return {
-        get: function() {
-            return $http.get('/api/v1/goalsActionsProgress');
-        }
-    };
-});
-
-app.factory('ProgressFactory', function($http) {
-    
-    var factory = {};
-    return {
-        post: function(actionid, progress) {
-            var body = {_actionid: actionid, counter: progress};
-            return $http.post('/api/v1/progress', body);
-        }
-    };
-});
-// FILTERS
+/** FILTERS */
 
 // http://stackoverflow.com/questions/29989200/angular-calculate-percentage-in-the-html
 app.filter('percentage', ['$filter', function ($filter) {
@@ -2626,7 +1774,6 @@ app.filter('firstNChars', function(){
       output = string.substring(0, limit - 3) + '...';
     }
     return output;
-    // TODO: google string function for returning/slicing first n chars of string
   }
 })
 
@@ -2672,7 +1819,8 @@ app.filter('periodInWords', function() {
   };
 });
 
-// DIRECTIVES
+/** DIRECTIVES */
+
 app.directive('createSidenav', function() {
   return {
     restrict: 'E',

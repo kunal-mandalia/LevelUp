@@ -13,19 +13,17 @@
 </div>
 
 <!-- 
-
 Settings
 Public/Private
 change password
-
-
  -->
+ 
 <div layout="row" layout-align="center center">
  <md-list flex-gt-sm="30" flex ng-cloak>
   <md-subheader class="md-no-sticky">Settings</md-subheader>
   <md-list-item>
     <h1 class="md-subhead"> {{ data.user.is_public | is_publicFormat }} </h1>
-    <md-checkbox class="md-secondary" ng-model="data.user.is_public" ng-change="updateIsPublic()"></md-checkbox>
+    <md-checkbox class="md-secondary" ng-model="data.user.is_public" ng-change="updateIsPublic()" aria-label="Profile picture url"></md-checkbox>
   </md-list-item>
   <md-divider></md-divider>
   <md-list-item>
@@ -44,16 +42,6 @@ change password
 
 </div>
 
-
-<!-- {{data.user.first_name}} {{data.user.last_name}}
-
-Joined: {{data.user.created | date }}
-Public? {{data.user.is_public}}
-
-Password:
-Old: <input></input>
-New: <input></input>
-
-<button>Change</button>
-
- -->
+<div ng-controller="CreateCtrl">
+    <create-sidenav f="methods" d="data"></create-sidenav>
+</div>

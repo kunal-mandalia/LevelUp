@@ -264,15 +264,20 @@ Iss5: Create public profile view #5
 
 Rethinking the restful routes (issues having /:id/profile, /:id/dashboard)
 
-Menu bars depending on loggedin, anon - NOW
+Menu bars depending on loggedin, anon - NOW {OK: [anon, loggin/own, loggedin/other]} - done
 List view - aria labels, loading screen - done
-Todo: action.put status (handle like action post is handled) - hard
-Menu profile image css cross browser - later
 github callback url - done
 Profile page logout, - done
 dashboard - buttons, aria-labels - done
-auth api routes // TODO: check action belongs to current user
-hide/disable controls if not logged in and current - after auth api
 goal aria-labels - done
+comment code according to JSdoc standard - inprog/done
+
+
+auth api routes // TODO: check action belongs to current user - client and server? Do both...Must be on server at least
+hide/disable controls if not logged in and current - after auth api
+
+Menu profile image css cross browser - later
+Todo: action.put status (handle like action post is handled) - hard - handle server side
 test public/private views - 
-comment code according to JSdoc standard
+bug: putgoal error: undefined saving goal reopen
+18,28->17,24
