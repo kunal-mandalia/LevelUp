@@ -18,7 +18,7 @@ Public/Private
 change password
  -->
  
-<div layout="row" layout-align="center center">
+<div ng-hide="data.user._id !== data.loggedInAs._id" layout="row" layout-align="center center">
  <md-list flex-gt-sm="30" flex ng-cloak>
   <md-subheader class="md-no-sticky">Settings</md-subheader>
   <md-list-item>

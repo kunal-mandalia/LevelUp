@@ -655,7 +655,7 @@ app.controller('ProfileCtrl', function(DataService, $scope, $http, $mdSidenav, $
 
   $scope.updateIsPublic = function(){
 
-    var body = {'is_public': $rootScope.data.user.is_public};
+    var body = {'is_public': $rootScope.data.user.is_public, 'userId': $rootScope.data.user._id};
 
     DataService.updateProfile(body)
       .success(function(res){
@@ -668,7 +668,7 @@ app.controller('ProfileCtrl', function(DataService, $scope, $http, $mdSidenav, $
 
   $scope.updatePictureUrl = function(){
 
-    var body = {'picture_url': $rootScope.data.user.picture_url};
+    var body = {'picture_url': $rootScope.data.user.picture_url, 'userId': $rootScope.data.user._id};
 
     DataService.updateProfile(body)
       .success(function(res){
@@ -763,11 +763,14 @@ app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $tim
   $scope.save = function(){
     console.log('save');
     // put api
+    var goalUpdate = {};
     var goals = [];
     $rootScope.data.goal['active'].date_modified = new Date(Date.now());
     goals.push($rootScope.data.goal['active']);
 
-    DataService.putGoal($rootScope.data.goal['active'])
+    goalUpdate = {_id: $rootScope.data.goal['active']._id, status: $rootScope.data.goal['active'].status, is_public: $rootScope.data.goal['active'].is_public, due: $rootScope.data.goal['active'].due};
+
+    DataService.putGoal(goalUpdate)
       .success(function(res){
         console.log('putgoal success: ' + res);
         DataService.prepareGoalData(goals, $rootScope.data.outlook);
@@ -777,6 +780,7 @@ app.controller('GoalCtrl', function(DataService, $scope, $http, $mdSidenav, $tim
         $scope.showEditButtons = false;
       })
       .error(function(err){
+        $scope.cancel();
         console.log('putgoal error: ' + err);
       });
   };
@@ -897,6 +901,7 @@ app.controller('ActionCtrl', function(DataService, $scope, $http, $mdSidenav, $r
         $scope.showEditButtons = false;
       })
       .error(function(err){
+        $scope.cancel();
         console.log('putAction error: ' + err);
       });
   }

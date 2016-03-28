@@ -297,6 +297,18 @@ body {
     border-radius: 50%;
 }
 
+.circle-image-cropper-small {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+}
+
 .circle-image {
     display: inline;
     margin: 0 auto;
@@ -318,9 +330,13 @@ body {
 }
 
 .menu-profile {
-	height: 200%;
-	margin-top: -40%;
-	margin-left: -45%;
+	height: 175%;
+	margin-top: -35%;
+	margin-left: -35%;
+}
+
+.menu-profile-container {
+	height: 100%;
 }
 
 .user-card {
@@ -338,10 +354,18 @@ body {
 	margin-top: -20px;
 }
 
-.goal-card {
+.profile-card {
 	margin-right: 14px;
 	background-color: rgba(173, 173, 173, 0.22);
-	margin-bottom: 5px;
+	margin-bottom: 6px;
+}
+
+.large-negative-margin-bottom {
+	margin-bottom: -15px;
+}
+
+.small-margin-top {
+	margin-top: 5px;
 }
 
 .small-margin-bottom {
@@ -382,4 +406,22 @@ body {
 
 .blue-fill {
 	fill: rgb(52,112,206);
+}
+
+.floating-box {
+    display: inline-block;
+    border: 3px solid #73AD21;  
+}
+
+.Row
+{
+    display: table;
+    width: 100%; /*Optional*/
+    table-layout: fixed; /*Optional*/
+    border-spacing: 10px; /*Optional*/
+}
+.Column
+{
+    display: table-cell;
+    background-color: red; /*Optional*/
 }

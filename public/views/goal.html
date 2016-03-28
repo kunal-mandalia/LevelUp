@@ -4,15 +4,15 @@
   <div flex>
 
         <!-- Profile -->
-        <div layout="row" layout-align="start center" class="goal-card small-margin-bottom">
-            <div layout="column">
-                <div class="circle-image-cropper profile-user-image user-card-picture">
-                    <img src="{{ data.user.picture_url }}" height="80" width="80" alt="{{ data.user.first_name }}" class="circle-image " ng-cloak>
+        <div class="profile-card md-padding">
+            <div layout="row" layout-align="start center" class="">
+                <div class="circle-image-cropper-small">
+                    <img src="{{ data.user.picture_url }}" alt="{{ data.user.first_name }}" class="circle-image" ng-cloak></img>
                 </div>
+                <md-chips class="medium-margin-left"><md-chip>Goal</md-chip></md-chips>
             </div>
-            <div layout="row" layout-align="start center" class="medium-pad-left">
-                <h1 class="md-headline md-padding">{{data.goal['active'].description}}</h1>
-                <md-chips class="large-margin-right"><md-chip>Goal</md-chip></md-chips>
+            <div layout="column" layout-align="center center" class="large-negative-margin-bottom">
+                <h1 class="md-headline light-gray">{{data.goal['active'].description}}</h1>
             </div>
         </div>
 
@@ -23,7 +23,7 @@
 
 	        </div>
 	        <div flex layout="column" layout-align="center center" class="dashboard-stat light-blue">
-	            <md-select required ng-model="data.goal['active'].status" ng-change="goalDataChanged()" aria-label="Goal status">
+	            <md-select required ng-disabled="data.user._id !== data.loggedInAs._id" ng-model="data.goal['active'].status" ng-change="goalDataChanged()" aria-label="Goal status">
                     <md-option ng-value="s" ng-repeat="s in statusList" >
                         {{s}}
                     </md-option>
@@ -73,7 +73,7 @@
   <div flex class="medium-margin-left">
         <div layout="row" layout-align="start center">
         	<h2 class="md-display-1 light-gray">Upcoming</h2>
-            <md-button class="md-icon-button" ng-click="toggleMenu('create-action')" aria-label="Create action">
+            <md-button ng-hide="data.user._id !== data.loggedInAs._id" class="md-icon-button" ng-click="toggleMenu('create-action')" aria-label="Create action">
                 <ng-md-icon icon="add" class="md-avatar green-fill" size="25"></ng-md-icon>
             </md-button>
         </div>
@@ -84,7 +84,7 @@
             <md-content flex="90" class="">
                 <md-list class="dashboard-box dashboardbox-top-margin">
                     <md-list-item class="md-2-line goal-list" ng-repeat="a in data.goal['active'].action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0)">
-                    	<md-button class="md-icon-button" aria-label="Increment progress">
+                    	<md-button ng-hide="data.user._id !== data.loggedInAs._id" class="md-icon-button" aria-label="Increment progress">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
@@ -122,11 +122,11 @@
 
         <!-- Goal details -->
         <div layout="column" class="md-padding" layout-align="start start" class="dashboard-stat-container">
-                <div layout="row" layout-align="start center">
+                <div layout="row" layout-align="start center" layout-wrap>
                     <div class="small-pad-top">
-                    <md-checkbox ng-model="data.goal['active'].is_public" ng-change="goalDataChanged()">{{data.goal['active'].is_public | is_publicFormat}}</md-checkbox>
+                    <md-checkbox ng-disabled="data.user._id !== data.loggedInAs._id" ng-model="data.goal['active'].is_public" ng-change="goalDataChanged()">{{data.goal['active'].is_public | is_publicFormat}}</md-checkbox>
                 </div>
-                    <md-datepicker ng-model="data.goal['active'].due" required md-placeholder="Until" ng-disabled="data.goal['active'].status !='Open'" ng-change="goalDataChanged()"></md-datepicker>
+                    <md-datepicker ng-disabled="data.user._id !== data.loggedInAs._id" ng-model="data.goal['active'].due" required md-placeholder="Until" ng-disabled="data.goal['active'].status !='Open'" ng-change="goalDataChanged()"></md-datepicker>
                     <div class="light-gray">(due)</div> 
                 </div>
                 

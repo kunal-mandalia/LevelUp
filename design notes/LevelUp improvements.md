@@ -274,10 +274,44 @@ comment code according to JSdoc standard - inprog/done
 
 
 auth api routes // TODO: check action belongs to current user - client and server? Do both...Must be on server at least
-hide/disable controls if not logged in and current - after auth api
+Secure these API endpoints:
 
+	updateProfile: function(body){
+      return $http.put('/api/v1/me', body); done
+    },
+    loadPrivateData: function(){
+      return $http.get('/api/v1/privateData'); not required
+    },
+    loadPublicData: function(userId){
+      return $http.get('/api/v1/publicData/' + userId); not required
+    },
+    resetPassword: function(email){
+      return $http.post('/api/v1/resetPassword', email); not required
+    },
+    deleteAction: function(action){
+      return $http.delete('/api/v1/action/' + action._id); done
+    },
+    deleteGoal: function(goal, options){
+      return $http.put('/api/v1/deleteGoal/' + goal._id, options); done - tested with postman
+    },
+    putAction: function(action){
+      return $http.put('/api/v1/action/' + action._id, action); done
+    },
+    putGoal: function(goal){
+      return $http.put('/api/v1/goal/' + goal._id, goal); done
+    },
+    saveGoal: function(goal){
+      return $http.post('/api/v1/goal', goal); not needed
+    },
+    saveAction: function(action){
+      return $http.post('/api/v1/action', action); not needed
+    },
+test public/private views - done
+
+
+hide/disable controls if not logged in and current - after auth api - done
 Menu profile image css cross browser - later
+
 Todo: action.put status (handle like action post is handled) - hard - handle server side
-test public/private views - 
 bug: putgoal error: undefined saving goal reopen
 18,28->17,24

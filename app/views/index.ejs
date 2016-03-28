@@ -84,7 +84,9 @@
                     <ng-md-icon icon="create"></ng-md-icon>
               </md-button>
               <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
-                <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                <div class="menu-profile-container">
+                  <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                </div>
               </md-button>
             </div>
           </div>
@@ -97,7 +99,9 @@
                 <ng-md-icon icon="home"></ng-md-icon>
               </md-button>
               <md-button class="md-icon-button menu-icon" aria-label='profile' ng-href="#/{{data.loggedInAs._id}}/profile">
-                <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                <div class="menu-profile-container">
+                  <img ng-src="{{data.loggedInAs.picture_url}}" class="menu-profile"></img>
+                </div>
               </md-button>
             </div>
           </div>

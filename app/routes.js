@@ -3,6 +3,65 @@ var auth = require('./models/auth.js');
 
 module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 
+    /**
+	* Authorise user to perform what will inevitably be CRUD requests against dbs via API endpoints
+	* The method involves checking whether the user currently logged in is the owner of the resource trying to be modified
+	* The current auth middleware checks only whether the user is logged in or not - making it possible to hit other user's api endpoints
+	* @param {Object} req - request variables and functions
+	* @param {Object} res - response variables and functions
+	* @param {Object} options - shows the id (options.id) and type (e.g. options.tyoe = 'action') of the resource (closest to userid: User < Goal < Action < Progress) being accessed
+	* @param {function} cbAuth - function to run if user is authorised
+	* @param {function} cbNotAuth - function to run if user is not authorised
+	*/
+	authorise = function authorise(req, res, options, cbAuth, cbNotAuth){
+		// options must be provided
+		if (!options){ return res.send(400);}
+
+		var resourceId 	 = options.id;
+		var resourceType = options.type;
+		var loggedInUserId = req.user._id;
+		var resourceOwnerId = '';
+
+		var resourceOwnerCb = function resourceOwnerCb(){
+			if (resourceOwnerId===loggedInUserId){
+				cbAuth();
+			} else {
+
+				if (!cbNotAuth){
+					return res.send(400);
+				} else {
+					cbNotAuth();
+				}
+			}
+		}
+
+		// find resourceOwnerId
+		// find associated goal and read _id
+		if (resourceType==='action'){
+			// Todo: handle orphan goals whose ids no longer link back to a resourceOwner
+			Action.findOne({_id : resourceId}, function (err, action){
+				if (err){ return res.send(400);}
+
+				Goal.findOne({_id : action._goalid}, function (err, goal){
+					if (err){ return res.send(400);}
+
+					resourceOwnerId = goal._userid;
+					resourceOwnerCb();
+				})
+			})
+		}
+
+		if (resourceType==='goal'){
+			// Todo: handle orphan goals whose ids no longer link back to a resourceOwner
+			Goal.findOne({_id : resourceId}, function (err, goal){
+				if (err){ return res.send(400);}
+
+				resourceOwnerId = goal._userid;
+				resourceOwnerCb();
+			})
+		}
+	}
+
 	app.get('/', function(req, res){
 	  res.render(__dirname + '/views/index.ejs', { title: 'Express' });
 	});
@@ -130,39 +189,49 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	// update user
 	app.put('/api/v1/me', auth, function(req, res){
 
-		console.log(req.body);
+		if (!req.body.userId){ return res.send(400);}
 
-		// sanitise attempted password change
-		var safeBody = req.body;
-		if ((typeof(safeBody)==="object") && (!safeBody['password'])){
-			delete safeBody['password'];
+		var update = function update(){
+			// sanitise attempted password change
+			var safeBody = req.body;
+			if ((typeof(safeBody)==="object") && (!safeBody['password'])){
+				delete safeBody['password'];
+			}
+
+			User.update({_id: req.user._id}, { $set: safeBody }, function(err, user){
+				if(err){return res.send(400);};
+
+				return res.send(200);
+			});
 		}
 
-		User.update({email: req.user.email}, { $set: safeBody }, function(err, user){
-			if(err){res.send(400);};
-			return res.send('Updated user');
-		});
-
+		// Requesting user must be same as who's profile is being updated
+		if (req.body.userId !== req.user._id){
+			return res.send(400);
+		}
+		else {
+			update();
+		}
 	});
 
 	// GOALS API
-	app.get('/api/v1/goal', auth, function(req, res){
-		// Goal.find({ _userid: req.user._id }, function(err, goal){
-		// 	if (err){return res.send(err);}
+	// app.get('/api/v1/goal', auth, function(req, res){
+	// 	// Goal.find({ _userid: req.user._id }, function(err, goal){
+	// 	// 	if (err){return res.send(err);}
 
-		// 	return res.send(goal);
-		// });
-		Goal.find()
-		  .where('_userid')
-		  .in(['56a6a3dc99d9ad855233e990', '56aa4bad352af28e579e34cb'])
-		  .exec(function (err, goal) {
-		    //make magic happen
-	    	if (err){return res.send(err);}
+	// 	// 	return res.send(goal);
+	// 	// });
+	// 	Goal.find()
+	// 	  .where('_userid')
+	// 	  .in(['56a6a3dc99d9ad855233e990', '56aa4bad352af28e579e34cb'])
+	// 	  .exec(function (err, goal) {
+	// 	    //make magic happen
+	//     	if (err){return res.send(err);}
 
-			return res.send(goal);
-		  });
+	// 		return res.send(goal);
+	// 	  });
 
-	});
+	// });
 
 	app.get('/api/v1/goal/:id', auth, function(req, res){
 		//get currently logged in user id
@@ -174,7 +243,6 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	});
 
 	app.post('/api/v1/goal', auth, function(req, res){
-		// TODO: Handle goal passed in instead of broken down namespaced req.body...
 		//get currently logged in user id through req.user._id
 		var goal = new Goal({ _userid: req.user._id, description: req.body.description, due: req.body.due, status: req.body.status, is_public: req.body.is_public });
 		goal.save(function (err, createdGoal) {
@@ -187,12 +255,17 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	});
 
 	app.put('/api/v1/goal/:id', auth, function(req, res){
-		// only update fields set in req.body
-		Goal.update({ _userid: req.user._id, _id: req.params.id }, { $set: req.body }, function(err, rawResponse){
-			if (err){ return res.send(err);}
 
-			return res.send('Updated goal : ' + JSON.stringify(rawResponse));
-		});
+		var update = function update(){
+			Goal.update({ _userid: req.user._id, _id: req.params.id }, { $set: req.body }, function(err, rawResponse){
+				if (err){ return res.send(err);}
+
+				return res.send('Updated goal : ' + JSON.stringify(rawResponse));
+			});
+		}
+
+		var options = {id: req.params.id, type: 'goal'};
+		authorise(req, res, options, update, null);
 	});
 
 	/**
@@ -203,38 +276,42 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 	*/
 	app.put('/api/v1/deleteGoal/:id', auth, function(req, res){
 
-		var actionDestination = req.body.actionDestination;
-		var actionMoveTo 	  = req.body.actionMoveTo;
-		//1. delete goal. only authorized user may delete goal
-		Goal.findOneAndRemove({ _userid: req.user._id, _id: req.params.id}, function(err){
-			if (err){ return res.send(err);}
+		var update = function update(){
+			var actionDestination = req.body.actionDestination;
+			var actionMoveTo 	  = req.body.actionMoveTo;
+			//1. delete goal. only authorized user may delete goal
+			Goal.findOneAndRemove({ _userid: req.user._id, _id: req.params.id}, function(err){
+				if (err){ return res.send(err);}
 
-			//2. Remove or rehouse associated actions
-			if  (actionDestination === 'move'){
-				var update = {_goalid: actionMoveTo};
-				// no parent goal (mongoose will provide a new random _goalid), mark goal as orphan
-				if (actionMoveTo === ''){
-					update = {_goalid: actionMoveTo, orphan: true};
-				}
-
-				Action.update({_goalid: req.params.id}, {$set: update}, {multi: true}, function (err, numAffected){
-					if (err){ return res.send(err);}
-
-					console.log(numAffected);
-					return res.send('Deleted goal and rehoused ' + numAffected.n + ' actions');
-				});
-			}
-			else if (actionDestination === 'delete'){
-				Action.remove({ _goalid: req.params.id }, function (err) {
-					if (!err){
-						return res.send('Deleted goal and associated actions');
-					} else {
-						return res.send(err);
+				//2. Remove or rehouse associated actions
+				if  (actionDestination === 'move'){
+					var update = {_goalid: actionMoveTo};
+					// no parent goal (mongoose will provide a new random _goalid), mark goal as orphan
+					if (actionMoveTo === ''){
+						update = {_goalid: actionMoveTo, orphan: true};
 					}
-				});
-			}
 
-		})
+					Action.update({_goalid: req.params.id}, {$set: update}, {multi: true}, function (err, numAffected){
+						if (err){ return res.send(err);}
+
+						console.log(numAffected);
+						return res.send('Deleted goal and rehoused ' + numAffected.n + ' actions');
+					});
+				}
+				else if (actionDestination === 'delete'){
+					Action.remove({ _goalid: req.params.id }, function (err) {
+						if (!err){
+							return res.send('Deleted goal and associated actions');
+						} else {
+							return res.send(err);
+						}
+					});
+				}
+			})
+		}
+
+		var options = {id: req.params.id, type: 'goal'};
+		authorise(req, res, options, update, null);
 	});
 
 	// ACTIONS API
@@ -287,26 +364,27 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		});
 	});
 
-	
-
 	app.put('/api/v1/action/:id', auth, function(req, res){
-		// Todo: check if Action belongs to current user
 		// Todo: handle status update
-
-
-		var update = req.body;
-		// check if action has been reassigned to another goal, if so, it's not an orphan
-		if (update._goalid){
-			if (update._goalid !== ''){
-			update.orphan = false;
+		var update = function update(){
+			var body = req.body;
+			// check if action has been reassigned to another goal, if so, it's not an orphan
+			if (body._goalid){
+				if (body._goalid !== ''){
+				body.orphan = false;
+				}
 			}
+
+			Action.update({ _id: req.params.id}, { $set: body }, function(err, rawResponse){
+				if (err){ return res.send(err);}
+
+				return res.send('Updated action : ' + JSON.stringify(rawResponse) + JSON.stringify(req.body));
+			});
 		}
 
-		Action.update({ _id: req.params.id}, { $set: update }, function(err, rawResponse){
-			if (err){ return res.send(err);}
+		var options = {id: req.params.id, type: 'action'};
+		authorise(req, res, options, update, null);
 
-			return res.send('Updated action : ' + JSON.stringify(rawResponse) + JSON.stringify(req.body));
-		});
 	});
 
 	app.get('/api/v1/action/:id', auth, function(req, res){
@@ -316,64 +394,74 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 			return res.send(JSON.stringify(doc));
 		})
 	});
-	// Todo: ensure action belongs to logged in user
-	app.delete('/api/v1/action/:id', auth, function(req, res){
-		Action.findOneAndRemove({ _id: req.params.id}, function(err){
-			if (err){ return res.send(err);}
 
-			return res.send('Document removed');
-		});
+	app.delete('/api/v1/action/:id', auth, function(req, res){
+
+		var update = function update(){
+			Action.findOneAndRemove({ _id: req.params.id}, function(err){
+				if (err){ return res.send(400);}
+
+				return res.send(200);
+			});
+		}
+		var options = {id: req.params.id, type: 'action'};
+		authorise(req, res, options, update, null);
 	});
 
 	// PROGRESS API
 	app.post('/api/v1/progress', auth, function(req, res){
-		// 1. find action (to attach progress to) [TODO: and ensure it belongs to current user]
-		Action.findOne({_id: req.body._actionid}, function(err, action){
-			if (err){
-				var error = new Error('Something went wrong');
-				return res.send(error);
-			}
 
-			// check if goal returned
-			if (!action){
+		// 1. find action (to attach progress to)
+		var update = function update(){
+				Action.findOne({_id: req.body._actionid}, function(err, action){
+				if (err){
+					var error = new Error('Something went wrong');
+					return res.send(error);
+				}
 
-				var error = new Error('Action does not exist');
-				return res.send(error);
-			}
+				// check if goal returned
+				if (!action){
 
-			// action found
-			// TODO: check action belongs to current user
+					var error = new Error('Action does not exist');
+					return res.send(error);
+				}
+
+				// action found
+				// TODO: check action belongs to current user
 
 
-			console.log( JSON.stringify(action));
+				console.log( JSON.stringify(action));
 
-			var nowString = req.body.date_created || Date.now();
-			var now = new Date(nowString);
-			var progressCount = req.body.counter;
+				var nowString = req.body.date_created || Date.now();
+				var now = new Date(nowString);
+				var progressCount = req.body.counter;
 
-			var progress = new Progress({ 
-			    _actionid		: req.body._actionid,
-			    counter			: req.body.counter,
-			    comment			: req.body.comment,
-			    date_created    : req.body.date_created
+				var progress = new Progress({ 
+				    _actionid		: req.body._actionid,
+				    counter			: req.body.counter,
+				    comment			: req.body.comment,
+				    date_created    : req.body.date_created
+				});
+
+				progress.save(function (err, createdProgress) {
+				  if (err){
+				  	res.status(400);
+				  	res.send('Server error');
+				  }
+
+				  //req.body is out of scope, setup local variables
+			      console.log (action.updateSummary(now, progressCount));
+				  return res.send(JSON.stringify(createdProgress));
+				});
 			});
+		}
 
-			progress.save(function (err, createdProgress) {
-			  if (err){
-			  	res.status(400);
-			  	res.send('Server error');
-			  }
-
-			  //req.body is out of scope, setup local variables
-			    console.log (action.updateSummary(now, progressCount));
-
-			  return res.send(JSON.stringify(createdProgress));
-			});
-		});
+		// 0. Authorise request
+		var options = {id: req.body._actionid, type: 'action'};
+		authorise(req, res, options, update, null);
 	});
 
 	
-
 	app.post('/api/v1/resetPassword', function(req, res){
 		var recipient = req.body.recipient;
 		// var username;
@@ -439,7 +527,7 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 		var goalIds = [];
 		var actionIds = [];
 
-		var goalsActionsProgress = [];
+		var data = [];
 
 		user.first_name 	= req.user.first_name;
 		user.last_name  	= req.user.last_name;
@@ -478,18 +566,22 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 						actionIds[i] = actions[i].id;
 					};
 
-					Progress.find()
-					.where('_actionid')
-					.in(actionIds)
-					.sort({date_created: 'descending'})
-					.exec(function (err, progressDocs){
+					data = [goals, actions, null, user];
+					return res.send(data);
 
-						if (err){return res.send(err);}
+					// Don't send progress data back to client, it's not required
+					// Progress.find()
+					// .where('_actionid')
+					// .in(actionIds)
+					// .sort({date_created: 'descending'})
+					// .exec(function (err, progressDocs){
 
-						progress = progressDocs;
-						goalsActionsProgress = [goals, actions, progress, user];
-						return res.send(goalsActionsProgress);
-					});
+					// 	if (err){return res.send(err);}
+
+					// 	progress = progressDocs;
+					// 	goalsActionsProgress = [goals, actions, progress, user];
+					// 	return res.send(goalsActionsProgress);
+					// });
 
 				});
 		  });
@@ -563,19 +655,21 @@ module.exports = function(passport, app, User, Goal, Action, Progress, bcrypt) {
 								actionIds[i] = actions[i].id;
 							};
 
-							// TODO: decide if progress logs are worth querying - currently not used
-							Progress.find()
-							.where('_actionid')
-							.in(actionIds)
-							.sort({date_created: 'descending'})
-							.exec(function (err, progressDocs){
+							data = [goals, actions, null, user];
+							return res.send(data);
 
-								if (err){return res.send(err);}
+							// Progress.find()
+							// .where('_actionid')
+							// .in(actionIds)
+							// .sort({date_created: 'descending'})
+							// .exec(function (err, progressDocs){
 
-								progress = progressDocs;
-								data = [goals, actions, progress, user];
-								return res.send(data);
-							});
+							// 	if (err){return res.send(err);}
+
+							// 	progress = progressDocs;
+							// 	data = [goals, actions, progress, user];
+							// 	return res.send(data);
+							// });
 						});
 				  });
 			}

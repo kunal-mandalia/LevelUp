@@ -33,7 +33,7 @@
                     <!-- Actions -->
                     <md-list-item class="md-2-line" ng-repeat="a in data.action | orderBy:'remainingDays'" ng-hide="(a._goalid != g._id) || (a.status[a.status.length-1].on==true && !filter.action.on) || (a.status[a.status.length-1].on==false && !filter.action.off) || (a.is_public==true && !filter.action.is_public) || (a.is_public==false && !filter.action.is_private) || (a.remainingDays > filter.action.daysRemaining)">
                     	<!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-                    	<md-button class="md-icon-button" aria-label="Increment Progress on action by 1">
+                    	<md-button ng-hide="data.user._id !== data.loggedInAs._id" class="md-icon-button" aria-label="Increment Progress on action by 1">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
                     	</md-button>
                         <div class="md-list-item-text" layout="column">
