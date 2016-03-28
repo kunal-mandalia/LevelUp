@@ -6,7 +6,7 @@ var userSchema = mongoose.Schema({
 	first_name 			: String, 
 	last_name		 	: String,
 	is_public			: { type: Boolean, default: false },
-	picture_url			: String, 
+	picture_url			: { type: String, default: 'http://www.kunalmandalia.com/wp-content/uploads/2016/03/koala2.png'}, 
 	date_created		: { type: Date, default: Date.now },
     date_modified		: { type: Date, default: Date.now }
 });

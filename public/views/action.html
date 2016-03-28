@@ -3,9 +3,7 @@
 <div layout="column" layout-gt-md="row" class="dashboard-pane-1">
 
   <div flex>
-
         <!-- Profile -->
-
         <div class="profile-card md-padding">
             <div layout="row" layout-align="start center" class="">
                 <div class="circle-image-cropper-small">
@@ -17,19 +15,6 @@
                 <h1 class="md-headline light-gray">{{data.action['active'].verb}} {{data.action['active'].verb_quantity}} {{data.action['active'].noun}} {{data.action['active'].period | periodInWords:0}}</h1>
             </div>
         </div>
-
-
-        <!-- <div layout="row" layout-align="start center" class="goal-card small-margin-bottom large-margin-top">
-            <div layout="column">
-                <div class="circle-image-cropper profile-user-image user-card-picture">
-                    <img src="{{ data.user.picture_url }}" height="80" width="80" alt="{{ data.user.first_name }}" class="circle-image " ng-cloak>
-                </div>
-            </div>
-            <div layout="row" layout-align="start center" class="medium-pad-left">
-                <h1 class="md-headline md-padding">{{data.action['active'].verb}} {{data.action['active'].verb_quantity}} {{data.action['active'].noun}} {{data.action['active'].period | periodInWords:0}}</h1>
-                <md-chips class="large-margin-right"><md-chip>Action</md-chip></md-chips>
-            </div>
-        </div> -->
 
 	    <!-- Goals -->
 	    <div layout="row" layout-align="center center" class="dashboard-stat-container">
@@ -70,7 +55,7 @@
 
   </div>
 
-  <div flex class="large-margin-left">
+  <div flex class="">
         <div layout="row" layout-align="start center">
         	<h2 class="md-display-1 light-gray">Progress</h2>
 
@@ -90,10 +75,7 @@
                 </div>
             </md-content>
         </div>
-	   
       
-
-
         <!-- Action details -->
         <div layout="column" class="md-padding" layout-wrap layout-align="center start" class="dashboard-stat-container">
             <div layout="row" layout-align="start center">
@@ -113,7 +95,6 @@
     </div>
     	
     <div flex>
-
         <!-- data.outlook -->
         <div layout="row" layout-align="start center">
             <h1 class="md-display-1 light-gray">{{data.outlook}} day outlook</h1>

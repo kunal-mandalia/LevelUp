@@ -1752,6 +1752,11 @@ return functions;
 
 /** FILTERS */
 
+app.filter('goalProgress', ['$filter', function($filter){
+  return function (goalStatus){
+    return (goalStatus==='Open') ? 0 : 1;
+  }
+}]);
 // http://stackoverflow.com/questions/29989200/angular-calculate-percentage-in-the-html
 app.filter('percentage', ['$filter', function ($filter) {
   return function (input, decimals) {

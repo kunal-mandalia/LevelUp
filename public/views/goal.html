@@ -11,7 +11,7 @@
                 </div>
                 <md-chips class="medium-margin-left"><md-chip>Goal</md-chip></md-chips>
             </div>
-            <div layout="column" layout-align="center center" class="large-negative-margin-bottom">
+            <div layout="row" layout-align="start center" class="large-negative-margin-bottom">
                 <h1 class="md-headline light-gray">{{data.goal['active'].description}}</h1>
             </div>
         </div>
@@ -70,7 +70,7 @@
   </div>
 
   <!-- Upcoming actions -->
-  <div flex class="medium-margin-left">
+  <div flex class="">
         <div layout="row" layout-align="start center">
         	<h2 class="md-display-1 light-gray">Upcoming</h2>
             <md-button ng-hide="data.user._id !== data.loggedInAs._id" class="md-icon-button" ng-click="toggleMenu('create-action')" aria-label="Create action">
@@ -82,7 +82,7 @@
         </div>
         <div layout="row" >
             <md-content flex="90" class="">
-                <md-list class="dashboard-box dashboardbox-top-margin">
+                <md-list class="dashboard-box dashboardbox-top-margin" ng-class="{'medium-margin-left': (data.loggedInAs._id!==data.user._id)}">
                     <md-list-item class="md-2-line goal-list" ng-repeat="a in data.goal['active'].action | orderBy:'remainingDays'" ng-hide="(a.remainingDays > data.outlook) || (a.remainingDays < 0)">
                     	<md-button ng-hide="data.user._id !== data.loggedInAs._id" class="md-icon-button" aria-label="Increment progress">
                     		<ng-md-icon icon="exposure_plus_1" style="fill:green" class="md-avatar goal-card-icon" ng-click="incrementProgress(a)"></ng-md-icon>
