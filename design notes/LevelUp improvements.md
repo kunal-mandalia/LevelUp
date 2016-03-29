@@ -307,10 +307,10 @@ Secure these API endpoints:
       return $http.post('/api/v1/action', action); not needed
     },
 test public/private views - done
-
-
 hide/disable controls if not logged in and current - after auth api - done
-Menu profile image css cross browser - later
+
+Menu profile image css cross browser - done
+favicon: - done
 
 Todo: action.put status (handle like action post is handled) - hard - handle server side
 bug: putgoal error: undefined saving goal reopen

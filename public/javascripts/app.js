@@ -1166,10 +1166,10 @@ app.controller('CreateCtrl', ['$scope', 'DataService', '$mdSidenav', '$rootScope
           $scope.methods.resetScopeData();
 
           // activeGoal indicates whether the user created the action from its respective goal page
-          if ($rootScope.data.goal['active']._id == goalid) {
-            $rootScope.data.goal['active'].action.push(res);
-            // $rootScope.setActiveAction(res, null);
-
+          if ('active' in $rootScope.data.goal){
+            if ($rootScope.data.goal['active']._id == goalid) {
+              $rootScope.data.goal['active'].action.push(res);
+            }
             DataService.updateOutlook($rootScope.data.goal['active'], $rootScope.data.goal['active'].action, $rootScope.data.outlook);
           };
 
