@@ -1385,11 +1385,10 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
         var days_since_created = 0;
         var days_since_modified = 0;
         var today = new Date(Date.now());
-
         var actionDurOn = 0;
-
         var singleAction = false;
         var tempActions = [];
+
         // if single action is provided instead of an array, calculate and append totals to itself.
         // This is useful for active action.
         if (!Array.isArray(actions)){
@@ -1406,14 +1405,14 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           //set date objects from strings
           action.date_modified = new Date(action.date_modified);
           action.date_created = new Date(action.date_created);
-          action.due = new Date(action.due);
+          // action.due = new Date(action.due);
 
           for (var j = 0; j < action.status.length; j++) {
             action.status[j].date = new Date(action.status[j].date);
           };
           // vars from prepareData
           var periodLengthMilliseconds = action.period * $rootScope.millisecondsInDay;
-          var startDate = new Date(action.date_created); // use action.date_created
+          var startDate = new Date(action.date_created);
           var startDateMilliseconds = startDate.getTime();
           var compareDateMilliseconds = Date.now();
           var totalPeriodsIncludingCurrent = Math.ceil((compareDateMilliseconds - startDateMilliseconds)/periodLengthMilliseconds);
@@ -1471,38 +1470,38 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
 
 
           action.chart.options = {
-                      chart: {
-                          type: 'multiBarChart',
-                          showControls: false,
-                          showLegend: false,
-                          height: 160,
-                          margin : {
-                              top: 10,
-                              right: 20,
-                              bottom: 50,
-                              left: 50
-                          },
-                          clipEdge: true,
-                          duration: 500,
-                          stacked: true,
-                          forceY: [0, action.verb_quantity],
-                          xAxis: {
-                              axisLabel: action.chart.xAxisLabel,
-                              showMaxMin: false,
-                              tickFormat: function(d){
-                                  return d3.format(',f')(d);
-                              }
-                          },
-                          yAxis: {
-                              axisLabel: 'Progress',
-                              axisLabelDistance: -20,
-                              showMaxMin: true,
-                              tickFormat: function(d){
-                                  return d3.format(',f')(d);
-                              }
-                          }
+              chart: {
+                  type: 'multiBarChart',
+                  showControls: false,
+                  showLegend: false,
+                  height: 160,
+                  margin : {
+                      top: 10,
+                      right: 20,
+                      bottom: 50,
+                      left: 50
+                  },
+                  clipEdge: true,
+                  duration: 500,
+                  stacked: true,
+                  forceY: [0, action.verb_quantity],
+                  xAxis: {
+                      axisLabel: action.chart.xAxisLabel,
+                      showMaxMin: false,
+                      tickFormat: function(d){
+                          return d3.format(',f')(d);
                       }
-                  };
+                  },
+                  yAxis: {
+                      axisLabel: 'Progress',
+                      axisLabelDistance: -20,
+                      showMaxMin: true,
+                      tickFormat: function(d){
+                          return d3.format(',f')(d);
+                      }
+                  }
+              }
+          };
 
           // calculate repetition, rep_complete, both at the individual action level and running total
           // having these stats at the individual action level means they're available for when user drills down into the action detail view.
@@ -1530,9 +1529,7 @@ app.factory("DataService", ['$rootScope', '$http', '$filter', function($rootScop
           // console.log('actionDurOn: ' + actionDurOn);
 
           actions[i].summary.totalRepetition = Math.ceil((action.verb_quantity/action.period)*actionDurOn); // since action.period is per day, we can multiply by outlook to get expected total reps over day range
-          
           temp_repetition += actions[i].summary.totalRepetition; // max rep = rep per day * days since created
-
           repetition += temp_repetition;
           // clear temp vars
           temp_rep_total = 0;

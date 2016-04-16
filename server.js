@@ -191,7 +191,9 @@ app.use(express.logger('dev'));
 app.use(express.cookieParser()); 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'securedsession' }));
+// app.use(express.session({ secret: 'securedsession' }));
+const THREE_MONTHS = 90 * 24 * 60 * 60 * 1000;
+app.use(express.session({secret:'s3cr3t123@0', cookie:{maxAge:THREE_MONTHS}}));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session());    // Add passport initialization
 app.use(app.router);
